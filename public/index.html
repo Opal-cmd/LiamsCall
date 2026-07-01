@@ -607,7 +607,7 @@
             </div>
 
             <div id="panel-content">
-                <div class="w-full max-w-lg px-4 py-8 overflow-y-auto max-h-full">
+                <div class="w-full max-w-xl px-5 py-8 overflow-y-auto max-h-full">
                     <h2 id="content-title" class="font-serif-brand text-3xl lg:text-4xl text-[var(--green-dark)] font-semibold mb-5 text-center"></h2>
                     <div id="content-body" class="text-gray-600 text-sm leading-relaxed"></div>
                 </div>
@@ -617,7 +617,37 @@
 
     <script>
         const CONTENT_PAGES = {
-            blog: { title: 'Blog', body: 'Articles on mental health, caregiving, and wellness will appear here.' },
+            blog: { title: 'Blog', body: `
+                <p class="text-gray-400 text-xs mb-6 text-center">Practical reads for caregivers and families</p>
+                <div class="space-y-5 text-left">
+                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Caregiver Wellbeing</span>
+                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">You Can't Pour From an Empty Cup</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">Caregiver burnout is real — and it sneaks up slowly. Recognizing the warning signs early (irritability, sleep changes, feeling numb) is the first step toward protecting both yourself and the person you care for. Rest isn't selfish. It's necessary.</p>
+                    </article>
+                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Practical Tips</span>
+                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">The 5-Minute Reset: Micro-breaks That Actually Work</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">You don't need an hour to decompress. Research shows that even 5 minutes of intentional breathing, stepping outside, or sitting quietly can meaningfully lower cortisol. We share techniques caregivers have found realistic to use mid-day.</p>
+                    </article>
+                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Communication</span>
+                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">How to Ask for Help Without Feeling Guilty</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">Many caregivers struggle to delegate — fearing judgment, feeling like giving up control, or simply not knowing how to ask. This post breaks down a simple framework for reaching out to family, friends, or community resources without the guilt spiral.</p>
+                    </article>
+                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Mental Health</span>
+                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">Grief While They're Still Here: Understanding Anticipatory Loss</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">Caring for someone with a progressive illness often means grieving them before they are gone. This type of grief is valid, common, and largely invisible in our culture. Understanding it — and giving yourself permission to feel it — is part of the healing process.</p>
+                    </article>
+                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Routines</span>
+                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">Building a Care Routine That Has Room for You</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">A predictable daily schedule benefits both the person receiving care and the caregiver. We walk through how to structure a routine that meets care needs while deliberately protecting time for your own sleep, food, movement, and connection.</p>
+                    </article>
+                    <p class="text-center text-xs text-gray-400 pt-2">More articles coming soon.</p>
+                </div>
+            ` },
             resources: { title: 'Crisis &amp; Support Resources', body: `
                 <p class="text-gray-500 text-xs mb-5">Ontario &amp; Canada — all lines are free and confidential unless noted.</p>
                 <div class="space-y-4 text-left">
@@ -671,8 +701,64 @@
                         <a href="tel:911" class="inline-block pill-dark text-xs px-3 py-1 font-medium">Call 9-1-1</a>
                     </div>
                 </div>
+
+                <h3 class="font-semibold text-gray-700 text-sm mt-8 mb-4">Self-Help &amp; Caregiver Tools</h3>
+                <div class="space-y-4">
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-[var(--green-dark)] text-sm">Ontario Caregiver Organization</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2">Free resources, workshops, and peer support groups for caregivers across Ontario.</p>
+                        <a href="https://ontariocaregiver.ca" target="_blank" rel="noopener" class="inline-block pill-dark text-xs px-3 py-1 font-medium mr-2">ontariocaregiver.ca</a>
+                        <a href="tel:18332273778" class="text-xs text-[var(--green-dark)] underline underline-offset-2">1-833-227-3778</a>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-[var(--green-dark)] text-sm">BounceBack Ontario</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2">Free guided self-help program for mild-to-moderate depression and anxiety. Delivered via phone coaching and workbooks.</p>
+                        <a href="https://bouncebackontario.ca" target="_blank" rel="noopener" class="inline-block pill-dark text-xs px-3 py-1 font-medium">bouncebackontario.ca</a>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-[var(--green-dark)] text-sm">CAMH: Mental Health &amp; Addiction Info</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2">Canada's leading mental health teaching hospital. Their website has guides on depression, anxiety, grief, and supporting a family member.</p>
+                        <a href="https://www.camh.ca/en/health-info" target="_blank" rel="noopener" class="inline-block pill-dark text-xs px-3 py-1 font-medium">camh.ca</a>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-[var(--green-dark)] text-sm">211 Ontario</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2">Dial 2-1-1 or visit online to find local social services, housing support, food banks, and community mental health programs near you.</p>
+                        <a href="https://211ontario.ca" target="_blank" rel="noopener" class="inline-block pill-dark text-xs px-3 py-1 font-medium mr-2">211ontario.ca</a>
+                        <span class="text-xs text-gray-500">or dial <strong>2-1-1</strong></span>
+                    </div>
+                </div>
             ` },
-            contact: { title: 'Contact Us', body: 'Reach out to the Liams Call AI team — contact details will appear here.' },
+            contact: { title: 'Contact Us', body: `
+                <p class="text-gray-400 text-xs mb-6 text-center">We'd love to hear from you</p>
+                <div class="space-y-4 text-left">
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <span class="font-semibold text-[var(--green-dark)] text-sm block mb-1">General Inquiries</span>
+                        <p class="text-xs text-gray-500 mb-2">Questions about Liams Call AI, feedback, or partnership opportunities.</p>
+                        <a href="mailto:hello@liamscall.ca" class="inline-block pill-dark text-xs px-3 py-1 font-medium">hello@liamscall.ca</a>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <span class="font-semibold text-[var(--green-dark)] text-sm block mb-1">Report a Concern</span>
+                        <p class="text-xs text-gray-500 mb-2">If the AI gave you a response that felt harmful, inappropriate, or inaccurate, please let us know. Your report helps us improve.</p>
+                        <a href="mailto:safety@liamscall.ca" class="inline-block pill-dark text-xs px-3 py-1 font-medium">safety@liamscall.ca</a>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <span class="font-semibold text-[var(--green-dark)] text-sm block mb-1">Media &amp; Press</span>
+                        <p class="text-xs text-gray-500 mb-2">Journalists, researchers, and community organizations are welcome to reach out.</p>
+                        <a href="mailto:media@liamscall.ca" class="inline-block pill-dark text-xs px-3 py-1 font-medium">media@liamscall.ca</a>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm bg-[var(--beige-main)] border-0">
+                        <p class="text-xs text-gray-500 leading-relaxed"><strong class="text-gray-700">Please note:</strong> Liams Call AI is not a crisis service. If you or someone you know needs immediate support, call or text <a href="tel:988" class="underline font-semibold text-[var(--green-dark)]">9-8-8</a> (Canada, 24/7) or call <a href="tel:911" class="underline font-semibold text-[var(--green-dark)]">9-1-1</a>.</p>
+                    </div>
+                </div>
+            ` },
         };
 
         const EXPAND_MS = 1050;
