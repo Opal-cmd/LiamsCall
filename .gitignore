@@ -1,0 +1,9 @@
+node_modules/
+.env
+.DS_Store
+*.log
+.claude/
+backups/
+html/
+shadcn-chatbot-kit-main/
+bg1.webp

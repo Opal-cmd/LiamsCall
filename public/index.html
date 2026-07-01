@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Liams Call AI — mental health support for caregivers and families. Anywhere. Anytime.">
+    <meta name="theme-color" content="#0f4a3a">
+    <title>Liams Call AI</title>
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green-dark: #0f4a3a;
+            --green-send: #1f6b52;
+            --beige-main: #e8dfd3;
+            --beige-widget: #ddd2c4;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --dur: 1.05s;
+        }
+
+        body { font-family: 'Inter', sans-serif; }
+
+        .font-serif-brand { font-family: 'Lora', Georgia, serif; }
+        .pill-dark { background: var(--green-dark); color: #fff; border-radius: 9999px; }
+        .btn-send { background: var(--green-send); }
+        .btn-send:hover { background: #185a44; }
+        #chat-send { white-space: nowrap; }
+        #chat-form { width: 100%; min-width: 0; }
+
+        .nav-link { cursor: pointer; }
+        .nav-link:hover { opacity: 0.75; }
+        .nav-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+
+        #chat-messages { scrollbar-width: thin; scrollbar-color: #b8aea2 transparent; }
+        #chat-messages::-webkit-scrollbar { width: 6px; }
+        #chat-messages::-webkit-scrollbar-thumb { background: #b8aea2; border-radius: 999px; }
+
+        .bubble {
+            max-width: 85%;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.92rem;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            border-radius: 1.1rem;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            box-shadow: 0 8px 22px rgba(15, 74, 58, 0.08);
+        }
+
+        .bubble-assistant {
+            color: #1f2937;
+            border-top-left-radius: 0.45rem;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            background:
+                linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(246, 247, 250, 0.88));
+        }
+
+        .bubble-user {
+            color: #f8fffd;
+            border-top-right-radius: 0.45rem;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background:
+                linear-gradient(145deg, #0f4a3a 0%, #145743 52%, #1d6c53 100%);
+            box-shadow:
+                0 12px 24px rgba(15, 74, 58, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+
+        .bubble-typing {
+            border-top-left-radius: 0.45rem;
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(246, 247, 250, 0.9));
+            box-shadow: 0 8px 20px rgba(15, 74, 58, 0.08);
+        }
+
+        .typing-dot { animation: bounce 1.2s infinite ease-in-out; }
+        .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+            40% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        #landing {
+            transition: opacity calc(var(--dur) * 0.65) var(--ease),
+                        transform calc(var(--dur) * 0.65) var(--ease);
+        }
+        #landing.is-hidden {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+        }
+
+        /* Gemini-style ambient glow behind the docked chat widget */
+        #chat-glow {
+            position: fixed;
+            z-index: 40;
+            left: 50%;
+            bottom: -4rem;
+            transform: translateX(-50%);
+            width: min(72rem, 130vw);
+            height: 28rem;
+            pointer-events: none;
+            background: radial-gradient(ellipse at 50% 85%,
+                rgba(15, 74, 58, 0.72) 0%,
+                rgba(20, 87, 67, 0.48) 30%,
+                rgba(31, 107, 82, 0.22) 58%,
+                rgba(31, 107, 82, 0) 78%);
+            filter: blur(36px);
+            animation: glow-breathe 5.5s ease-in-out infinite;
+            transition: opacity calc(var(--dur) * 0.5) ease;
+        }
+
+        #chat-glow.is-hidden {
+            opacity: 0;
+            animation: none;
+        }
+
+        @keyframes glow-breathe {
+            0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.07); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            :root { --dur: 0.01s; }
+            #chat-glow { animation: none; }
+        }
+
+        /* One shell — docked at bottom, then expands in place */
+        #chat-shell {
+            position: fixed;
+            z-index: 50;
+            display: flex;
+            overflow: hidden;
+            background: var(--beige-widget);
+            box-shadow: 0 10px 40px rgba(15, 74, 58, 0.14);
+            will-change: transform, width, height, border-radius;
+        }
+
+        #chat-shell.is-docked {
+            bottom: max(0.75rem, env(safe-area-inset-bottom));
+            left: 50%;
+            top: auto;
+            right: auto;
+            transform: translateX(-50%);
+            width: min(48rem, calc(100vw - 2rem));
+            height: auto;
+            max-height: 12.75rem;
+            border-radius: 2rem;
+            flex-direction: column;
+            box-shadow:
+                0 10px 40px rgba(15, 74, 58, 0.18),
+                0 0 55px rgba(15, 74, 58, 0.38),
+                0 0 110px rgba(15, 74, 58, 0.22);
+        }
+
+        #chat-shell.is-expanded {
+            top: 0 !important;
+            left: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+            transform: none !important;
+            border-radius: 0 !important;
+            flex-direction: row;
+            background: var(--beige-main);
+            box-shadow: none;
+        }
+
+        #chat-shell.is-animating {
+            transition:
+                top var(--dur) var(--ease),
+                left var(--dur) var(--ease),
+                width var(--dur) var(--ease),
+                height var(--dur) var(--ease),
+                transform var(--dur) var(--ease),
+                border-radius calc(var(--dur) * 0.9) var(--ease),
+                background calc(var(--dur) * 0.8) var(--ease),
+                box-shadow calc(var(--dur) * 0.5) ease;
+        }
+
+        #chat-sidebar {
+            width: 0;
+            min-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #fff;
+            border-right: 1px solid #f3f4f6;
+            transition:
+                width calc(var(--dur) * 0.7) var(--ease) 0.28s,
+                opacity calc(var(--dur) * 0.5) ease 0.38s;
+        }
+
+        #chat-shell.is-expanded #chat-sidebar {
+            width: 13rem;
+            min-width: 13rem;
+            opacity: 1;
+        }
+
+        /* Disclaimer only fits in the expanded layout */
+        #chat-shell.is-docked #chat-disclaimer { display: none; }
+
+        /* sidebar overlay hidden by default; shown via mobile-sidebar-open class */
+        #sidebar-overlay {
+            display: none;
+        }
+
+        /* sidebar close button only relevant on mobile drawer */
+        #sidebar-header { display: none; }
+
+        /* mobile topbar hidden everywhere except mobile-expanded (handled in media query) */
+        #mobile-topbar {
+            display: none;
+        }
+
+        /* Hard lock compact landing widget to bottom-only footprint */
+        #chat-shell.is-docked #chat-sidebar {
+            display: none;
+        }
+
+        #chat-shell.is-docked #chat-body,
+        #chat-shell.is-docked #chat-panel {
+            height: auto;
+            min-height: 0;
+            flex: 0 0 auto;
+        }
+
+        @media (min-width: 1024px) {
+            #chat-shell.is-expanded #chat-sidebar {
+                width: 15rem;
+                min-width: 15rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #chat-shell.is-docked {
+                left: 0.5rem;
+                right: 0.5rem;
+                width: auto;
+                border-radius: 1.25rem;
+                bottom: max(0.5rem, env(safe-area-inset-bottom));
+                transform: none;
+            }
+
+            /* Off-canvas sidebar drawer */
+            #chat-shell.is-expanded #chat-sidebar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 14.5rem;
+                min-width: 14.5rem;
+                opacity: 1;
+                z-index: 80;
+                border-right: 1px solid #e5e7eb;
+                box-shadow: 0 12px 28px rgba(15, 74, 58, 0.18);
+                transform: translateX(-100%);
+                transition: transform 300ms var(--ease);
+            }
+
+            #chat-shell.is-expanded.mobile-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+
+            #chat-shell.is-expanded #sidebar-header {
+                display: flex;
+            }
+
+            /* In-flow mobile top bar — shown only when shell is expanded */
+            #mobile-topbar {
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                flex-shrink: 0;
+                height: 3.25rem;
+                padding: 0 1rem;
+                border-bottom: 1px solid rgba(15, 74, 58, 0.08);
+                background: var(--beige-main);
+            }
+
+            #mobile-sidebar-toggle {
+                position: absolute;
+                left: 0.85rem;
+                top: 50%;
+                transform: translateY(-50%);
+                display: inline-flex;
+                width: 2.25rem;
+                height: 2.25rem;
+                border-radius: 0.7rem;
+                border: 1px solid rgba(15, 74, 58, 0.18);
+                background: rgba(255, 255, 255, 0.9);
+                color: #0f4a3a;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 10px rgba(15, 74, 58, 0.1);
+                z-index: 2;
+            }
+
+            #mobile-sidebar-toggle svg {
+                width: 1.1rem;
+                height: 1.1rem;
+                stroke: currentColor;
+            }
+
+            #mobile-top-center {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                pointer-events: none;
+            }
+
+            #mobile-top-center img {
+                height: 1.35rem;
+                width: auto;
+                object-fit: contain;
+            }
+
+            #mobile-top-center span {
+                font-size: 1rem;
+                font-weight: 700;
+                color: #0f172a;
+                white-space: nowrap;
+            }
+
+            /* Show topbar only in expanded state */
+            #chat-shell.is-expanded #mobile-topbar { display: flex; }
+
+            /* Messages no longer need manual top padding — topbar is in-flow */
+            #chat-shell.is-expanded #chat-messages {
+                padding: 1rem 0.9rem 0.5rem;
+            }
+
+            #chat-shell.is-expanded #chat-footer {
+                padding: 0 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
+            }
+
+            #widget-header {
+                padding: 0.85rem 0.9rem 0.35rem;
+            }
+
+            #chat-shell.is-docked #chat-footer {
+                padding: 0 0.7rem 0.75rem;
+            }
+
+            #chat-form { gap: 0.45rem; }
+
+            #chat-input {
+                min-width: 0;
+                font-size: 16px;
+            }
+
+            #chat-send {
+                padding-left: 0.9rem;
+                padding-right: 0.9rem;
+            }
+
+            #chat-sidebar .nav-link {
+                font-size: 0.85rem;
+                line-height: 1.3;
+                text-align: left;
+            }
+
+            #chat-sidebar .ad-card { font-size: 0.65rem; }
+
+            /* Overlay backdrop */
+            #sidebar-overlay {
+                position: absolute;
+                inset: 0;
+                z-index: 70;
+                background: rgba(15, 23, 42, 0.35);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 220ms ease;
+            }
+
+            #chat-shell.is-expanded.mobile-sidebar-open #sidebar-overlay {
+                display: block;
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
+        #chat-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        #widget-header {
+            flex-shrink: 0;
+            padding: 1.25rem 1.5rem 0.5rem;
+            transition: opacity calc(var(--dur) * 0.4) ease, max-height calc(var(--dur) * 0.5) var(--ease);
+        }
+
+        #chat-shell.is-expanded #widget-header {
+            opacity: 0;
+            max-height: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #chat-messages {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            transition:
+                opacity calc(var(--dur) * 0.55) ease 0.18s,
+                padding calc(var(--dur) * 0.7) var(--ease);
+        }
+
+        #chat-shell.is-docked #chat-messages {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            display: none;
+            padding: 0;
+            flex: 0;
+        }
+
+        #chat-shell.is-expanded #chat-messages {
+            opacity: 1;
+            max-height: none;
+            flex: 1;
+            padding: 2.5rem 2rem 1rem;
+        }
+
+        @media (min-width: 1024px) {
+            #chat-shell.is-expanded #chat-messages {
+                padding: 2.5rem 4rem 1rem;
+            }
+        }
+
+        #chat-footer {
+            flex-shrink: 0;
+            padding: 0 1.5rem 1.25rem;
+            transition: padding calc(var(--dur) * 0.7) var(--ease);
+        }
+
+        #chat-shell.is-expanded #chat-footer {
+            padding: 0 2rem 2.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            #chat-shell.is-expanded #chat-footer {
+                padding: 0 4rem 2.5rem;
+            }
+        }
+
+        /* Push landing page content below the notch / Dynamic Island */
+        #landing {
+            padding-top: env(safe-area-inset-top);
+            padding-top: constant(safe-area-inset-top); /* iOS < 11.2 fallback */
+        }
+
+        #landing-header {
+            padding-top: 1.5rem;
+        }
+
+        #panel-content {
+            display: none;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        #panel-content.is-visible { display: flex; }
+        #chat-panel.is-hidden { display: none; }
+    </style>
+</head>
+<body class="h-screen w-screen m-0 overflow-hidden bg-white">
+
+    <div id="landing" class="h-full flex flex-col">
+        <header class="relative flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 pb-4 sm:pb-4 shrink-0" id="landing-header">
+            <img
+                src="/assets/logo.png"
+                alt="Liam's Call AI logo"
+                class="h-9 sm:h-12 md:h-14 w-auto select-none object-contain shrink-0"
+            >
+            <!-- Desktop nav — centered pill -->
+            <nav class="hidden md:flex absolute left-1/2 -translate-x-1/2 pill-dark px-8 lg:px-14 py-3 items-center gap-6 lg:gap-10 text-sm font-medium whitespace-nowrap">
+                <button type="button" class="nav-link" data-nav="chat">New Chat</button>
+                <button type="button" class="nav-link" data-nav="blog">Blog</button>
+                <button type="button" class="nav-link" data-nav="resources">Resources</button>
+                <button type="button" class="nav-link" data-nav="contact">Contact Us</button>
+            </nav>
+            <!-- Mobile nav — compact pills inline with logo -->
+            <nav class="md:hidden flex items-center gap-1.5 flex-wrap justify-end">
+                <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="chat">New Chat</button>
+                <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="blog">Blog</button>
+                <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="resources">Resources</button>
+                <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="contact">Contact Us</button>
+            </nav>
+        </header>
+        <div class="flex-1 relative">
+            <div class="absolute inset-y-0 right-8 lg:right-20 hidden md:flex flex-col items-end justify-center text-right max-w-md px-4 select-none">
+                <h2 class="text-3xl lg:text-5xl font-black text-[var(--green-dark)] tracking-tight mb-6 leading-tight">
+                    Mental health. Anywhere. Anytime.
+                </h2>
+                <button id="hero-action" type="button" class="pill-dark px-8 py-3.5 text-sm font-semibold hover:opacity-90 transition">
+                    Start a conversation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ambient glow behind the docked widget -->
+    <div id="chat-glow" aria-hidden="true"></div>
+
+    <!-- Single chat shell — same element from docked → fullscreen -->
+    <div id="chat-shell" class="is-docked">
+        <div id="sidebar-overlay"></div>
+        <aside id="chat-sidebar" class="flex flex-col px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+            <div id="sidebar-header" class="flex items-center justify-between mb-4 sm:mb-6 shrink-0">
+                <span class="text-xs font-semibold uppercase tracking-widest text-gray-400 select-none">Menu</span>
+                <button id="sidebar-close" type="button" aria-label="Close navigation menu" class="flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <nav class="flex flex-col gap-5 text-sm text-gray-900 shrink-0">
+                <button type="button" class="nav-link text-left" data-nav="chat">New Chat</button>
+                <button type="button" class="nav-link text-left" data-nav="blog">Blog</button>
+                <button type="button" class="nav-link text-left" data-nav="resources">Resources</button>
+                <button type="button" class="nav-link text-left" data-nav="contact">Contact Us</button>
+            </nav>
+            <div class="mt-auto pt-3 sm:pt-5 md:pt-8 shrink-0">
+                <div class="ad-card rounded-xl overflow-hidden border border-gray-200 bg-[#1a2d5a] text-white text-[9px] md:text-[10px] leading-snug shadow-sm">
+                    <div class="px-3 py-2 border-b border-white/10 font-semibold tracking-wide">Resources</div>
+                    <div class="px-3 py-3 space-y-2">
+                        <p class="font-semibold text-[11px]">Mental health support, anytime you need it.</p>
+                        <p class="text-white/70">Explore guides, tips, and tools for caregivers and families.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div id="chat-body">
+            <!-- Mobile top bar: in-flow, so messages sit naturally below it -->
+            <div id="mobile-topbar">
+                <button id="mobile-sidebar-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="chat-sidebar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <button id="home-btn-mobile" type="button" aria-label="Back to homepage" style="background:none;border:none;padding:0;cursor:pointer;">
+                    <div id="mobile-top-center">
+                        <img src="/assets/logo.png" alt="">
+                        <span>Liams Call AI</span>
+                    </div>
+                </button>
+            </div>
+
+            <div id="chat-panel" class="flex flex-col flex-1 min-h-0">
+                <div id="widget-header" class="flex items-center gap-2 sm:gap-4">
+                    <img
+                        id="home-btn-widget"
+                        src="/assets/logo.png"
+                        alt="Liam's Call AI logo"
+                        class="h-8 sm:h-10 w-auto shrink-0 object-contain cursor-pointer"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Back to homepage"
+                    >
+                    <div>
+                        <h1 class="font-serif-brand text-xl sm:text-2xl font-semibold text-gray-900 leading-tight">Liams Call AI</h1>
+                        <p class="text-xs sm:text-sm text-gray-600 mt-0.5">Mental health support, anytime you need it</p>
+                    </div>
+                </div>
+
+                <div id="chat-messages" class="space-y-3" aria-live="polite" aria-label="Chat messages">
+                    <div class="flex justify-start welcome-msg">
+                        <div class="bubble bubble-assistant">Hi, I'm here to help with caregiving questions, stress, routines, and support. What would you like to talk about today?</div>
+                    </div>
+                </div>
+
+                <div id="chat-footer">
+                    <form id="chat-form" class="flex items-end gap-2 sm:gap-3">
+                        <label for="chat-input" class="sr-only">Message</label>
+                        <textarea
+                            id="chat-input"
+                            rows="1"
+                            placeholder="Type your message..."
+                            class="min-w-0 flex-1 resize-none rounded-full border-0 bg-white px-4 sm:px-5 py-3 sm:py-3.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--green-dark)]/20 max-h-24 shadow-sm"
+                        ></textarea>
+                        <button id="chat-send" type="submit" class="btn-send shrink-0 rounded-2xl px-4 sm:px-9 py-3 sm:py-3.5 text-sm font-semibold text-white transition disabled:opacity-50 min-h-[44px]">
+                            Send
+                        </button>
+                    </form>
+                    <div id="chat-status" class="text-[11px] text-gray-600 mt-2 min-h-[16px] text-center"></div>
+                    <p id="chat-disclaimer" class="text-[10px] text-gray-500 text-center mt-1 leading-snug">
+                        Liams Call AI is not a medical professional. If you are in crisis, call or text
+                        <a href="tel:988" class="underline font-medium">988</a> (US) or your local emergency number.
+                    </p>
+                </div>
+            </div>
+
+            <div id="panel-content">
+                <div class="text-center max-w-lg">
+                    <h2 id="content-title" class="font-serif-brand text-4xl lg:text-5xl text-[var(--green-dark)]/30 font-semibold mb-4"></h2>
+                    <p id="content-body" class="text-gray-600 text-sm leading-relaxed"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CONTENT_PAGES = {
+            blog: { title: 'Blog', body: 'Articles on mental health, caregiving, and wellness will appear here.' },
+            resources: { title: 'Resources', body: 'Guides, links, and support tools will appear here.' },
+            contact: { title: 'Contact Us', body: 'Reach out to the Liams Call AI team — contact details will appear here.' },
+        };
+
+        const EXPAND_MS = 1050;
+        let isExpanded = false;
+        let isExpanding = false;
+        let conversation = [];
+        let isStreaming = false;
+
+        const landing = document.getElementById('landing');
+        const chatGlow = document.getElementById('chat-glow');
+        const chatShell = document.getElementById('chat-shell');
+        const chatPanel = document.getElementById('chat-panel');
+        const panelContent = document.getElementById('panel-content');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        const chatStatus = document.getElementById('chat-status');
+        const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        function expandShell() {
+            if (isExpanded || isExpanding) return Promise.resolve();
+            isExpanding = true;
+
+            const rect = chatShell.getBoundingClientRect();
+            const targetHeight = window.innerHeight;
+
+            // Pin shell at its current visual position (no hide, no clone, no swap)
+            chatShell.classList.remove('is-docked');
+            chatShell.style.top = rect.top + 'px';
+            chatShell.style.left = rect.left + 'px';
+            chatShell.style.width = rect.width + 'px';
+            chatShell.style.height = rect.height + 'px';
+            chatShell.style.bottom = 'auto';
+            chatShell.style.transform = 'none';
+
+            landing.classList.add('is-hidden');
+            chatGlow.classList.add('is-hidden');
+
+            return new Promise((resolve) => {
+                requestAnimationFrame(() => {
+                    chatShell.classList.add('is-animating');
+                    requestAnimationFrame(() => {
+                        chatShell.classList.add('is-expanded');
+                        chatShell.style.top = '0';
+                        chatShell.style.left = '0';
+                        chatShell.style.width = '100vw';
+                        chatShell.style.height = `${targetHeight}px`;
+                    });
+                });
+
+                setTimeout(() => {
+                    chatShell.classList.remove('is-animating');
+                    chatShell.style.top = '';
+                    chatShell.style.left = '';
+                    chatShell.style.width = '';
+                    chatShell.style.height = '';
+                    chatShell.style.bottom = '';
+                    chatShell.style.transform = '';
+                    isExpanded = true;
+                    isExpanding = false;
+                    resolve();
+                }, EXPAND_MS);
+            });
+        }
+
+        function showPanel(panel, navKey) {
+            chatPanel.classList.toggle('is-hidden', panel !== 'chat');
+            panelContent.classList.toggle('is-visible', panel === 'content');
+            document.querySelectorAll('.nav-link').forEach((l) => {
+                l.classList.toggle('active', l.dataset.nav === navKey);
+            });
+            closeMobileSidebar();
+        }
+
+        function isMobileViewport() {
+            return window.matchMedia('(max-width: 767px)').matches;
+        }
+
+        function closeMobileSidebar() {
+            chatShell.classList.remove('mobile-sidebar-open');
+            if (mobileSidebarToggle) mobileSidebarToggle.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleMobileSidebar() {
+            if (!isExpanded || !isMobileViewport()) return;
+            chatShell.classList.toggle('mobile-sidebar-open');
+            if (mobileSidebarToggle) {
+                const open = chatShell.classList.contains('mobile-sidebar-open');
+                mobileSidebarToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
+        }
+
+        async function navigate(navKey) {
+            if (navKey === 'chat') {
+                // Chat always does the full expand animation
+                if (!isExpanded) await expandShell();
+                showPanel('chat', 'chat');
+                chatInput.focus();
+                return;
+            }
+            // Content pages: expand instantly (no animation) if coming from landing
+            if (!isExpanded) {
+                chatShell.classList.remove('is-docked');
+                chatShell.classList.add('is-expanded');
+                landing.classList.add('is-hidden');
+                chatGlow.classList.add('is-hidden');
+                isExpanded = true;
+            }
+            showPanel('content', navKey);
+            document.getElementById('content-title').textContent = CONTENT_PAGES[navKey]?.title || '';
+            document.getElementById('content-body').textContent = CONTENT_PAGES[navKey]?.body || '';
+        }
+
+        function newChat() {
+            if (isStreaming) return;
+            conversation = [];
+            chatMessages.innerHTML = `
+                <div class="flex justify-start welcome-msg">
+                    <div class="bubble bubble-assistant">Hi, I'm here to help with caregiving questions, stress, routines, and support. What would you like to talk about today?</div>
+                </div>`;
+            navigate('chat');
+        }
+
+        document.querySelectorAll('[data-nav]').forEach((link) => {
+            link.addEventListener('click', () => {
+                if (link.dataset.nav === 'chat') newChat();
+                else navigate(link.dataset.nav);
+            });
+        });
+
+        mobileSidebarToggle?.addEventListener('click', toggleMobileSidebar);
+        sidebarClose?.addEventListener('click', closeMobileSidebar);
+        sidebarOverlay?.addEventListener('click', closeMobileSidebar);
+
+        window.addEventListener('resize', () => {
+            if (!isMobileViewport()) closeMobileSidebar();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMobileSidebar();
+        });
+
+        document.getElementById('hero-action')?.addEventListener('click', () => chatInput.focus());
+
+        function goHome() {
+            if (!isExpanded) return;
+            closeMobileSidebar();
+            showPanel('chat', '');
+            chatShell.classList.add('is-animating');
+            chatShell.classList.remove('is-expanded');
+            chatShell.classList.add('is-docked');
+            landing.classList.remove('is-hidden');
+            chatGlow.classList.remove('is-hidden');
+            setTimeout(() => chatShell.classList.remove('is-animating'), 1100);
+            isExpanded = false;
+        }
+
+        document.getElementById('home-btn-widget')?.addEventListener('click', goHome);
+        document.getElementById('home-btn-widget')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); }
+        });
+        document.getElementById('home-btn-mobile')?.addEventListener('click', goHome);
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function createMessageBubble(role, text = '') {
+            const wrapper = document.createElement('div');
+            wrapper.className = role === 'user' ? 'flex justify-end' : 'flex justify-start';
+            const bubble = document.createElement('div');
+            bubble.className = role === 'user'
+                ? 'bubble bubble-user'
+                : 'bubble bubble-assistant';
+            bubble.textContent = text;
+            wrapper.appendChild(bubble);
+            chatMessages.appendChild(wrapper);
+            scrollToBottom();
+            return bubble;
+        }
+
+        function createTypingIndicator() {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'typing-wrapper flex justify-start';
+            wrapper.innerHTML = `<div class="bubble bubble-typing">
+                <div class="flex items-center gap-1.5">
+                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 inline-block"></span>
+                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 inline-block"></span>
+                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 inline-block"></span>
+                </div></div>`;
+            chatMessages.appendChild(wrapper);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            document.querySelectorAll('.typing-wrapper').forEach((el) => el.remove());
+        }
+
+        function setStreamingState(active) {
+            isStreaming = active;
+            chatInput.disabled = active;
+            chatSend.disabled = active;
+            chatStatus.textContent = active ? 'Assistant is typing...' : '';
+        }
+
+        function parseSseChunk(chunk, onEvent) {
+            for (const block of chunk.split('\n\n')) {
+                if (!block.trim()) continue;
+                const lines = block.split('\n');
+                let eventName = 'message', dataLine = '';
+                for (const line of lines) {
+                    if (line.startsWith('event:')) eventName = line.slice(6).trim();
+                    else if (line.startsWith('data:')) dataLine = line.slice(5).trim();
+                }
+                if (!dataLine) continue;
+                try { onEvent(eventName, JSON.parse(dataLine)); } catch { /* skip */ }
+            }
+        }
+
+        async function streamChat(messages, onToken) {
+            let response;
+            try {
+                response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages }),
+                });
+            } catch {
+                throw new Error('Cannot reach the chat server. Run "npm start" and open http://localhost:3000.');
+            }
+            if (!response.ok || !response.body) {
+                throw new Error('Chat server error. Make sure "npm start" is running on http://localhost:3000.');
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '', streamError = null;
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const parts = buffer.split('\n\n');
+                buffer = parts.pop() || '';
+                for (const part of parts) {
+                    parseSseChunk(part, (eventName, data) => {
+                        if (eventName === 'token' && data.text) onToken(data.text);
+                        else if (eventName === 'error') streamError = new Error(data.message || 'Could not respond.');
+                    });
+                }
+            }
+            if (buffer.trim()) {
+                parseSseChunk(buffer, (eventName, data) => {
+                    if (eventName === 'token' && data.text) onToken(data.text);
+                    else if (eventName === 'error') streamError = new Error(data.message || 'Could not respond.');
+                });
+            }
+            if (streamError) throw streamError;
+        }
+
+        function wait(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (!message || isStreaming) return;
+
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+
+            // 1) Start expand — same element, no blank swap
+            const expandPromise = !isExpanded ? expandShell() : Promise.resolve();
+
+            // 2) Show user message mid-slide (feels connected to the action)
+            await wait(180);
+            await expandPromise;
+
+            createMessageBubble('user', message);
+            conversation.push({ role: 'user', content: message });
+
+            setStreamingState(true);
+            createTypingIndicator();
+
+            let assistantBubble = null, assistantText = '';
+
+            try {
+                await streamChat(conversation, (token) => {
+                    if (!assistantBubble) {
+                        removeTypingIndicator();
+                        assistantBubble = createMessageBubble('assistant', '');
+                    }
+                    assistantText += token;
+                    assistantBubble.textContent = assistantText;
+                    scrollToBottom();
+                });
+
+                if (!assistantText) {
+                    removeTypingIndicator();
+                    throw new Error('No response was returned from the assistant.');
+                }
+                conversation.push({ role: 'assistant', content: assistantText });
+            } catch (error) {
+                removeTypingIndicator();
+                createMessageBubble('assistant', error.message || 'Something went wrong. Please try again.');
+            } finally {
+                setStreamingState(false);
+                chatInput.focus();
+            }
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.requestSubmit();
+            }
+        });
+
+        chatInput.addEventListener('input', () => {
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 112) + 'px';
+        });
+
+        fetch('/api/health')
+            .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+            .then((d) => {
+                chatStatus.textContent = d.provider ? `Connected (${d.provider})` : 'Connected';
+                setTimeout(() => { if (!isStreaming) chatStatus.textContent = ''; }, 2500);
+            })
+            .catch(() => {
+                chatStatus.textContent = 'Server offline — run npm start, then open http://localhost:3000';
+                chatStatus.classList.add('text-red-500');
+            });
+    </script>
+
+</body>
+</html>
