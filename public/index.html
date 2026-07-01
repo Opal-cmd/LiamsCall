@@ -467,9 +467,10 @@
         #panel-content {
             display: none;
             flex: 1;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            padding: 2rem;
+            overflow-y: auto;
+            min-height: 0;
         }
         #panel-content.is-visible { display: flex; }
         #chat-panel.is-hidden { display: none; }
@@ -607,7 +608,7 @@
             </div>
 
             <div id="panel-content">
-                <div class="w-full max-w-xl px-5 py-8 overflow-y-auto max-h-full">
+                <div class="w-full max-w-xl px-5 py-8">
                     <h2 id="content-title" class="font-serif-brand text-3xl lg:text-4xl text-[var(--green-dark)] font-semibold mb-5 text-center"></h2>
                     <div id="content-body" class="text-gray-600 text-sm leading-relaxed"></div>
                 </div>
