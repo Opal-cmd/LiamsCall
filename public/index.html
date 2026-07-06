@@ -6,11 +6,11 @@
     <meta name="description" content="Liams Call AI — mental health support for caregivers and families. Anywhere. Anytime.">
     <meta name="theme-color" content="#0f4a3a">
     <title>Liams Call AI</title>
-    <link rel="icon" type="image/png" href="/assets/logo.png">
+    <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --green-dark: #0f4a3a;
@@ -23,7 +23,7 @@
 
         body { font-family: 'Inter', sans-serif; }
 
-        .font-serif-brand { font-family: 'Lora', Georgia, serif; }
+        .font-serif-brand { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.02em; }
         .pill-dark { background: var(--green-dark); color: #fff; border-radius: 9999px; }
         .btn-send { background: var(--green-send); }
         .btn-send:hover { background: #185a44; }
@@ -343,6 +343,13 @@
                 padding: 0.85rem 0.9rem 0.35rem;
             }
 
+            /* Tint SVG logos to brand green */
+            #landing-header > img,
+            #widget-header > img,
+            #mobile-top-center img {
+                filter: invert(18%) sepia(60%) saturate(800%) hue-rotate(120deg) brightness(70%) contrast(120%);
+            }
+
             #chat-shell.is-docked #chat-footer {
                 padding: 0 0.7rem 0.75rem;
             }
@@ -481,9 +488,10 @@
     <div id="landing" class="h-full flex flex-col">
         <header class="relative flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 pb-4 sm:pb-4 shrink-0" id="landing-header">
             <img
-                src="/assets/logo.png"
+                src="/assets/logo-horizontal.svg"
                 alt="Liam's Call AI logo"
-                class="h-9 sm:h-12 md:h-14 w-auto select-none object-contain shrink-0"
+                class="h-9 sm:h-12 md:h-14 select-none object-contain shrink-0"
+                style="width: auto; max-width: 200px;"
             >
             <!-- Desktop nav — centered pill -->
             <nav class="hidden md:flex absolute left-1/2 -translate-x-1/2 pill-dark px-8 lg:px-14 py-3 items-center gap-6 lg:gap-10 text-sm font-medium whitespace-nowrap">
@@ -557,8 +565,8 @@
                 </button>
                 <button id="home-btn-mobile" type="button" aria-label="Back to homepage" style="background:none;border:none;padding:0;cursor:pointer;">
                     <div id="mobile-top-center">
-                        <img src="/assets/logo.png" alt="">
-                        <span>Liams Call AI</span>
+                        <img src="/assets/logo-icon.svg" alt="">
+                        <span>Liam's Call</span>
                     </div>
                 </button>
             </div>
@@ -567,7 +575,7 @@
                 <div id="widget-header" class="flex items-center gap-2 sm:gap-4">
                     <img
                         id="home-btn-widget"
-                        src="/assets/logo.png"
+                        src="/assets/logo-icon.svg"
                         alt="Liam's Call AI logo"
                         class="h-8 sm:h-10 w-auto shrink-0 object-contain cursor-pointer"
                         role="button"
@@ -575,7 +583,7 @@
                         aria-label="Back to homepage"
                     >
                     <div>
-                        <h1 class="font-serif-brand text-xl sm:text-2xl font-semibold text-gray-900 leading-tight">Liams Call AI</h1>
+                        <h1 class="font-serif-brand text-xl sm:text-2xl text-gray-900 leading-tight">Liam's Call</h1>
                         <p class="text-xs sm:text-sm text-gray-600 mt-0.5">Mental health support, anytime you need it</p>
                     </div>
                 </div>
@@ -610,7 +618,7 @@
 
             <div id="panel-content">
                 <div class="w-full max-w-xl px-5 py-8">
-                    <h2 id="content-title" class="font-serif-brand text-3xl lg:text-4xl text-[var(--green-dark)] font-semibold mb-5 text-center"></h2>
+                    <h2 id="content-title" class="font-serif-brand text-3xl lg:text-4xl text-[var(--green-dark)] mb-5 text-center"></h2>
                     <div id="content-body" class="text-gray-600 text-sm leading-relaxed"></div>
                 </div>
             </div>
