@@ -498,6 +498,7 @@
                 <button type="button" class="nav-link" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link" data-nav="contact">Contact Us</button>
+                <button type="button" class="nav-link opacity-60 text-xs font-normal" data-nav="privacy">Privacy</button>
             </nav>
             <!-- Mobile nav — compact pills inline with logo -->
             <nav class="md:hidden flex items-center gap-1.5 flex-wrap justify-end">
@@ -540,6 +541,7 @@
                 <button type="button" class="nav-link text-left" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link text-left" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link text-left" data-nav="contact">Contact Us</button>
+                <button type="button" class="nav-link text-left text-xs text-gray-400" data-nav="privacy">Privacy Policy</button>
             </nav>
             <div class="mt-auto pt-3 sm:pt-5 md:pt-8 shrink-0">
                 <div class="ad-card rounded-xl overflow-hidden border border-gray-200 bg-[#1a2d5a] text-white text-[9px] md:text-[10px] leading-snug shadow-sm">
@@ -611,6 +613,7 @@
                         Liams Call AI is not a medical professional. In a crisis, call or text
                         <a href="tel:988" class="underline font-medium">9-8-8</a> (Canada, 24/7) or call
                         <a href="tel:911" class="underline font-medium">9-1-1</a> for emergencies.
+                        &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="privacy" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">Privacy Policy</button>
                     </p>
                 </div>
             </div>
@@ -766,6 +769,117 @@
                     <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm bg-[var(--beige-main)] border-0">
                         <p class="text-xs text-gray-500 leading-relaxed"><strong class="text-gray-700">Please note:</strong> Liams Call AI is not a crisis service. If you or someone you know needs immediate support, call or text <a href="tel:988" class="underline font-semibold text-[var(--green-dark)]">9-8-8</a> (Canada, 24/7) or call <a href="tel:911" class="underline font-semibold text-[var(--green-dark)]">9-1-1</a>.</p>
                     </div>
+                </div>
+            ` },
+            privacy: { title: 'Privacy Policy', body: `
+                <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 6, 2026 &nbsp;·&nbsp; Last updated: July 6, 2026</p>
+
+                <div class="space-y-6 text-left text-sm text-gray-600 leading-relaxed">
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">1. Who we are</h3>
+                        <p>Liam's Call AI ("<strong>we</strong>", "<strong>us</strong>", or "<strong>our</strong>") is a mental health support tool for caregivers and families, accessible at liamscall.onrender.com (and any future custom domain). This Privacy Policy explains how we collect, use, and protect information when you use our website and chat service.</p>
+                        <p class="mt-2">For privacy inquiries, contact us at <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a>.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">2. Information we collect</h3>
+                        <p class="font-medium text-gray-700 mt-2 mb-1">a) Information you provide</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li><strong>Chat messages:</strong> The text you type into the chat interface is sent to our server to generate an AI response. We do not knowingly store message content on our servers beyond the duration of your session.</li>
+                        </ul>
+                        <p class="font-medium text-gray-700 mt-3 mb-1">b) Information collected automatically</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li><strong>IP address:</strong> Logged by our hosting provider (Render) for security and rate-limiting purposes.</li>
+                            <li><strong>Browser &amp; device information:</strong> Standard HTTP headers (browser type, operating system, referring URL) may be logged.</li>
+                            <li><strong>Usage data:</strong> Page visits and general interaction data may be aggregated anonymously.</li>
+                        </ul>
+                        <p class="font-medium text-gray-700 mt-3 mb-1">c) Information we do NOT collect</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>We do not require account creation or collect names, email addresses, or phone numbers through the chat interface.</li>
+                            <li>We do not use tracking pixels or third-party analytics scripts.</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">3. How we use your information</h3>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>To generate AI responses to your chat messages in real time.</li>
+                            <li>To enforce rate limits and protect against abuse.</li>
+                            <li>To improve the reliability and safety of the service.</li>
+                            <li>To comply with applicable laws and regulations.</li>
+                        </ul>
+                        <p class="mt-2 text-xs text-gray-500">We do not sell, rent, or trade your personal information to any third party for marketing purposes.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">4. Third-party services</h3>
+                        <p class="text-xs text-gray-500 mb-2">We use the following third-party services to operate the site. Each has its own privacy policy.</p>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="font-medium text-gray-700 text-xs">AI model providers (OpenAI / Anthropic / Groq)</p>
+                                <p class="text-xs text-gray-500">Your chat messages are processed by one of these providers to generate responses. Messages are sent via our server — your IP address is not exposed to these providers. Each provider's data use is governed by their respective API usage policies, which prohibit training on your inputs by default.</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700 text-xs">Render (hosting)</p>
+                                <p class="text-xs text-gray-500">Our server is hosted on Render.com (San Francisco, USA). Render may process server logs that include IP addresses. See <a href="https://render.com/privacy" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">render.com/privacy</a>.</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700 text-xs">Google Fonts</p>
+                                <p class="text-xs text-gray-500">We load the Inter typeface from Google Fonts. Google may collect limited data (such as IP address) when serving font files. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">Google Privacy Policy</a>.</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700 text-xs">Google AdSense (future)</p>
+                                <p class="text-xs text-gray-500">We may in the future display ads served by Google AdSense. When active, Google and its partners may use cookies (including the DoubleClick DART cookie) to serve ads based on your prior visits to this and other websites. You can opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">Google Ad Settings</a> or <a href="https://www.aboutads.info/choices" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">aboutads.info</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">5. Cookies</h3>
+                        <p class="text-xs text-gray-500">Liam's Call AI itself does not set cookies. However, third-party services integrated into this site (such as Google Fonts and, in the future, Google AdSense) may set cookies in your browser. You can manage cookie preferences through your browser settings.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">6. Data retention &amp; security</h3>
+                        <p class="text-xs text-gray-500">Chat messages are not persistently stored on our servers. Server logs (including IP addresses) are retained by Render according to their own policies, generally no longer than 30 days. We implement industry-standard security measures including HTTPS encryption, API token authentication, and server-side rate limiting.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">7. Children's privacy</h3>
+                        <p class="text-xs text-gray-500">This service is intended for adults (18+). We do not knowingly collect personal information from individuals under the age of 18. If you believe a minor has provided us with personal information, please contact us at <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a> and we will take steps to delete it.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">8. Your rights (PIPEDA)</h3>
+                        <p class="text-xs text-gray-500 mb-2">Under Canada's <em>Personal Information Protection and Electronic Documents Act</em> (PIPEDA), you have the right to:</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>Know what personal information we hold about you.</li>
+                            <li>Request correction of inaccurate information.</li>
+                            <li>Withdraw consent to the collection or use of your information (with reasonable notice).</li>
+                            <li>Challenge our compliance with PIPEDA by contacting us or the <a href="https://www.priv.gc.ca" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">Office of the Privacy Commissioner of Canada</a>.</li>
+                        </ul>
+                        <p class="text-xs text-gray-500 mt-2">To exercise any of these rights, email us at <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a>.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">9. Links to other websites</h3>
+                        <p class="text-xs text-gray-500">Our Resources page contains links to third-party websites (e.g. crisis lines, CAMH, 211 Ontario). We are not responsible for the privacy practices of those sites and encourage you to review their policies.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">10. Changes to this policy</h3>
+                        <p class="text-xs text-gray-500">We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated effective date. Continued use of the service after changes constitutes acceptance of the revised policy.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-[var(--beige-main)] border-0 p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">11. Contact us</h3>
+                        <p class="text-xs text-gray-500">For any privacy-related questions or to exercise your PIPEDA rights:</p>
+                        <p class="text-xs mt-2"><strong class="text-gray-700">Liam's Call AI</strong><br>
+                        Email: <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a><br>
+                        Canada</p>
+                    </div>
+
                 </div>
             ` },
         };
