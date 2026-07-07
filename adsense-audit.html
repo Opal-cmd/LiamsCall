@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liam's Call — Google AdSense Readiness Audit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f9fafb;
+      color: #111827;
+      line-height: 1.5;
+    }
+
+    .page { max-width: 860px; margin: 0 auto; padding: 48px 40px; }
+
+    h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; }
+    h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 14px; margin-top: 40px; }
+    .page-sub { font-size: 14px; color: #6b7280; margin-top: 4px; margin-bottom: 32px; }
+
+    .divider { border: none; border-top: 1px solid #e5e7eb; margin: 36px 0; }
+
+    /* ── Stats ─────────────────────────────────────────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; text-align: center; }
+    .stat-num  { font-size: 36px; font-weight: 700; line-height: 1; }
+    .stat-label{ font-size: 12px; color: #9ca3af; margin-top: 6px; }
+
+    /* ── Verdict ───────────────────────────────────────── */
+    .verdict {
+      background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px;
+      padding: 14px 18px; margin-bottom: 36px;
+    }
+    .verdict strong { font-size: 14px; color: #991b1b; display: block; margin-bottom: 6px; }
+    .verdict p { font-size: 13px; color: #b91c1c; }
+
+    /* ── Action plan table ─────────────────────────────── */
+    .action-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .action-table th {
+      text-align: left; font-size: 11px; font-weight: 600; color: #9ca3af;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      border-bottom: 1px solid #e5e7eb; padding: 8px 12px 8px 0;
+    }
+    .action-table td { padding: 10px 12px 10px 0; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+    .action-table tr:last-child td { border-bottom: none; }
+    .step-num { font-weight: 600; color: #9ca3af; width: 28px; }
+    .effort { color: #6b7280; white-space: nowrap; }
+    .urgency { color: #374151; font-weight: 500; white-space: nowrap; }
+
+    /* ── Check item ────────────────────────────────────── */
+    .category-title {
+      font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
+      margin-top: 40px; margin-bottom: 12px;
+    }
+    .check-item {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 10px;
+    }
+    .check-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .check-label { font-size: 14px; font-weight: 600; }
+    .check-detail { font-size: 13px; color: #6b7280; }
+    .check-fix {
+      display: flex; gap: 6px; align-items: flex-start; margin-top: 8px;
+      padding-top: 8px; border-top: 1px solid #f3f4f6;
+    }
+    .fix-arrow { font-size: 12px; color: #9ca3af; flex-shrink: 0; margin-top: 1px; }
+    .fix-text  { font-size: 12px; color: #4b5563; }
+
+    /* ── Pills ─────────────────────────────────────────── */
+    .pill {
+      display: inline-flex; align-items: center; border-radius: 9999px;
+      padding: 2px 10px; font-size: 12px; font-weight: 500; white-space: nowrap;
+    }
+    .pill-blocker { background: #fee2e2; color: #991b1b; }
+    .pill-fix     { background: #fef3c7; color: #92400e; }
+    .pill-pass    { background: #dcfce7; color: #166534; }
+    .pill-info    { background: #dbeafe; color: #1e40af; }
+
+    /* ── Timeline ──────────────────────────────────────── */
+    .timeline { display: flex; flex-direction: column; gap: 10px; }
+    .timeline-row { display: flex; gap: 16px; align-items: flex-start; }
+    .timeline-period { font-size: 13px; font-weight: 600; color: #6b7280; width: 120px; flex-shrink: 0; padding-top: 1px; }
+    .timeline-milestone { font-size: 13px; color: #374151; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <h1>Google AdSense Readiness</h1>
+  <p class="page-sub">Liam's Call AI — audit against Google AdSense program policies · July 2026</p>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num" style="color:#dc2626;">3</div>
+      <div class="stat-label">Hard blockers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#d97706;">4</div>
+      <div class="stat-label">Fixes needed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#16a34a;">5</div>
+      <div class="stat-label">Passing</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#9ca3af;">No</div>
+      <div class="stat-label">Ready to apply</div>
+    </div>
+  </div>
+
+  <!-- Verdict -->
+  <div class="verdict">
+    <strong>Not ready — 3 hard blockers must be resolved before applying</strong>
+    <p>The biggest issue is the subdomain (onrender.com). AdSense requires a domain you personally own. Fix that first, then address the Privacy Policy and Terms pages, then wait 3–6 months for domain age before applying.</p>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Action plan -->
+  <h2>Priority action plan</h2>
+  <table class="action-table">
+    <thead>
+      <tr>
+        <th style="width:28px;"></th>
+        <th>Action</th>
+        <th style="text-align:right;">Effort</th>
+        <th style="text-align:right;">When</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="step-num">1.</td><td>Buy a custom domain</td><td class="effort" style="text-align:right;">1 day · ~$12/yr</td><td class="urgency" style="text-align:right;">Do now</td></tr>
+      <tr><td class="step-num">2.</td><td>Connect domain to Render + update CORS/API settings</td><td class="effort" style="text-align:right;">1 hour</td><td class="urgency" style="text-align:right;">Do now</td></tr>
+      <tr><td class="step-num">3.</td><td>Write Privacy Policy page <span style="font-size:11px;color:#16a34a;font-weight:500;">✓ done</span></td><td class="effort" style="text-align:right;">1–2 hours</td><td class="urgency" style="text-align:right;">Do now</td></tr>
+      <tr><td class="step-num">4.</td><td>Write Terms of Use + AI disclaimer page</td><td class="effort" style="text-align:right;">1–2 hours</td><td class="urgency" style="text-align:right;">Do now</td></tr>
+      <tr><td class="step-num">5.</td><td>Add Google Search Console &amp; submit sitemap</td><td class="effort" style="text-align:right;">30 min</td><td class="urgency" style="text-align:right;">After custom domain</td></tr>
+      <tr><td class="step-num">6.</td><td>Expand blog articles to full-length posts</td><td class="effort" style="text-align:right;">1–2 days</td><td class="urgency" style="text-align:right;">Within 1 month</td></tr>
+      <tr><td class="step-num">7.</td><td>Add About Us page</td><td class="effort" style="text-align:right;">30 min</td><td class="urgency" style="text-align:right;">Within 1 month</td></tr>
+      <tr><td class="step-num">8.</td><td>Apply to AdSense</td><td class="effort" style="text-align:right;">10 min</td><td class="urgency" style="text-align:right;">After 3–6 months live</td></tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+
+  <!-- Checklist -->
+  <h2 style="margin-top:0;">Full checklist</h2>
+
+  <p class="category-title">Hard blockers — will cause rejection</p>
+
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-blocker">Blocker</span><span class="check-label">Custom domain required</span></div>
+    <p class="check-detail">liamscall.onrender.com is a subdomain of render.com. AdSense rejects free hosting subdomains — you need a domain you own (e.g. liamscall.ca or liamscall.com).</p>
+    <div class="check-fix"><span class="fix-arrow">Fix →</span><span class="fix-text">Buy a domain ($10–15/yr on Namecheap or Google Domains) and connect it to Render via a custom domain in dashboard settings.</span></div>
+  </div>
+
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-blocker">Blocker</span><span class="check-label">Privacy Policy page</span></div>
+    <p class="check-detail">AdSense mandates a Privacy Policy that discloses cookie use, data collection, and third-party ad serving. <span style="color:#16a34a;font-weight:500;">✓ Added July 6 2026.</span></p>
+    <div class="check-fix"><span class="fix-arrow">Done →</span><span class="fix-text">Privacy Policy is now accessible via the sidebar nav and chat footer disclaimer.</span></div>
+  </div>
+
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-blocker">Blocker</span><span class="check-label">Terms of Use / Disclaimer</span></div>
+    <p class="check-detail">Mental health sites especially need a disclaimer clarifying that the chatbot is not a substitute for professional care. Google also looks for this for sensitive-category sites.</p>
+    <div class="check-fix"><span class="fix-arrow">Fix →</span><span class="fix-text">Add a /terms page with a clear disclaimer. Your crisis footer is good but a dedicated page is required.</span></div>
+  </div>
+
+  <p class="category-title">Content quality</p>
+
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-fix">Fix needed</span><span class="check-label">Original written content</span></div>
+    <p class="check-detail">Your Blog has 5 short article excerpts. AdSense reviewers look for substantial, original, human-readable articles with full text.</p>
+    <div class="check-fix"><span class="fix-arrow">Fix →</span><span class="fix-text">Expand each blog post to 400–700 words of real content.</span></div>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-fix">Fix needed</span><span class="check-label">AI-generated content policy</span></div>
+    <p class="check-detail">The primary feature is an AI chatbot. Google's helpful content guidelines are cautious about AI-first sites. Human-authored Blog/Resources content helps.</p>
+    <div class="check-fix"><span class="fix-arrow">Fix →</span><span class="fix-text">Keep human-authored pages (Blog, Resources) as the main content. Frame the chatbot as a tool, not the whole site.</span></div>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-fix">Fix needed</span><span class="check-label">About Us page</span></div>
+    <p class="check-detail">AdSense reviewers want to know who runs the site. No About page exists.</p>
+    <div class="check-fix"><span class="fix-arrow">Fix →</span><span class="fix-text">Add a simple About page — who you are, the mission, and that this is a caregiving support tool.</span></div>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-fix">Fix needed</span><span class="check-label">Sensitive health category</span></div>
+    <p class="check-detail">Mental health is a 'sensitive interest' category. Google allows ads but may restrict certain ad types. All content must be clearly informational and non-deceptive.</p>
+    <div class="check-fix"><span class="fix-arrow">Note →</span><span class="fix-text">Your existing crisis disclaimer is a good signal. Ensure all content is framed as support/information, not diagnosis or treatment.</span></div>
+  </div>
+
+  <p class="category-title">Technical requirements</p>
+
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-pass">Pass</span><span class="check-label">HTTPS / SSL</span></div>
+    <p class="check-detail">Render provides free SSL — site is served over HTTPS.</p>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-pass">Pass</span><span class="check-label">Mobile responsive</span></div>
+    <p class="check-detail">Full mobile-first responsive layout with hamburger sidebar.</p>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-fix">Fix needed</span><span class="check-label">Page load speed</span></div>
+    <p class="check-detail">Tailwind CDN (@tailwindcss/browser) is ~400 KB and runs in the browser. This hurts Core Web Vitals scores, which AdSense reviewers check.</p>
+    <div class="check-fix"><span class="fix-arrow">Fix →</span><span class="fix-text">Switch to a pre-built Tailwind CSS file. Not a hard blocker but improves approval odds.</span></div>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-pass">Pass</span><span class="check-label">Easy navigation</span></div>
+    <p class="check-detail">Blog, Resources, Contact, New Chat, and Privacy Policy are all reachable from the header nav.</p>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-pass">Pass</span><span class="check-label">No broken pages / 404s</span></div>
+    <p class="check-detail">All routes handled by Express — no known broken links.</p>
+  </div>
+
+  <p class="category-title">Traffic &amp; age</p>
+
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-fix">Fix needed</span><span class="check-label">Domain age</span></div>
+    <p class="check-detail">Sites under 6 months old are routinely rejected in sensitive categories. The site launched June 2026.</p>
+    <div class="check-fix"><span class="fix-arrow">Fix →</span><span class="fix-text">Apply after the site has been live with a custom domain for 3–6 months with some organic traffic.</span></div>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-info">Info</span><span class="check-label">Organic traffic</span></div>
+    <p class="check-detail">No hard minimum, but reviewers look for evidence of real visitors. A site with zero indexed pages is harder to approve.</p>
+    <div class="check-fix"><span class="fix-arrow">Fix →</span><span class="fix-text">Submit sitemap to Google Search Console once custom domain is live.</span></div>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-info">Info</span><span class="check-label">Google Search Console verified</span></div>
+    <p class="check-detail">Needed before AdSense application so Google can see your traffic history.</p>
+    <div class="check-fix"><span class="fix-arrow">Fix →</span><span class="fix-text">Verify site ownership via HTML meta tag or DNS record in Search Console.</span></div>
+  </div>
+
+  <p class="category-title">AdSense account requirements</p>
+
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-info">Info</span><span class="check-label">Age 18+</span></div>
+    <p class="check-detail">Account holder must be 18 or older.</p>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-info">Info</span><span class="check-label">Valid payment profile</span></div>
+    <p class="check-detail">Canadian address and payment method required. AdSense pays via cheque or EFT.</p>
+  </div>
+  <div class="check-item">
+    <div class="check-row"><span class="pill pill-info">Info</span><span class="check-label">One AdSense account per person</span></div>
+    <p class="check-detail">If you already have an AdSense account (e.g. from YouTube), add this site to it rather than creating a new one.</p>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Timeline -->
+  <h2 style="margin-top:0;">Realistic timeline</h2>
+  <p style="font-size:13px;color:#6b7280;margin-bottom:16px;">Assuming you act on the blockers this week:</p>
+  <div class="timeline">
+    <div class="timeline-row">
+      <span class="timeline-period">This week</span>
+      <span class="timeline-milestone">Custom domain live, Privacy Policy done, Terms page added, Search Console verified</span>
+    </div>
+    <div class="timeline-row">
+      <span class="timeline-period">Month 1–2</span>
+      <span class="timeline-milestone">Blog expanded to full articles, About page added, organic indexing begins</span>
+    </div>
+    <div class="timeline-row">
+      <span class="timeline-period">Month 3–6</span>
+      <span class="timeline-milestone">Domain age matures, some organic traffic visible in Search Console</span>
+    </div>
+    <div class="timeline-row">
+      <span class="timeline-period">Month 6+</span>
+      <span class="timeline-milestone">Apply to AdSense — realistic chance of approval if content is strong</span>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;padding-top:24px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center;">
+    Generated July 6, 2026 · Liam's Call AI internal document
+  </div>
+
+</div>
+</body>
+</html>
