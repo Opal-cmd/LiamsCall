@@ -499,9 +499,6 @@
                 <button type="button" class="nav-link" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link" data-nav="contact">Contact Us</button>
                 <button type="button" class="nav-link" data-nav="about">About</button>
-                <span class="opacity-30 text-xs select-none">|</span>
-                <button type="button" class="nav-link opacity-60 text-xs font-normal" data-nav="privacy">Privacy</button>
-                <button type="button" class="nav-link opacity-60 text-xs font-normal" data-nav="terms">Terms</button>
             </nav>
             <!-- Mobile nav — compact pills inline with logo -->
             <nav class="md:hidden flex items-center gap-1.5 flex-wrap justify-end">
@@ -1143,7 +1140,14 @@
             }
         }
 
+        // Update this URL once the WordPress blog subdomain is live
+        const BLOG_URL = 'https://blog.liamscall.ca';
+
         async function navigate(navKey) {
+            if (navKey === 'blog') {
+                window.open(BLOG_URL, '_blank', 'noopener,noreferrer');
+                return;
+            }
             if (navKey === 'chat') {
                 // Chat always does the full expand animation
                 if (!isExpanded) await expandShell();
