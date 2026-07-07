@@ -8,13 +8,22 @@ const app = express();
 // Required so rate limiting sees real client IPs behind Render/nginx/Cloudflare
 app.set('trust proxy', 1);
 const PORT = Number(process.env.PORT) || 3000;
-const PRIMARY_PROVIDER = (process.env.AI_PROVIDER || 'groq').toLowerCase();
-const FALLBACK_PROVIDER = (process.env.FALLBACK_PROVIDER || '').toLowerCase();
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 const CHAT_API_TOKEN = process.env.CHAT_API_TOKEN || '';
-const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60000;
+const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000;
 const RATE_LIMIT_MAX_REQUESTS = Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 30;
+const DAILY_LIMIT_PER_IP = Number(process.env.DAILY_LIMIT_PER_IP) || 50;
 const MAX_TOKENS = Number(process.env.MAX_TOKENS) || 1024;
+
+// Provider chain: comma-separated list of providers to try in order.
+// e.g. PROVIDER_CHAIN=groq,gemini,openai
+// Falls back to legacy AI_PROVIDER / FALLBACK_PROVIDER if not set.
+const PROVIDER_CHAIN = process.env.PROVIDER_CHAIN
+  ? process.env.PROVIDER_CHAIN.split(',').map((p) => p.trim().toLowerCase()).filter(Boolean)
+  : [
+      (process.env.AI_PROVIDER || 'groq').toLowerCase(),
+      ...(process.env.FALLBACK_PROVIDER ? [process.env.FALLBACK_PROVIDER.toLowerCase()] : []),
+    ];
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 const SYSTEM_PROMPT =
@@ -27,7 +36,10 @@ const SYSTEM_PROMPT =
     'Keep responses concise by default and ask a clarifying question when intent is ambiguous.',
   ].join(' ');
 
+// Per-minute rate limit buckets
 const requestBuckets = new Map();
+// Per-day limit buckets  { date: 'YYYY-MM-DD', count: number }
+const dailyBuckets = new Map();
 
 app.use(express.json({ limit: '32kb' }));
 
@@ -80,6 +92,21 @@ app.use((req, res, next) => {
   return next();
 });
 
+// Daily message limit per IP
+app.use((req, res, next) => {
+  if (req.path !== '/api/chat') return next();
+  const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+  const key = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+  const bucket = dailyBuckets.get(key) || { date: today, count: 0 };
+  if (bucket.date !== today) { bucket.date = today; bucket.count = 0; }
+  bucket.count += 1;
+  dailyBuckets.set(key, bucket);
+  if (bucket.count > DAILY_LIMIT_PER_IP) {
+    return res.status(429).json({ error: 'Daily message limit reached. Please try again tomorrow.' });
+  }
+  return next();
+});
+
 app.use((req, res, next) => {
   if (!CHAT_API_TOKEN || req.path !== '/api/chat') return next();
   const token = req.headers['x-chat-token'];
@@ -94,41 +121,23 @@ app.use((req, res, next) => {
 app.use(express.static(PUBLIC_DIR));
 
 function modelForProvider(provider) {
-  if (provider === 'groq') return process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  if (provider === 'groq')     return process.env.GROQ_MODEL    || 'llama-3.3-70b-versatile';
+  if (provider === 'gemini')   return process.env.GEMINI_MODEL  || 'gemini-2.0-flash';
   if (provider === 'anthropic') return process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
-  return process.env.OPENAI_MODEL || 'gpt-4o';
+  return process.env.OPENAI_MODEL || 'gpt-4o-mini';
 }
 
-function fallbackModelForProvider(provider) {
-  if (provider === 'groq') return process.env.GROQ_FALLBACK_MODEL || '';
-  if (provider === 'anthropic') return process.env.ANTHROPIC_FALLBACK_MODEL || '';
-  return process.env.OPENAI_FALLBACK_MODEL || '';
-}
-
+// Returns the ordered list of providers to try, skipping any with no API key configured.
 function getProviderCandidates() {
-  const primaryModel = modelForProvider(PRIMARY_PROVIDER);
-  const candidates = [{ provider: PRIMARY_PROVIDER, model: primaryModel }];
-
-  // If FALLBACK_PROVIDER is set, allow fallback to same provider with a different model.
-  if (FALLBACK_PROVIDER) {
-    const fallbackProvider = FALLBACK_PROVIDER;
-    const fallbackModel = fallbackModelForProvider(fallbackProvider) || modelForProvider(fallbackProvider);
-    if (
-      fallbackProvider !== PRIMARY_PROVIDER ||
-      fallbackModel !== primaryModel
-    ) {
-      candidates.push({ provider: fallbackProvider, model: fallbackModel });
-    }
-    return candidates;
-  }
-
-  // No explicit fallback provider: optionally fallback to same provider alternate model.
-  const sameProviderFallbackModel = fallbackModelForProvider(PRIMARY_PROVIDER);
-  if (sameProviderFallbackModel && sameProviderFallbackModel !== primaryModel) {
-    candidates.push({ provider: PRIMARY_PROVIDER, model: sameProviderFallbackModel });
-  }
-
-  return candidates;
+  return PROVIDER_CHAIN
+    .map((provider) => ({ provider, model: modelForProvider(provider) }))
+    .filter(({ provider }) => {
+      if (provider === 'groq')      return !!process.env.GROQ_API_KEY;
+      if (provider === 'gemini')    return !!process.env.GEMINI_API_KEY;
+      if (provider === 'anthropic') return !!process.env.ANTHROPIC_API_KEY;
+      if (provider === 'openai')    return !!process.env.OPENAI_API_KEY;
+      return false;
+    });
 }
 
 function getApiConfig(provider, modelOverride) {
@@ -140,10 +149,24 @@ function getApiConfig(provider, modelOverride) {
     return {
       provider,
       url: 'https://api.groq.com/openai/v1/chat/completions',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      buildBody: (messages) => ({
+        model,
+        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+        stream: true,
+        max_tokens: MAX_TOKENS,
+      }),
+    };
+  }
+
+  // Gemini via Google's OpenAI-compatible endpoint — same streaming format as Groq/OpenAI
+  if (provider === 'gemini') {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error('Missing GEMINI_API_KEY in environment variables.');
+    return {
+      provider,
+      url: `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`,
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       buildBody: (messages) => ({
         model,
         messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
@@ -377,6 +400,7 @@ app.post('/api/chat', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Liams Call AI server running at http://localhost:${PORT}`);
-  console.log(`Primary provider: ${PRIMARY_PROVIDER}`);
-  if (FALLBACK_PROVIDER) console.log(`Fallback provider: ${FALLBACK_PROVIDER}`);
+  const configured = getProviderCandidates();
+  console.log(`Provider chain: ${configured.map((c) => `${c.provider}(${c.model})`).join(' → ')}`);
+  if (configured.length === 0) console.warn('WARNING: No AI providers configured — chat will fail.');
 });
