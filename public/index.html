@@ -498,7 +498,10 @@
                 <button type="button" class="nav-link" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link" data-nav="contact">Contact Us</button>
+                <button type="button" class="nav-link" data-nav="about">About</button>
+                <span class="opacity-30 text-xs select-none">|</span>
                 <button type="button" class="nav-link opacity-60 text-xs font-normal" data-nav="privacy">Privacy</button>
+                <button type="button" class="nav-link opacity-60 text-xs font-normal" data-nav="terms">Terms</button>
             </nav>
             <!-- Mobile nav — compact pills inline with logo -->
             <nav class="md:hidden flex items-center gap-1.5 flex-wrap justify-end">
@@ -541,7 +544,9 @@
                 <button type="button" class="nav-link text-left" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link text-left" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link text-left" data-nav="contact">Contact Us</button>
+                <button type="button" class="nav-link text-left" data-nav="about">About Us</button>
                 <button type="button" class="nav-link text-left text-xs text-gray-400" data-nav="privacy">Privacy Policy</button>
+                <button type="button" class="nav-link text-left text-xs text-gray-400" data-nav="terms">Terms of Use</button>
             </nav>
             <div class="mt-auto pt-3 sm:pt-5 md:pt-8 shrink-0">
                 <div class="ad-card rounded-xl overflow-hidden border border-gray-200 bg-[#1a2d5a] text-white text-[9px] md:text-[10px] leading-snug shadow-sm">
@@ -613,7 +618,9 @@
                         Liams Call AI is not a medical professional. In a crisis, call or text
                         <a href="tel:988" class="underline font-medium">9-8-8</a> (Canada, 24/7) or call
                         <a href="tel:911" class="underline font-medium">9-1-1</a> for emergencies.
-                        &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="privacy" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">Privacy Policy</button>
+                        &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="privacy" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">Privacy</button>
+                        &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="terms" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">Terms</button>
+                        &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="about" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">About</button>
                     </p>
                 </div>
             </div>
@@ -631,33 +638,68 @@
         const CONTENT_PAGES = {
             blog: { title: 'Blog', body: `
                 <p class="text-gray-400 text-xs mb-6 text-center">Practical reads for caregivers and families</p>
-                <div class="space-y-5 text-left">
-                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div class="space-y-6 text-left">
+
+                    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                         <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Caregiver Wellbeing</span>
-                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">You Can't Pour From an Empty Cup</h3>
-                        <p class="text-xs text-gray-500 leading-relaxed">Caregiver burnout is real — and it sneaks up slowly. Recognizing the warning signs early (irritability, sleep changes, feeling numb) is the first step toward protecting both yourself and the person you care for. Rest isn't selfish. It's necessary.</p>
+                        <h3 class="font-semibold text-gray-800 text-base mt-1 mb-3">You Can't Pour From an Empty Cup</h3>
+                        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+                            <p>Caregiver burnout does not arrive all at once. It tends to build quietly over months, stacking small stressors — a missed meal here, a lost night of sleep there, a cancelled plan to see a friend — until the weight becomes almost impossible to carry. By the time most caregivers recognize what is happening, they are already running on empty.</p>
+                            <p>Burnout is not weakness. It is a physiological and psychological response to sustained stress without adequate recovery. Research published in journals like <em>The Gerontologist</em> consistently shows that family caregivers experience higher rates of depression, anxiety, immune suppression, and cardiovascular strain than non-caregivers of comparable age. Your body is not broken — it is responding exactly as it should to a relentlessly demanding situation.</p>
+                            <p>The warning signs are worth knowing: persistent irritability or short-temperedness toward the person you care for; feeling emotionally numb or detached; changes in sleep (either too much or not enough); withdrawing from friends or activities you used to enjoy; getting sick more often; and a growing sense that nothing you do is ever enough. If several of these feel familiar, that is important information — not a reason for shame.</p>
+                            <p>The first step is accepting that your own wellbeing is not optional. It is structural. A caregiver who is depleted cannot provide consistent, compassionate care — not because of a character flaw, but because humans are not built for unlimited output without rest. Protecting your health is an act of care for both of you.</p>
+                            <p>Practical starting points: tell one person you trust exactly how you are feeling; ask your family doctor about caregiver support referrals; and explore the Ontario Caregiver Organization's free helpline at 1-833-227-3778. Small conversations often open doors that feel locked.</p>
+                        </div>
                     </article>
-                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+
+                    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                         <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Practical Tips</span>
-                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">The 5-Minute Reset: Micro-breaks That Actually Work</h3>
-                        <p class="text-xs text-gray-500 leading-relaxed">You don't need an hour to decompress. Research shows that even 5 minutes of intentional breathing, stepping outside, or sitting quietly can meaningfully lower cortisol. We share techniques caregivers have found realistic to use mid-day.</p>
+                        <h3 class="font-semibold text-gray-800 text-base mt-1 mb-3">The 5-Minute Reset: Micro-breaks That Actually Work</h3>
+                        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+                            <p>When caregiving is your day, the idea of a vacation, a spa day, or even an hour to yourself can feel absurd. But waiting for large blocks of free time before you recover is a strategy that rarely works — and it is not necessary. Brief, intentional pauses scattered through the day can meaningfully reset your nervous system, even when they last only five minutes.</p>
+                            <p>The science supports this. Cortisol — the body's primary stress hormone — responds to deliberate slow breathing within two to three minutes. When you activate the parasympathetic nervous system through slow exhalations (breathing in for four counts, out for six), your heart rate slows and the stress response begins to dampen. You do not need silence, a yoga mat, or even privacy. A bathroom break counts.</p>
+                            <p>Five techniques caregivers have found genuinely usable: (1) <strong>4-6 breathing</strong> — four counts in, six counts out, for two minutes. (2) <strong>Sensory grounding</strong> — name five things you can see right now, four you can touch, three you can hear. This pulls attention out of anxious thought loops. (3) <strong>A brief walk outside</strong> — even to the end of the driveway and back. Natural light and movement shift cortisol within minutes. (4) <strong>One cup of something warm</strong> — held with both hands, drunk slowly, without a screen. (5) <strong>Stretching your neck and shoulders</strong> — caregivers carry tension here chronically; thirty seconds of gentle movement releases it.</p>
+                            <p>The key is making these automatic rather than aspirational. Link them to existing moments: the first coffee of the morning, the transition between tasks, or the five minutes after the person you care for falls asleep. Habits that attach to existing anchors are the ones that stick.</p>
+                            <p>None of this replaces real rest — sustained sleep, social connection, and time that belongs entirely to you. But micro-breaks create a floor of stability that makes everything else slightly more manageable. They are not a cure. They are maintenance.</p>
+                        </div>
                     </article>
-                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+
+                    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                         <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Communication</span>
-                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">How to Ask for Help Without Feeling Guilty</h3>
-                        <p class="text-xs text-gray-500 leading-relaxed">Many caregivers struggle to delegate — fearing judgment, feeling like giving up control, or simply not knowing how to ask. This post breaks down a simple framework for reaching out to family, friends, or community resources without the guilt spiral.</p>
+                        <h3 class="font-semibold text-gray-800 text-base mt-1 mb-3">How to Ask for Help Without Feeling Guilty</h3>
+                        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+                            <p>Most caregivers struggle to ask for help. The reasons are layered: fear of being seen as incapable, a sense that no one else will do things "properly," not wanting to burden the people they love, or a deeply internalized belief that needing help is a form of failure. These feelings are understandable. They are also, over time, enormously costly.</p>
+                            <p>The guilt spiral tends to work like this: you recognize you need help, you feel guilty for needing it, you talk yourself out of asking, you keep going alone, you get more depleted, and eventually you feel guilty about how depleted you are. The loop is self-sealing. Breaking it requires a small act of courage — not a change in personality, just a willingness to say something true to another person.</p>
+                            <p>A useful reframe: asking for help is not about you. It is about the person you care for. When you are rested, supported, and not running on empty, you are measurably more patient, attentive, and effective. Accepting help is a care decision, not a surrender.</p>
+                            <p>Practically, the most effective requests are specific and time-bounded. "Can you sit with Mom on Thursday afternoon so I can sleep?" is easier for someone to answer than "I need more support." Vague asks produce vague responses. Concrete ones get a yes or a no, both of which are useful.</p>
+                            <p>If family isn't available or able, look outward. The Ontario Caregiver Organization offers free peer support groups. Many municipalities have caregiver relief programs funded through Community Care Access. Your family doctor can refer you to a social worker. There is more support available than most caregivers know — it just requires asking one person who can point you toward it.</p>
+                        </div>
                     </article>
-                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+
+                    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                         <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Mental Health</span>
-                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">Grief While They're Still Here: Understanding Anticipatory Loss</h3>
-                        <p class="text-xs text-gray-500 leading-relaxed">Caring for someone with a progressive illness often means grieving them before they are gone. This type of grief is valid, common, and largely invisible in our culture. Understanding it — and giving yourself permission to feel it — is part of the healing process.</p>
+                        <h3 class="font-semibold text-gray-800 text-base mt-1 mb-3">Grief While They're Still Here: Understanding Anticipatory Loss</h3>
+                        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+                            <p>There is a form of grief that has no public ritual, no bereavement leave, no casseroles at the door. It is the grief of watching someone you love slowly become someone different — through dementia, a progressive illness, or the long decline of aging. They are still here, still present in some form. But the person you knew is changing, and you are losing them in pieces, over years.</p>
+                            <p>Psychologists call this anticipatory grief, and it is one of the most common — and least acknowledged — experiences in caregiving. Studies suggest that caregivers of people with dementia often describe their grief as more painful than the grief they feel after the person's actual death, in part because there is no social permission to mourn someone who is still alive.</p>
+                            <p>What anticipatory grief can look like: deep sadness when looking at old photographs; anger that surfaces without an obvious cause; moments of wishing the situation were already over, followed by crushing guilt for having that thought; a sense of loneliness that is hard to explain to people who are not in the same position. All of these are normal responses to an abnormal amount of sustained loss.</p>
+                            <p>Giving yourself permission to grieve — without waiting for a conventional endpoint — is not morbid. It is honest. Grief is not a failure of loyalty or love. It is love responding to loss, and it needs somewhere to go.</p>
+                            <p>Some things that help: naming the grief out loud to at least one person, whether a friend, a therapist, or a support group; keeping a simple journal; finding a caregiver-specific grief group (ConnexOntario can connect you to options in your area); or using a tool like Liam's Call to put words to what you are feeling in a low-stakes space. You do not have to be alone in this, even when it feels that way.</p>
+                        </div>
                     </article>
-                    <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+
+                    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                         <span class="text-[10px] font-semibold uppercase tracking-widest text-[var(--green-dark)] opacity-60">Routines</span>
-                        <h3 class="font-semibold text-gray-800 text-sm mt-1 mb-1">Building a Care Routine That Has Room for You</h3>
-                        <p class="text-xs text-gray-500 leading-relaxed">A predictable daily schedule benefits both the person receiving care and the caregiver. We walk through how to structure a routine that meets care needs while deliberately protecting time for your own sleep, food, movement, and connection.</p>
+                        <h3 class="font-semibold text-gray-800 text-base mt-1 mb-3">Building a Care Routine That Has Room for You</h3>
+                        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+                            <p>Routine often gets described as a burden — a rigid structure that boxes you in. But for caregivers, a well-built daily routine is less a cage and more a container. It absorbs the cognitive load of constant decision-making, creates predictability for the person you care for, and — when designed intentionally — carves out space that belongs to you.</p>
+                            <p>The research on routines in caregiving contexts is consistent: predictable schedules reduce agitation in people with dementia, improve sleep for both parties, and lower caregiver-reported stress levels over time. The structure itself is protective, not just for the person receiving care but for you. Knowing what comes next reduces the mental overhead of perpetual improvisation.</p>
+                            <p>Start with the non-negotiables: medication times, meals, hygiene, and sleep windows. Anchor these first, and let the rest of the day organize around them. Then look at your own needs — not as luxuries to slot in if time allows, but as fixed appointments that are as important as anything else. Even one 30-minute block per day that is genuinely yours (not on call, not available) can function as a reset.</p>
+                            <p>Build in contingency. Routines fail. Illness disrupts schedules. Unexpected appointments happen. A routine that assumes everything will go according to plan becomes a source of stress rather than relief when it does not. Build a 15-minute buffer between transitions, and have one fallback option for your own break time (a shorter version of it, rather than nothing).</p>
+                            <p>Review the routine every few weeks. The needs of the person you care for will change, and so will yours. A routine that worked in January may not work in June. Treating it as a living document — something you adjust rather than abandon when it stops fitting — keeps it functional over the long term.</p>
+                        </div>
                     </article>
-                    <p class="text-center text-xs text-gray-400 pt-2">More articles coming soon.</p>
+
                 </div>
             ` },
             resources: { title: 'Crisis &amp; Support Resources', body: `
@@ -878,6 +920,130 @@
                         <p class="text-xs mt-2"><strong class="text-gray-700">Liam's Call AI</strong><br>
                         Email: <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a><br>
                         Canada</p>
+                    </div>
+
+                </div>
+            ` },
+            about: { title: 'About Us', body: `
+                <div class="space-y-5 text-left text-sm text-gray-600 leading-relaxed">
+
+                    <div class="rounded-xl bg-[var(--beige-main)] p-5">
+                        <h3 class="font-bold text-gray-800 text-base mb-2">Our mission</h3>
+                        <p>Liam's Call exists for one reason: to make sure no caregiver or family member facing a mental health challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.</p>
+                        <p class="mt-2">We built Liam's Call as a safe starting point: a place to put words to what you are feeling, to find crisis resources in one place, and to take a breath before deciding what to do next.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">Who we are</h3>
+                        <p>Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.</p>
+                        <p class="mt-2">We are based in Ontario, Canada, and we are committed to making this tool relevant to Canadians — including Ontario-specific crisis resources, PIPEDA-compliant data practices, and content informed by Canadian mental health guidelines.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">How the AI works</h3>
+                        <p>Liam's Call uses a large language model (AI) to have supportive, open-ended conversations. The AI is specifically guided to respond with warmth and care to caregiving challenges, emotional distress, and questions about mental health resources.</p>
+                        <p class="mt-2"><strong class="text-gray-700">Important:</strong> Liam's Call is a support tool, not a clinical service. The AI is not a therapist, counsellor, or medical professional. It does not diagnose conditions, prescribe treatment, or replace professional mental health care. If you or someone you know is in crisis, please use the resources on our <button type="button" class="underline text-[var(--green-dark)] font-medium" data-nav="resources">Resources page</button> or call 9-8-8 immediately.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">Our commitment to safety</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-500 text-xs">
+                            <li>The AI is trained to recognize crisis language and always direct users to emergency services and crisis lines first.</li>
+                            <li>We do not store your chat messages beyond your session. Conversations are not used to train AI models.</li>
+                            <li>We do not sell, share, or monetize your personal data.</li>
+                            <li>We continuously review AI responses and update our safety guidelines as standards evolve.</li>
+                            <li>If the AI ever gives you a response that feels harmful or inappropriate, please report it to <a href="mailto:safety@liamscall.ca" class="underline text-[var(--green-dark)]">safety@liamscall.ca</a> — your feedback directly improves the tool.</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">Get in touch</h3>
+                        <p class="text-xs text-gray-500 mb-3">We'd love to hear from caregivers, community organizations, researchers, and anyone who wants to help make this resource better.</p>
+                        <div class="space-y-2 text-xs">
+                            <p><strong class="text-gray-700">General:</strong> <a href="mailto:hello@liamscall.ca" class="underline text-[var(--green-dark)]">hello@liamscall.ca</a></p>
+                            <p><strong class="text-gray-700">Safety concerns:</strong> <a href="mailto:safety@liamscall.ca" class="underline text-[var(--green-dark)]">safety@liamscall.ca</a></p>
+                            <p><strong class="text-gray-700">Privacy inquiries:</strong> <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a></p>
+                            <p><strong class="text-gray-700">Media &amp; press:</strong> <a href="mailto:media@liamscall.ca" class="underline text-[var(--green-dark)]">media@liamscall.ca</a></p>
+                        </div>
+                    </div>
+
+                </div>
+            ` },
+            terms: { title: 'Terms of Use', body: `
+                <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 6, 2026 &nbsp;·&nbsp; Last updated: July 6, 2026</p>
+
+                <div class="space-y-5 text-left text-sm text-gray-600 leading-relaxed">
+
+                    <div class="rounded-xl bg-amber-50 border border-amber-200 p-4">
+                        <h3 class="font-bold text-amber-800 mb-2">Important notice — not a crisis or clinical service</h3>
+                        <p class="text-xs text-amber-700">Liam's Call AI is a support and information tool only. It is <strong>not</strong> a substitute for professional mental health care, medical advice, diagnosis, or treatment. If you or someone you know is in immediate danger or experiencing a mental health emergency, please call <strong>9-1-1</strong> or the Suicide Crisis Helpline at <strong>9-8-8</strong> immediately.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">1. Acceptance of terms</h3>
+                        <p class="text-xs text-gray-500">By accessing or using Liam's Call AI (the "Service"), you agree to be bound by these Terms of Use. If you do not agree, please do not use the Service. These terms apply to all visitors and users of the website.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">2. Description of service</h3>
+                        <p class="text-xs text-gray-500">Liam's Call AI is an AI-powered conversational support tool designed to assist caregivers and family members with information, emotional support, and referrals to mental health resources. The Service is provided "as is" for informational and supportive purposes only.</p>
+                        <p class="text-xs text-gray-500 mt-2">The AI that powers this Service is a general-purpose large language model. Responses are generated automatically and may not always be accurate, complete, or appropriate to your specific situation. Always verify important information with a qualified professional.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">3. Not a medical or clinical service</h3>
+                        <p class="text-xs text-gray-500 mb-2">The Service is not a healthcare provider, therapist, counsellor, social worker, or crisis service. Nothing in this Service constitutes:</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>Medical advice or a medical diagnosis</li>
+                            <li>Mental health therapy or counselling</li>
+                            <li>A crisis intervention service</li>
+                            <li>A substitute for professional clinical care</li>
+                        </ul>
+                        <p class="text-xs text-gray-500 mt-2">Always seek the advice of a qualified mental health professional for any mental health concerns. Never disregard professional advice or delay seeking it because of something you read or heard through this Service.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">4. User responsibilities</h3>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>You must be 18 years of age or older to use this Service.</li>
+                            <li>You agree not to use the Service for any unlawful purpose or in any way that violates these Terms.</li>
+                            <li>You agree not to use the Service to harass, threaten, or harm others.</li>
+                            <li>You agree not to attempt to reverse-engineer, overload, or disrupt the Service.</li>
+                            <li>You are responsible for ensuring that any information you share through the Service is appropriate and does not violate the rights of third parties.</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">5. Disclaimer of warranties</h3>
+                        <p class="text-xs text-gray-500">The Service is provided on an "as is" and "as available" basis without warranties of any kind, either express or implied. We do not warrant that the Service will be uninterrupted, error-free, or that AI responses will be accurate, appropriate, or safe for your particular circumstances. Your use of the Service is at your sole risk.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">6. Limitation of liability</h3>
+                        <p class="text-xs text-gray-500">To the fullest extent permitted by applicable law, Liam's Call AI and its operators shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of, or inability to use, the Service. This includes but is not limited to reliance on AI-generated content, decisions made based on Service output, or any harm resulting from the use or misuse of information provided.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">7. Intellectual property</h3>
+                        <p class="text-xs text-gray-500">All content on the Service, including text, graphics, logos, and software, is the property of Liam's Call AI or its content suppliers and is protected by applicable Canadian copyright and intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">8. Changes to the service and terms</h3>
+                        <p class="text-xs text-gray-500">We reserve the right to modify, suspend, or discontinue the Service at any time without notice. We may also update these Terms from time to time. The revised Terms will be posted with an updated effective date. Continued use of the Service after any changes constitutes your acceptance of the new Terms.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">9. Governing law</h3>
+                        <p class="text-xs text-gray-500">These Terms are governed by and construed in accordance with the laws of the Province of Ontario and the federal laws of Canada applicable therein. Any disputes shall be resolved in the courts of Ontario, Canada.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-[var(--beige-main)] border-0 p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">10. Contact us</h3>
+                        <p class="text-xs text-gray-500">Questions about these Terms? Contact us at:</p>
+                        <p class="text-xs mt-2"><strong class="text-gray-700">Liam's Call AI</strong><br>
+                        Email: <a href="mailto:hello@liamscall.ca" class="underline text-[var(--green-dark)]">hello@liamscall.ca</a><br>
+                        Ontario, Canada</p>
                     </div>
 
                 </div>
