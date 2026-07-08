@@ -498,10 +498,488 @@
         #panel-content.is-visible { display: flex; }
         #chat-panel.is-hidden { display: none; }
     </style>
+    <style>
+        /* =========================================================
+           INSPIRATIONAL QUOTES PAGE
+           ========================================================= */
+
+        #panel-content.quotes-mode > div {
+            max-width: 54rem !important;
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+            padding-top: 1.25rem !important;
+            padding-bottom: 2.5rem !important;
+        }
+        #panel-content.quotes-mode #content-title { display: none; }
+
+        /* Hero featured quote card */
+        .quotes-hero {
+            position: relative;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            min-height: 15rem;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .quotes-hero:hover { transform: scale(1.005); box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
+
+        .quotes-hero canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .quotes-hero-dim {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.2);
+        }
+        .quotes-hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 1.75rem 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 15rem;
+            justify-content: flex-end;
+        }
+        .quotes-hero-content .q-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: #fff;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.65rem;
+            border-radius: 999px;
+            margin-bottom: 0.85rem;
+            align-self: flex-start;
+        }
+        .quotes-hero-content blockquote {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            font-weight: 700;
+            font-style: italic;
+            line-height: 1.45;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.45);
+            margin: 0 0 0.65rem;
+        }
+        .quotes-hero-content cite {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.82);
+            font-style: normal;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .hero-action-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .hero-action-bar button {
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.28);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.4rem 0.95rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            letter-spacing: 0.04em;
+        }
+        .hero-action-bar button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Category filter pills */
+        .quotes-filter-tabs {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.1rem;
+        }
+        .quotes-filter-tab {
+            padding: 0.32rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            transition: all 0.18s;
+            letter-spacing: 0.02em;
+        }
+        .quotes-filter-tab:hover { border-color: var(--green-dark); color: var(--green-dark); }
+        .quotes-filter-tab.active { background: var(--green-dark); border-color: var(--green-dark); color: white; }
+
+        /* Quote card grid */
+        .quotes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+            gap: 0.9rem;
+        }
+        .quote-card {
+            position: relative;
+            border-radius: 0.95rem;
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 4 / 3;
+            transition: transform 0.22s ease, box-shadow 0.22s ease;
+        }
+        .quote-card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+        .quote-card canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .quote-card-dim {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 55%, transparent 100%);
+        }
+        .quote-card-body {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1rem 1.1rem;
+        }
+        .quote-card-body blockquote {
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-style: italic;
+            line-height: 1.45;
+            color: #fff;
+            margin: 0 0 0.35rem;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.55);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .quote-card-body cite {
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.78);
+            font-style: normal;
+            font-weight: 500;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+        .quote-card .wp-hint {
+            position: absolute;
+            top: 0.7rem;
+            right: 0.7rem;
+            z-index: 3;
+            width: 1.65rem;
+            height: 1.65rem;
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(6px);
+            border-radius: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.18s;
+        }
+        .quote-card:hover .wp-hint { opacity: 1; }
+
+        /* =========================================================
+           WALLPAPER FULL-SCREEN OVERLAY
+           ========================================================= */
+        #wallpaper-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.38s ease;
+        }
+        #wallpaper-overlay.is-open { opacity: 1; pointer-events: auto; }
+
+        #wp-bg {
+            position: absolute;
+            inset: 0;
+            transition: background 0.55s ease;
+        }
+        #wp-art {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+        #wp-art canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.55;
+        }
+        #wp-dim {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.22);
+        }
+
+        #wp-content {
+            position: relative;
+            z-index: 2;
+            max-width: 44rem;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+        #wp-cat {
+            display: inline-block;
+            background: rgba(255,255,255,0.14);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.24);
+            color: rgba(255,255,255,0.88);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            padding: 0.22rem 0.7rem;
+            border-radius: 999px;
+            margin-bottom: 1.75rem;
+        }
+        #wp-quote {
+            font-size: clamp(1.2rem, 3.2vw, 2.1rem);
+            font-weight: 700;
+            font-style: italic;
+            line-height: 1.4;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+            margin-bottom: 1.4rem;
+            letter-spacing: -0.01em;
+        }
+        #wp-quote::before { content: '\201C'; }
+        #wp-quote::after  { content: '\201D'; }
+        #wp-author {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.78);
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        #wp-author::before { content: '— '; }
+
+        /* Top-right controls */
+        #wp-ctrl-top {
+            position: absolute;
+            top: 1.1rem;
+            right: 1.1rem;
+            z-index: 10;
+            display: flex;
+            gap: 0.4rem;
+        }
+        /* Bottom center controls */
+        #wp-ctrl-bottom {
+            position: absolute;
+            bottom: 1.6rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+        /* Left/right nav */
+        #wp-prev { position: absolute; top: 50%; left: 1.1rem; transform: translateY(-50%); z-index: 10; }
+        #wp-next { position: absolute; top: 50%; right: 1.1rem; transform: translateY(-50%); z-index: 10; }
+
+        .wp-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.14);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.24);
+            color: #fff;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.18s, transform 0.15s;
+        }
+        .wp-btn:hover { background: rgba(255,255,255,0.26); }
+        .wp-icon-btn { width: 2.2rem; height: 2.2rem; }
+        .wp-nav-btn { width: 2.65rem; height: 2.65rem; }
+        .wp-nav-btn:hover { transform: scale(1.08); }
+        .wp-text-btn {
+            padding: 0.42rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            gap: 0.35rem;
+        }
+        .wp-text-btn svg { width: 0.9rem; height: 0.9rem; }
+
+        #wp-counter {
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.6);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        #wp-copy-toast {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.72);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 0.32rem 0.85rem;
+            border-radius: 999px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.28s;
+            z-index: 20;
+            white-space: nowrap;
+        }
+        #wp-copy-toast.show { opacity: 1; }
+
+        /* =========================================================
+           LANDING ART — CC0 images from The Met / NASA behind chat
+           ========================================================= */
+        #landing { position: relative; }
+
+        #landing-art {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        #landing-art-img {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transform: scale(1.05);
+            transition: opacity 1.4s ease, transform 8s ease;
+        }
+        #landing-art.is-loaded #landing-art-img { opacity: 1; transform: scale(1); }
+
+        #landing-art-veil {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom,
+                rgba(8, 22, 17, 0.52) 0%,
+                rgba(8, 22, 17, 0.32) 42%,
+                rgba(8, 22, 17, 0.66) 100%);
+            opacity: 0;
+            transition: opacity 1.4s ease;
+        }
+        #landing-art.is-loaded #landing-art-veil { opacity: 1; }
+
+        /* Keep header + hero above the art */
+        #landing-header, #landing > .flex-1 { position: relative; z-index: 1; }
+
+        /* Landing quote block — centered over the art */
+        #landing-quote {
+            position: absolute;
+            left: 50%;
+            top: 45%;
+            transform: translate(-50%, -50%);
+            width: calc(100% - 2.5rem);
+            max-width: 42rem;
+            text-align: center;
+            z-index: 1;
+            user-select: none;
+        }
+        #landing-quote blockquote {
+            font-size: clamp(1.15rem, 2.8vw, 1.9rem);
+            font-weight: 700;
+            font-style: italic;
+            line-height: 1.45;
+            letter-spacing: -0.01em;
+            color: var(--green-dark);
+            margin: 0 0 0.7rem;
+            transition: color 0.8s ease;
+        }
+        #landing-quote blockquote::before { content: '\201C'; }
+        #landing-quote blockquote::after  { content: '\201D'; }
+        #landing-quote cite {
+            font-size: 0.72rem;
+            font-style: normal;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(15, 74, 58, 0.65);
+            transition: color 0.8s ease;
+        }
+        #landing.has-art #landing-quote blockquote {
+            color: #fff;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
+        }
+        #landing.has-art #landing-quote cite {
+            color: rgba(255, 255, 255, 0.78);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        #landing-quote-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-top: 0.9rem;
+            padding: 0.32rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.66rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            border: 1.5px solid rgba(15, 74, 58, 0.3);
+            background: rgba(255, 255, 255, 0.55);
+            color: var(--green-dark);
+            transition: all 0.2s ease;
+        }
+        #landing.has-art #landing-quote-refresh {
+            border-color: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(8px);
+            color: #fff;
+        }
+        #landing-quote-refresh:hover { transform: translateY(-1px); }
+
+        /* Artwork attribution — bottom-left corner */
+        #landing-art-credit {
+            position: absolute;
+            bottom: 0.65rem;
+            left: 1rem;
+            z-index: 1;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.62);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+            max-width: 40vw;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0;
+            transition: opacity 1.4s ease;
+            pointer-events: none;
+        }
+        #landing.has-art #landing-art-credit { opacity: 1; }
+    </style>
 </head>
 <body class="h-screen w-screen m-0 overflow-hidden bg-white">
 
     <div id="landing" class="h-full flex flex-col">
+        <!-- CC0 art background (The Met Open Access / NASA) -->
+        <div id="landing-art" aria-hidden="true">
+            <div id="landing-art-img"></div>
+            <div id="landing-art-veil"></div>
+        </div>
+        <div id="landing-art-credit"></div>
+
         <header class="relative flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 pb-4 sm:pb-4 shrink-0" id="landing-header">
             <img
                 src="/assets/logo-icon.svg"
@@ -515,6 +993,7 @@
                 <button type="button" class="nav-link" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link" data-nav="contact">Contact Us</button>
                 <button type="button" class="nav-link" data-nav="about">About</button>
+                <button type="button" class="nav-link" data-nav="quotes">Inspiration</button>
             </nav>
             <!-- Mobile nav — compact pills inline with logo -->
             <nav class="md:hidden flex items-center gap-1.5 flex-wrap justify-end">
@@ -522,16 +1001,19 @@
                 <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="contact">Contact Us</button>
+                <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="quotes">Inspiration</button>
             </nav>
         </header>
         <div class="flex-1 relative">
-            <div class="absolute inset-y-0 right-8 lg:right-20 hidden md:flex flex-col items-end justify-center text-right max-w-md px-4 select-none">
-                <h2 class="text-3xl lg:text-5xl font-black text-[var(--green-dark)] tracking-tight mb-6 leading-tight">
-                    Mental health. Anywhere. Anytime.
-                </h2>
-                <button id="hero-action" type="button" class="pill-dark px-8 py-3.5 text-sm font-semibold hover:opacity-90 transition">
-                    Start a conversation
-                </button>
+            <!-- Rotating inspirational quote over the art -->
+            <div id="landing-quote">
+                <blockquote id="lq-text"></blockquote>
+                <cite id="lq-author"></cite>
+                <div>
+                    <button id="landing-quote-refresh" type="button" title="New quote and artwork">
+                        &#8635;&nbsp;New inspiration
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -563,6 +1045,7 @@
                 <button type="button" class="nav-link text-left" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link text-left" data-nav="contact">Contact Us</button>
                 <button type="button" class="nav-link text-left" data-nav="about">About Us</button>
+                <button type="button" class="nav-link text-left" data-nav="quotes">Inspiration</button>
             </nav>
             <div class="mt-auto pt-3 sm:pt-5 md:pt-8 shrink-0">
                 <div class="ad-card rounded-xl overflow-hidden border border-gray-200 bg-[#1a2d5a] text-white text-[9px] md:text-[10px] leading-snug shadow-sm">
@@ -654,6 +1137,69 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- =========================================================
+         WALLPAPER FULL-SCREEN OVERLAY
+         ========================================================= -->
+    <div id="wallpaper-overlay" role="dialog" aria-modal="true" aria-label="Quote wallpaper viewer">
+        <div id="wp-bg"></div>
+        <div id="wp-art"></div>
+        <div id="wp-dim"></div>
+
+        <!-- Top-right: close -->
+        <div id="wp-ctrl-top">
+            <button id="wp-close" type="button" class="wp-btn wp-icon-btn" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Prev / Next navigation -->
+        <div id="wp-prev">
+            <button type="button" class="wp-btn wp-nav-btn" aria-label="Previous quote">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+        </div>
+        <div id="wp-next">
+            <button type="button" class="wp-btn wp-nav-btn" aria-label="Next quote">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Central quote content -->
+        <div id="wp-content">
+            <div id="wp-cat"></div>
+            <p id="wp-quote"></p>
+            <p id="wp-author"></p>
+        </div>
+
+        <!-- Bottom bar: copy · counter · download -->
+        <div id="wp-ctrl-bottom">
+            <button id="wp-copy" type="button" class="wp-btn wp-text-btn" title="Copy quote to clipboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+            </button>
+            <span id="wp-counter"></span>
+            <button id="wp-download" type="button" class="wp-btn wp-text-btn" title="Download as 1920×1080 wallpaper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Save Wallpaper
+            </button>
+        </div>
+
+        <div id="wp-copy-toast">Copied to clipboard</div>
     </div>
 
     <script>
@@ -1070,6 +1616,37 @@
 
                 </div>
             ` },
+            quotes: { title: 'Daily Wisdom', body: `
+                <div id="quotes-container">
+                    <!-- Hero featured quote -->
+                    <div id="quotes-hero" class="quotes-hero">
+                        <canvas id="quotes-hero-canvas"></canvas>
+                        <div class="quotes-hero-dim"></div>
+                        <div class="quotes-hero-content">
+                            <span id="hero-tag" class="q-tag"></span>
+                            <blockquote id="hero-text"></blockquote>
+                            <cite id="hero-author"></cite>
+                            <div class="hero-action-bar">
+                                <button id="hero-wallpaper-btn" type="button">&#10064; View as Wallpaper</button>
+                                <button id="hero-next-btn" type="button">Next Quote &rarr;</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category filter tabs -->
+                    <div class="quotes-filter-tabs">
+                        <button class="quotes-filter-tab active" data-filter="all">All</button>
+                        <button class="quotes-filter-tab" data-filter="stoicism">Stoicism</button>
+                        <button class="quotes-filter-tab" data-filter="enlightenment">Enlightenment</button>
+                        <button class="quotes-filter-tab" data-filter="empowerment">Self-Empowerment</button>
+                        <button class="quotes-filter-tab" data-filter="wisdom">Wisdom</button>
+                        <button class="quotes-filter-tab" data-filter="love">Love &amp; Spirit</button>
+                    </div>
+
+                    <!-- Quote cards grid -->
+                    <div id="quotes-grid" class="quotes-grid"></div>
+                </div>
+            ` },
         };
 
         const EXPAND_MS = 1050;
@@ -1191,6 +1768,12 @@
             showPanel('content', navKey);
             document.getElementById('content-title').innerHTML = CONTENT_PAGES[navKey]?.title || '';
             document.getElementById('content-body').innerHTML = CONTENT_PAGES[navKey]?.body || '';
+
+            // Quotes page: widen container + initialize interactive art
+            panelContent.classList.toggle('quotes-mode', navKey === 'quotes');
+            if (navKey === 'quotes') {
+                requestAnimationFrame(() => initQuotesPage());
+            }
         }
 
         function newChat() {
@@ -1221,8 +1804,6 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeMobileSidebar();
         });
-
-        document.getElementById('hero-action')?.addEventListener('click', () => chatInput.focus());
 
         function goHome() {
             if (!isExpanded) return;
@@ -1414,6 +1995,616 @@
                 chatStatus.textContent = 'Server offline — run npm start, then open http://localhost:3000';
                 chatStatus.classList.add('text-red-500');
             });
+
+        /* ==========================================================
+           INSPIRATIONAL QUOTES — DATA LIBRARY & ART ENGINE
+           ========================================================== */
+
+        const QUOTES_LIBRARY = [
+            // ── STOICISM ──────────────────────────────────────────────
+            { id:  1, text: "You have power over your mind, not outside events. Realize this, and you will find strength.", author: "Marcus Aurelius", source: "Meditations", category: "stoicism" },
+            { id:  2, text: "The impediment to action advances action. What stands in the way becomes the way.", author: "Marcus Aurelius", source: "Meditations", category: "stoicism" },
+            { id:  3, text: "Waste no more time arguing about what a good man should be. Be one.", author: "Marcus Aurelius", source: "Meditations", category: "stoicism" },
+            { id:  4, text: "We suffer more in imagination than in reality.", author: "Seneca", source: "Letters to Lucilius", category: "stoicism" },
+            { id:  5, text: "Begin at once to live, and count each separate day as a separate life.", author: "Seneca", source: "Letters to Lucilius", category: "stoicism" },
+            { id:  6, text: "It is not the man who has too little, but the man who craves more, that is poor.", author: "Seneca", source: "Letters to Lucilius", category: "stoicism" },
+            { id:  7, text: "Make the best use of what is in your power, and take the rest as it happens.", author: "Epictetus", source: "Enchiridion", category: "stoicism" },
+            { id:  8, text: "He is a wise man who does not grieve for the things which he has not, but rejoices for those which he has.", author: "Epictetus", source: "Discourses", category: "stoicism" },
+            // ── ENLIGHTENMENT / BUDDHISM / TAOISM ────────────────────
+            { id:  9, text: "Peace comes from within. Do not seek it without.", author: "Buddha", source: "Dhammapada", category: "enlightenment" },
+            { id: 10, text: "The mind is everything. What you think you become.", author: "Buddha", source: "Dhammapada", category: "enlightenment" },
+            { id: 11, text: "Three things cannot be long hidden: the sun, the moon, and the truth.", author: "Buddha", source: "Dhammapada", category: "enlightenment" },
+            { id: 12, text: "Knowing others is wisdom, knowing yourself is enlightenment.", author: "Lao Tzu", source: "Tao Te Ching", category: "enlightenment" },
+            { id: 13, text: "Nature does not hurry, yet everything is accomplished.", author: "Lao Tzu", source: "Tao Te Ching", category: "enlightenment" },
+            { id: 14, text: "When you realize there is nothing lacking, the whole world belongs to you.", author: "Lao Tzu", source: "Tao Te Ching", category: "enlightenment" },
+            { id: 15, text: "The present moment always will have been.", author: "Eckhart Tolle", source: "The Power of Now", category: "enlightenment" },
+            { id: 16, text: "If you are depressed, you are living in the past. If you are anxious, you are living in the future. If you are at peace, you are living in the present.", author: "Lao Tzu", source: "Tao Te Ching", category: "enlightenment" },
+            // ── SELF-EMPOWERMENT ──────────────────────────────────────
+            { id: 17, text: "You are never too old to set another goal or to dream a new dream.", author: "C.S. Lewis", source: "", category: "empowerment" },
+            { id: 18, text: "In the middle of every difficulty lies opportunity.", author: "Albert Einstein", source: "", category: "empowerment" },
+            { id: 19, text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius", source: "Analects", category: "empowerment" },
+            { id: 20, text: "Fall seven times, stand up eight.", author: "Japanese Proverb", source: "", category: "empowerment" },
+            { id: 21, text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt", source: "", category: "empowerment" },
+            { id: 22, text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson", source: "", category: "empowerment" },
+            { id: 23, text: "You do not find the happy life — you make it.", author: "Camilla Eyring Kimball", source: "", category: "empowerment" },
+            // ── WISDOM & PHILOSOPHY ───────────────────────────────────
+            { id: 24, text: "He who has a why to live can bear almost any how.", author: "Friedrich Nietzsche", source: "Twilight of the Idols", category: "wisdom" },
+            { id: 25, text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle", source: "Nicomachean Ethics", category: "wisdom" },
+            { id: 26, text: "The unexamined life is not worth living.", author: "Socrates", source: "Apology", category: "wisdom" },
+            { id: 27, text: "I am not what happened to me, I am what I choose to become.", author: "Carl Jung", source: "", category: "wisdom" },
+            { id: 28, text: "The cave you fear to enter holds the treasure you seek.", author: "Joseph Campbell", source: "", category: "wisdom" },
+            { id: 29, text: "Between stimulus and response there is a space. In that space is our power to choose our response.", author: "Viktor Frankl", source: "Man's Search for Meaning", category: "wisdom" },
+            // ── LOVE & SPIRIT (Rumi / Sufi) ───────────────────────────
+            { id: 30, text: "Out beyond ideas of wrongdoing and rightdoing, there is a field. I'll meet you there.", author: "Rumi", source: "Masnavi", category: "love" },
+            { id: 31, text: "Your task is not to seek for love, but merely to seek and find all the barriers within yourself that you have built against it.", author: "Rumi", source: "Masnavi", category: "love" },
+            { id: 32, text: "Yesterday I was clever, so I wanted to change the world. Today I am wise, so I am changing myself.", author: "Rumi", source: "Masnavi", category: "love" },
+            { id: 33, text: "Let yourself be silently drawn by the strange pull of what you really love. It will not lead you astray.", author: "Rumi", source: "Masnavi", category: "love" },
+            { id: 34, text: "The wound is the place where the Light enters you.", author: "Rumi", source: "Masnavi", category: "love" },
+            { id: 35, text: "Wherever you are, and whatever you do, be in love.", author: "Rumi", source: "Masnavi", category: "love" },
+        ];
+
+        const ART_THEMES = {
+            stoicism:     { label: 'Stoicism',       gradient: ['#1a1a2e','#0f3460','#533483'], accent: '#e2b96f', particle: 'rgba(226,185,111,0.35)', text: '#fef3c7' },
+            enlightenment:{ label: 'Enlightenment',  gradient: ['#052e16','#065f46','#047857'], accent: '#6ee7b7', particle: 'rgba(110,231,183,0.3)',  text: '#ecfdf5' },
+            empowerment:  { label: 'Self-Empowerment',gradient: ['#431407','#c2410c','#d97706'], accent: '#fbbf24', particle: 'rgba(251,191,36,0.3)',   text: '#fff7ed' },
+            wisdom:       { label: 'Wisdom',          gradient: ['#1e1b4b','#3730a3','#6d28d9'], accent: '#a5b4fc', particle: 'rgba(165,180,252,0.3)',  text: '#eef2ff' },
+            love:         { label: 'Love & Spirit',   gradient: ['#3b0764','#7e22ce','#be185d'], accent: '#f0abfc', particle: 'rgba(240,171,252,0.3)',  text: '#fdf4ff' },
+        };
+
+        function getTheme(category) {
+            return ART_THEMES[category] || ART_THEMES.wisdom;
+        }
+
+        function cssGrad(theme) {
+            const [c1, c2, c3] = theme.gradient;
+            return `linear-gradient(135deg, ${c1} 0%, ${c2} 55%, ${c3} 100%)`;
+        }
+
+        /* Draw abstract art onto a canvas element */
+        function paintArt(canvas, theme, w, h) {
+            canvas.width  = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            /* Background gradient */
+            const [c1, c2, c3] = theme.gradient;
+            const grd = ctx.createLinearGradient(0, 0, w, h);
+            grd.addColorStop(0,    c1);
+            grd.addColorStop(0.55, c2);
+            grd.addColorStop(1,    c3);
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, w, h);
+
+            /* Soft radial glow */
+            const gx = w * 0.65, gy = h * 0.32;
+            const rg = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.max(w, h) * 0.65);
+            rg.addColorStop(0, theme.particle.replace(/[\d.]+\)$/, '0.38)'));
+            rg.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = rg;
+            ctx.fillRect(0, 0, w, h);
+
+            /* Fine geometric lines — deterministic pseudo-random per theme */
+            const seed = theme.label.charCodeAt(0) * 0.618033988749895;
+            const r    = (n) => { const x = Math.sin(seed + n) * 43758.5453123; return x - Math.floor(x); };
+            ctx.strokeStyle = theme.particle;
+            ctx.lineWidth   = 0.7;
+            for (let i = 0; i < 7; i++) {
+                ctx.beginPath();
+                ctx.moveTo(r(i * 2)     * w, r(i * 2 + 1) * h);
+                ctx.lineTo(r(i * 2 + 10)* w, r(i * 2 + 11)* h);
+                ctx.stroke();
+            }
+
+            /* Floating circles */
+            for (let i = 0; i < 5; i++) {
+                const cx = r(i + 20) * w;
+                const cy = r(i + 25) * h;
+                const rad= 18 + r(i + 30) * 70;
+                ctx.strokeStyle = theme.particle.replace(/[\d.]+\)$/, `${(0.07 + r(i) * 0.12).toFixed(2)})`);
+                ctx.lineWidth   = 0.8;
+                ctx.beginPath();
+                ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            /* Star-like particles */
+            ctx.fillStyle = theme.accent;
+            for (let i = 0; i < 55; i++) {
+                const px = r(i + 40) * w;
+                const py = r(i + 41) * h;
+                const ps = 0.4 + r(i + 42) * 2.2;
+                ctx.globalAlpha = 0.2 + r(i + 43) * 0.55;
+                ctx.beginPath();
+                ctx.arc(px, py, ps, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        /* ==========================================================
+           QUOTES PAGE — INIT & RENDER
+           ========================================================== */
+
+        const quotesState = { filter: 'all', heroIdx: 0, wpIdx: 0, isOpen: false };
+
+        function getFiltered(filter) {
+            return filter === 'all' ? [...QUOTES_LIBRARY] : QUOTES_LIBRARY.filter(q => q.category === filter);
+        }
+
+        function initQuotesPage() {
+            const body = document.getElementById('content-body');
+            if (!body || !body.querySelector('#quotes-container')) return;
+
+            quotesState.filter = 'all';
+            quotesState.heroIdx = new Date().getDate() % QUOTES_LIBRARY.length;
+
+            renderHero(quotesState.heroIdx);
+            renderGrid(getFiltered('all'));
+
+            /* Filter tab events */
+            body.querySelectorAll('.quotes-filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    body.querySelectorAll('.quotes-filter-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    quotesState.filter = tab.dataset.filter;
+                    renderGrid(getFiltered(quotesState.filter));
+                });
+            });
+
+            /* Hero buttons */
+            body.querySelector('#hero-wallpaper-btn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openWallpaper(quotesState.heroIdx);
+            });
+            body.querySelector('#hero-next-btn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                quotesState.heroIdx = (quotesState.heroIdx + 1) % QUOTES_LIBRARY.length;
+                renderHero(quotesState.heroIdx);
+            });
+            body.querySelector('#quotes-hero')?.addEventListener('click', () => {
+                openWallpaper(quotesState.heroIdx);
+            });
+        }
+
+        function renderHero(idx) {
+            const body = document.getElementById('content-body');
+            if (!body) return;
+            const q = QUOTES_LIBRARY[idx];
+            const t = getTheme(q.category);
+            const hero = body.querySelector('#quotes-hero');
+            if (hero) hero.style.background = cssGrad(t);
+            const tag    = body.querySelector('#hero-tag');
+            const text   = body.querySelector('#hero-text');
+            const author = body.querySelector('#hero-author');
+            if (tag)    tag.textContent    = t.label;
+            if (text)   text.textContent   = q.text;
+            if (author) author.textContent = '\u2014 ' + q.author + (q.source ? ', ' + q.source : '');
+            const cv = document.getElementById('quotes-hero-canvas');
+            if (cv) {
+                const W = cv.offsetWidth  || 600;
+                const H = cv.offsetHeight || 240;
+                paintArt(cv, t, W, H);
+            }
+        }
+
+        function renderGrid(quotes) {
+            const grid = document.getElementById('quotes-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            quotes.forEach(q => {
+                const t       = getTheme(q.category);
+                const globalI = QUOTES_LIBRARY.indexOf(q);
+                const card    = document.createElement('div');
+                card.className = 'quote-card';
+                card.style.background = cssGrad(t);
+                card.dataset.idx = globalI;
+                card.innerHTML = `
+                    <canvas width="360" height="270"></canvas>
+                    <div class="quote-card-dim"></div>
+                    <div class="quote-card-body">
+                        <blockquote>${q.text.length > 115 ? q.text.slice(0, 112) + '\u2026' : q.text}</blockquote>
+                        <cite>${q.author}</cite>
+                    </div>
+                    <div class="wp-hint" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="13" height="13">
+                            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </div>`;
+                card.addEventListener('click', () => openWallpaper(globalI));
+                grid.appendChild(card);
+                requestAnimationFrame(() => {
+                    const cv = card.querySelector('canvas');
+                    if (cv) paintArt(cv, t, 360, 270);
+                });
+            });
+        }
+
+        /* ==========================================================
+           WALLPAPER OVERLAY
+           ========================================================== */
+
+        const wpOverlay  = document.getElementById('wallpaper-overlay');
+        const wpBg       = document.getElementById('wp-bg');
+        const wpArt      = document.getElementById('wp-art');
+        const wpCat      = document.getElementById('wp-cat');
+        const wpQuoteEl  = document.getElementById('wp-quote');
+        const wpAuthorEl = document.getElementById('wp-author');
+        const wpCounter  = document.getElementById('wp-counter');
+
+        function openWallpaper(idx) {
+            quotesState.wpIdx  = idx;
+            quotesState.isOpen = true;
+            renderWallpaper(idx);
+            wpOverlay.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('wp-close')?.focus();
+        }
+
+        function closeWallpaper() {
+            wpOverlay.classList.remove('is-open');
+            document.body.style.overflow = '';
+            quotesState.isOpen = false;
+        }
+
+        function shiftWallpaper(delta) {
+            quotesState.wpIdx = (quotesState.wpIdx + delta + QUOTES_LIBRARY.length) % QUOTES_LIBRARY.length;
+            renderWallpaper(quotesState.wpIdx);
+        }
+
+        function renderWallpaper(idx) {
+            const q = QUOTES_LIBRARY[idx];
+            const t = getTheme(q.category);
+
+            wpBg.style.background = cssGrad(t);
+            wpCat.textContent     = t.label;
+            wpQuoteEl.textContent = q.text;
+            wpAuthorEl.textContent= q.author + (q.source ? ' \u00B7 ' + q.source : '');
+            wpQuoteEl.style.color = t.text || '#fff';
+            wpAuthorEl.style.color= 'rgba(255,255,255,0.78)';
+            wpCounter.textContent = (idx + 1) + ' / ' + QUOTES_LIBRARY.length;
+
+            /* Regenerate art canvas */
+            let cv = document.getElementById('wp-art-canvas');
+            if (!cv) {
+                cv = document.createElement('canvas');
+                cv.id = 'wp-art-canvas';
+                wpArt.appendChild(cv);
+            }
+            paintArt(cv, t, window.innerWidth, window.innerHeight);
+        }
+
+        /* Download 1920×1080 wallpaper via Canvas */
+        function downloadWallpaper() {
+            const q = QUOTES_LIBRARY[quotesState.wpIdx];
+            const t = getTheme(q.category);
+            const W = 1920, H = 1080;
+            const cv  = document.createElement('canvas');
+            cv.width  = W; cv.height = H;
+            const ctx = cv.getContext('2d');
+
+            /* Background */
+            const [c1, c2, c3] = t.gradient;
+            const grd = ctx.createLinearGradient(0, 0, W, H);
+            grd.addColorStop(0, c1); grd.addColorStop(0.55, c2); grd.addColorStop(1, c3);
+            ctx.fillStyle = grd; ctx.fillRect(0, 0, W, H);
+
+            /* Glow */
+            const rg = ctx.createRadialGradient(W*0.65, H*0.32, 0, W*0.65, H*0.32, Math.max(W,H)*0.6);
+            rg.addColorStop(0, t.particle.replace(/[\d.]+\)$/, '0.4)')); rg.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+
+            /* Stars */
+            ctx.fillStyle = t.accent;
+            for (let i = 0; i < 140; i++) {
+                const r = (i * 0.61803398875) % 1;
+                const s = (i * 0.38196601125) % 1;
+                const sz= 0.5 + ((i * 0.17320508075) % 1) * 3;
+                ctx.globalAlpha = 0.12 + ((i * 0.27182818284) % 1) * 0.55;
+                ctx.beginPath(); ctx.arc(r*W, s*H, sz, 0, Math.PI*2); ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            /* Overlay for readability */
+            ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(0, 0, W, H);
+
+            /* Category label */
+            ctx.font = '600 22px Inter, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.textAlign = 'center';
+            ctx.fillText(t.label.toUpperCase(), W/2, H*0.30);
+
+            /* Divider */
+            ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(W/2 - 55, H*0.33); ctx.lineTo(W/2 + 55, H*0.33); ctx.stroke();
+
+            /* Quote text */
+            ctx.font = 'italic 700 52px Inter, Georgia, serif';
+            ctx.fillStyle = t.text || '#fff';
+            ctx.textAlign = 'center';
+            const lastY = wrapCanvasText(ctx, '\u201C' + q.text + '\u201D', W/2, H*0.41, W*0.72, 70);
+
+            /* Author */
+            ctx.font = '500 26px Inter, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.75)';
+            ctx.fillText('\u2014 ' + q.author + (q.source ? ' \u00B7 ' + q.source : ''), W/2, lastY + 72);
+
+            /* Branding */
+            ctx.font = '400 16px Inter, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillText("Liam\u2019s Call \u00B7 Daily Wisdom", W/2, H - 36);
+
+            cv.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a   = document.createElement('a');
+                a.href    = url;
+                a.download= 'quote-' + q.author.toLowerCase().replace(/\s+/g,'-') + '-wallpaper.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+        }
+
+        function wrapCanvasText(ctx, text, x, y, maxW, lineH) {
+            const words = text.split(' ');
+            let line = '', curY = y;
+            for (const word of words) {
+                const test = line ? line + ' ' + word : word;
+                if (ctx.measureText(test).width > maxW && line) {
+                    ctx.fillText(line, x, curY);
+                    line = word; curY += lineH;
+                } else { line = test; }
+            }
+            if (line) ctx.fillText(line, x, curY);
+            return curY;
+        }
+
+        function copyWallpaperQuote() {
+            const q = QUOTES_LIBRARY[quotesState.wpIdx];
+            const text = '\u201C' + q.text + '\u201D \u2014 ' + q.author;
+            navigator.clipboard?.writeText(text).then(() => {
+                const t = document.getElementById('wp-copy-toast');
+                if (t) { t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
+            }).catch(() => {});
+        }
+
+        /* Wire wallpaper overlay controls */
+        document.getElementById('wp-close')?.addEventListener('click', closeWallpaper);
+        document.getElementById('wp-prev')?.querySelector('button')?.addEventListener('click', () => shiftWallpaper(-1));
+        document.getElementById('wp-next')?.querySelector('button')?.addEventListener('click', () => shiftWallpaper(1));
+        document.getElementById('wp-download')?.addEventListener('click', downloadWallpaper);
+        document.getElementById('wp-copy')?.addEventListener('click', copyWallpaperQuote);
+
+        /* Click outside content area to close */
+        wpOverlay?.addEventListener('click', (e) => {
+            if (e.target === wpOverlay || e.target === wpBg) closeWallpaper();
+        });
+
+        /* Keyboard: arrows navigate, Escape closes */
+        document.addEventListener('keydown', (e) => {
+            if (!quotesState.isOpen) return;
+            if (e.key === 'Escape')     closeWallpaper();
+            if (e.key === 'ArrowLeft')  shiftWallpaper(-1);
+            if (e.key === 'ArrowRight') shiftWallpaper(1);
+        });
+
+        /* ==========================================================
+           LANDING ART — random CC0 image (The Met / NASA) + quote
+           behind the chat section, refreshed on every page load
+           ========================================================== */
+
+        const MET_API   = 'https://collectionapi.metmuseum.org/public/collection/v1';
+        const RIJKS_API = 'https://data.rijksmuseum.nl';
+
+        /* Feel-good fine-art themes — chosen for large result pools in
+           The Met's European Paintings collection */
+        const MET_QUERIES  = ['landscape', 'garden', 'flowers', 'harbor', 'pastoral', 'meadow',
+                              'moonlight', 'spring', 'sunset', 'sea'];
+
+        /* Fine-art paintings departments only — The Met's API ignores its
+           departmentIds parameter when combined with other filters, so each
+           object's department must be verified client-side. This is what
+           keeps pottery, armor, and artifacts out. */
+        const MET_OK_DEPARTMENTS = new Set([
+            'European Paintings',
+            'The American Wing',
+            'Robert Lehman Collection',
+        ]);
+
+        /* Content filter — skip artworks whose metadata suggests violent,
+           morbid, or otherwise non-calming subject matter, plus pottery,
+           fragments, and weaponry artifacts */
+        const ART_BLOCKLIST = /\b(war|battle|death|dead|dying|skull|crucifix|martyr|massacre|execution|behead|nude|naked|slaughter|funeral|corpse|wound|plague|murder|sacrifice|demon|hell|damnation|torture|weapon|cannon|rifle|soldier|siege|invasion|amphora|vase|krater|terracotta|fragment|vessel|jug|urn|sarcophagus|relief|sword|dagger|armou?r|helmet|shield|storm|shipwreck|ruin|hunt|boar|prey|carcass)/i;
+
+        function contentOk(...fields) {
+            return !ART_BLOCKLIST.test(fields.filter(Boolean).join(' '));
+        }
+
+        const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        function preloadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload  = () => resolve({ url, w: img.naturalWidth, h: img.naturalHeight });
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        /* Quality gate: sharp enough to cover the viewport, and an aspect
+           ratio close enough to the screen's that cover-cropping looks good */
+        function imageFitsScreen(w, h) {
+            const vw = window.innerWidth  || 1280;
+            const vh = window.innerHeight || 800;
+            if (w < vw * 0.8 || h < vh * 0.8) return false;   // too low-res, would blur
+            const imgAR  = w / h;
+            const viewAR = vw / vh;
+            const mismatch = Math.max(imgAR / viewAR, viewAR / imgAR);
+            return mismatch <= 2.2;                            // rejects extreme crops
+        }
+
+        /* Cheap orientation pre-filter using the artwork's physical
+           measurements, so unsuitable paintings are skipped before the
+           (large) original image is ever downloaded */
+        function metOrientationOk(obj) {
+            const em = obj.measurements?.find(m => m.elementMeasurements?.Width && m.elementMeasurements?.Height)?.elementMeasurements;
+            if (!em) return true;   // no data — let the pixel check decide
+            const viewAR = (window.innerWidth || 1280) / (window.innerHeight || 800);
+            const artAR  = em.Width / em.Height;
+            return Math.max(artAR / viewAR, viewAR / artAR) <= 2.2;
+        }
+
+        /* The Met Open Access — fine-art paintings only, public domain (CC0).
+           Every object is verified to belong to a paintings department AND
+           be classified as a painting before its image is downloaded. */
+        async function fetchMetArt() {
+            const q   = pickRandom(MET_QUERIES);
+            const res = await fetch(`${MET_API}/search?hasImages=true&isPublicDomain=true&departmentIds=11&medium=Paintings&q=${encodeURIComponent(q)}`);
+            const ids = (await res.json()).objectIDs || [];
+            if (!ids.length) throw new Error('No Met results');
+
+            const pool = ids.slice(0, 300);
+            let downloads = 0;
+            for (let attempt = 0; attempt < 15 && downloads < 3; attempt++) {
+                const id  = pickRandom(pool);
+                const obj = await (await fetch(`${MET_API}/objects/${id}`)).json();
+                if (!obj.isPublicDomain || !obj.primaryImage) continue;
+                /* Hard fine-art gates */
+                if (!MET_OK_DEPARTMENTS.has(obj.department)) continue;
+                if (obj.classification && !/painting/i.test(obj.classification)) continue;
+                if (!contentOk(obj.title, obj.medium, obj.classification, (obj.tags || []).map(t => t.term).join(' '))) continue;
+                if (!metOrientationOk(obj)) continue;
+
+                downloads++;
+                try {
+                    const img = await preloadImage(obj.primaryImage);
+                    if (!imageFitsScreen(img.w, img.h)) continue;
+                    const artist = obj.artistDisplayName || 'Unknown artist';
+                    return { url: img.url, credit: `\u201C${obj.title}\u201D \u2014 ${artist} \u00B7 The Met (CC0)` };
+                } catch { /* image failed to load — try another */ }
+            }
+            throw new Error('No usable Met image');
+        }
+
+        /* Rijksmuseum (data.rijksmuseum.nl) — keyless Linked Art API.
+           Server-side filters: type=painting + imageAvailable=true + title
+           keyword. Each result is resolved through the Linked Art chain
+           (object → visual item → digital object) to a IIIF endpoint whose
+           info.json provides exact pixel dimensions BEFORE downloading, and
+           the IIIF server resizes to 1920px so downloads stay small. */
+        const RIJKS_TITLE_QUERIES = ['landscape', 'garden', 'flowers', 'river', 'winter', 'view', 'still life'];
+
+        async function rijksLd(url) {
+            const res = await fetch(url.replace('id.rijksmuseum.nl', 'data.rijksmuseum.nl'),
+                { headers: { Accept: 'application/ld+json' } });
+            if (!res.ok) throw new Error('Rijks HTTP ' + res.status);
+            return res.json();
+        }
+
+        async function fetchRijksArt() {
+            const q      = pickRandom(RIJKS_TITLE_QUERIES);
+            const search = await rijksLd(`${RIJKS_API}/search/collection?type=painting&imageAvailable=true&title=${encodeURIComponent(q)}`);
+            const items  = search.orderedItems || [];
+            if (!items.length) throw new Error('No Rijksmuseum results');
+
+            for (let attempt = 0; attempt < 4; attempt++) {
+                try {
+                    const obj   = await rijksLd(pickRandom(items).id);
+                    const title = obj.identified_by?.find(n => n.type === 'Name')?.content || 'Untitled';
+                    if (!contentOk(title)) continue;
+
+                    /* Linked Art chain: object.shows → VisualItem.digitally_shown_by
+                       → DigitalObject.access_point → IIIF image */
+                    const vis  = await rijksLd(obj.shows?.[0]?.id);
+                    const dig  = await rijksLd(vis.digitally_shown_by?.[0]?.id);
+                    const iiif = dig.access_point?.[0]?.id;
+                    if (!iiif) continue;
+
+                    /* Check exact pixel dimensions from IIIF info.json (cheap) */
+                    const base = iiif.replace(/\/full\/[^/]+\/0\/default\.jpg$/, '');
+                    const info = await (await fetch(`${base}/info.json`)).json();
+                    if (!imageFitsScreen(info.width, info.height)) continue;
+
+                    /* Server-side resize to 1920px wide */
+                    const img = await preloadImage(`${base}/full/1920,/0/default.jpg`);
+                    const artist = obj.produced_by?.carried_out_by?.[0]?._label
+                        || obj.produced_by?.part?.[0]?.carried_out_by?.[0]?._label
+                        || 'Unknown artist';
+                    return { url: img.url, credit: `\u201C${title}\u201D \u2014 ${artist} \u00B7 Rijksmuseum (public domain)` };
+                } catch { /* broken chain — try another object */ }
+            }
+            throw new Error('No usable Rijksmuseum image');
+        }
+
+        /* James Webb Space Telescope — proxied through our server so the
+           API key stays in environment variables, not client code */
+        async function fetchJwstArt() {
+            const page = 1 + Math.floor(Math.random() * 10);
+            const res  = await fetch(`/api/jwst?page=${page}&perPage=50`);
+            if (!res.ok) throw new Error('JWST not available');
+            const items = ((await res.json()).body || []).filter(i =>
+                i.location && /\.jpe?g$/i.test(i.location) && !/thumb/i.test(i.location)
+            );
+            if (!items.length) throw new Error('No JWST results');
+
+            for (let attempt = 0; attempt < 3; attempt++) {
+                const item = pickRandom(items);
+                try {
+                    const img = await preloadImage(item.location);
+                    if (!imageFitsScreen(img.w, img.h)) continue;
+                    const label = item.observation_id || item.program || 'Deep space observation';
+                    return { url: img.url, credit: `\u201C${label}\u201D \u00B7 James Webb Space Telescope \u00B7 NASA/ESA/CSA (CC BY 4.0)` };
+                } catch { /* try another */ }
+            }
+            throw new Error('No usable JWST image');
+        }
+
+        function setLandingQuote() {
+            const q = pickRandom(QUOTES_LIBRARY);
+            const text   = document.getElementById('lq-text');
+            const author = document.getElementById('lq-author');
+            if (text)   text.textContent   = q.text;
+            if (author) author.textContent = '\u2014 ' + q.author;
+        }
+
+        async function initLandingArt() {
+            setLandingQuote();
+
+            const landingEl = document.getElementById('landing');
+            const artWrap   = document.getElementById('landing-art');
+            const artImg    = document.getElementById('landing-art-img');
+            const creditEl  = document.getElementById('landing-art-credit');
+            if (!landingEl || !artWrap || !artImg) return;
+
+            /* Met + Rijksmuseum fine-art paintings + James Webb imagery */
+            const sources = [fetchMetArt, fetchRijksArt, fetchJwstArt];
+            sources.sort(() => Math.random() - 0.5);
+
+            for (const fetchArt of sources) {
+                try {
+                    /* Fetchers only return images that passed the pixel
+                       quality gate, already fully preloaded */
+                    const art = await fetchArt();
+                    artImg.style.backgroundImage = `url("${art.url}")`;
+                    if (creditEl) creditEl.textContent = art.credit;
+                    artWrap.classList.add('is-loaded');
+                    landingEl.classList.add('has-art');
+                    return;
+                } catch { /* try next source */ }
+            }
+            /* Both APIs unavailable — quote stays visible on the plain background */
+        }
+
+        document.getElementById('landing-quote-refresh')?.addEventListener('click', () => {
+            const landingEl = document.getElementById('landing');
+            const artWrap   = document.getElementById('landing-art');
+            landingEl?.classList.remove('has-art');
+            artWrap?.classList.remove('is-loaded');
+            initLandingArt();
+        });
+
+        initLandingArt();
     </script>
 
 </body>

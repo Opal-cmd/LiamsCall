@@ -14,6 +14,7 @@ const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000;
 const RATE_LIMIT_MAX_REQUESTS = Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 30;
 const DAILY_LIMIT_PER_IP = Number(process.env.DAILY_LIMIT_PER_IP) || 50;
 const MAX_TOKENS = Number(process.env.MAX_TOKENS) || 1024;
+const JWST_API_KEY = process.env.JWST_API_KEY || '';
 
 // Provider chain: comma-separated list of providers to try in order.
 // e.g. PROVIDER_CHAIN=groq,gemini,openai
@@ -386,7 +387,25 @@ app.get('/', (_req, res) => {
 // Public health check: intentionally minimal so internal configuration
 // (models, rate limits, auth setup) is not disclosed.
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, providers: PROVIDER_CHAIN });
+  res.json({ ok: true, providers: PROVIDER_CHAIN, jwst: Boolean(JWST_API_KEY) });
+});
+
+/* Proxy James Webb Space Telescope images — keeps the API key server-side */
+app.get('/api/jwst', async (req, res) => {
+  if (!JWST_API_KEY) return res.status(503).json({ error: 'JWST API key not configured.' });
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const perPage = Math.min(50, Math.max(1, Number(req.query.perPage) || 50));
+  try {
+    const upstream = await fetch(
+      `https://api.jwstapi.com/all/type/jpg?page=${page}&perPage=${perPage}`,
+      { headers: { 'X-API-KEY': JWST_API_KEY } },
+    );
+    if (!upstream.ok) return res.status(upstream.status).json({ error: 'JWST upstream error.' });
+    const data = await upstream.json();
+    res.json(data);
+  } catch {
+    res.status(502).json({ error: 'Could not reach JWST API.' });
+  }
 });
 
 app.post('/api/chat', async (req, res) => {
