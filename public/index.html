@@ -1023,11 +1023,11 @@
     <div id="chat-shell" class="is-docked">
         <div id="sidebar-overlay"></div>
         <aside id="chat-sidebar" class="flex flex-col px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
-            <!-- Sidebar logo — returns to homepage -->
-            <button id="sidebar-home-btn" type="button" aria-label="Back to homepage" class="flex items-center gap-2.5 mb-5 sm:mb-7 shrink-0 text-left" style="background:none;border:none;padding:0;cursor:pointer;">
-                <img src="/assets/logo-icon.svg" alt="" class="h-7 w-auto pointer-events-none" style="filter:invert(18%) sepia(60%) saturate(800%) hue-rotate(120deg) brightness(70%) contrast(120%);">
-                <span class="text-sm font-bold text-[var(--green-dark)] tracking-tight pointer-events-none" style="letter-spacing:-0.02em;">Liam's Call</span>
-            </button>
+            <!-- Sidebar logo -->
+            <div class="flex items-center gap-2.5 mb-5 sm:mb-7 shrink-0">
+                <img src="/assets/logo-icon.svg" alt="Liam's Call" class="h-7 w-auto" style="filter:invert(18%) sepia(60%) saturate(800%) hue-rotate(120deg) brightness(70%) contrast(120%);">
+                <span class="text-sm font-bold text-[var(--green-dark)] tracking-tight" style="letter-spacing:-0.02em;">Liam's Call</span>
+            </div>
             <div id="sidebar-header" class="flex items-center justify-between mb-4 sm:mb-6 shrink-0">
                 <span class="text-xs font-semibold uppercase tracking-widest text-gray-400 select-none">Menu</span>
                 <button id="sidebar-close" type="button" aria-label="Close navigation menu" class="flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition">
@@ -1820,7 +1820,6 @@
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); }
         });
         document.getElementById('home-btn-mobile')?.addEventListener('click', goHome);
-        document.getElementById('sidebar-home-btn')?.addEventListener('click', goHome);
 
         function scrollToBottom() {
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -1887,16 +1886,10 @@
                     body: JSON.stringify({ messages }),
                 });
             } catch {
-                throw new Error('Unable to connect right now. Please check your connection and try again.');
-            }
-            if (response.status === 429) {
-                throw new Error('Too many messages. Please wait a moment and try again.');
-            }
-            if (response.status === 403) {
-                throw new Error('This session could not be verified. Please refresh the page and try again.');
+                throw new Error('Cannot reach the chat server. Run "npm start" and open http://localhost:3000.');
             }
             if (!response.ok || !response.body) {
-                throw new Error('The assistant is temporarily unavailable. Please try again in a moment.');
+                throw new Error('Chat server error. Make sure "npm start" is running on http://localhost:3000.');
             }
 
             const reader = response.body.getReader();
@@ -1991,12 +1984,12 @@
 
         fetch('/api/health')
             .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
-            .then(() => {
-                chatStatus.textContent = 'Connected';
+            .then((d) => {
+                chatStatus.textContent = d.provider ? `Connected (${d.provider})` : 'Connected';
                 setTimeout(() => { if (!isStreaming) chatStatus.textContent = ''; }, 2500);
             })
             .catch(() => {
-                chatStatus.textContent = 'Unable to reach the server. Please try again shortly.';
+                chatStatus.textContent = 'Server offline — run npm start, then open http://localhost:3000';
                 chatStatus.classList.add('text-red-500');
             });
 
