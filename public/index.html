@@ -528,6 +528,79 @@
             display: none;
         }
 
+        /* Mobile landing nav — logo left, hamburger menu right */
+        #landing-header .mobile-nav {
+            position: relative;
+            z-index: 2;
+        }
+
+        #landing-mobile-menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            border: none;
+            background: var(--green-dark);
+            color: #fff;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.15s ease;
+        }
+
+        #landing-mobile-menu-toggle:hover {
+            background: #145743;
+        }
+
+        #landing-mobile-menu-toggle svg {
+            width: 1.15rem;
+            height: 1.15rem;
+            stroke: currentColor;
+        }
+
+        #landing-mobile-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            min-width: 11.5rem;
+            background: var(--green-dark);
+            border-radius: 1rem;
+            padding: 0.45rem;
+            box-shadow: 0 12px 32px rgba(15, 74, 58, 0.28);
+            z-index: 20;
+        }
+
+        #landing-mobile-menu.is-open {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        #landing-mobile-menu .nav-link {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.6rem 0.9rem;
+            border-radius: 0.65rem;
+            font-size: 0.84rem;
+            font-weight: 500;
+            color: #fff;
+            background: none;
+            border: none;
+        }
+
+        #landing-mobile-menu .nav-link:hover {
+            background: rgba(255, 255, 255, 0.12);
+            opacity: 1;
+        }
+
+        #landing-mobile-menu .nav-link.active {
+            background: rgba(255, 255, 255, 0.16);
+            font-weight: 600;
+        }
+
         #panel-content {
             display: none;
             flex: 1;
@@ -1035,20 +1108,37 @@
                 <button type="button" class="nav-link" data-nav="contact">Contact Us</button>
                 <button type="button" class="nav-link" data-nav="about">About</button>
             </nav>
-            <!-- Mobile nav — logo in pill, links on the right -->
-            <nav class="md:hidden flex items-center gap-1.5 flex-wrap justify-end w-full">
-                <span class="pill-dark px-2 py-1 flex items-center shrink-0 mr-auto">
+            <!-- Mobile nav — logo left, hamburger menu right -->
+            <div class="mobile-nav md:hidden flex items-center justify-between w-full">
+                <span class="pill-dark px-2 py-1 flex items-center shrink-0">
                     <img
                         src="/assets/logo-icon.svg"
                         alt="Liam's Call AI logo"
                         class="nav-logo-icon h-8 w-auto select-none object-contain"
+                        style="filter: brightness(0) invert(1);"
                     >
                 </span>
-                <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="chat">New Chat</button>
-                <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="blog">Blog</button>
-                <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="resources">Resources</button>
-                <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="contact">Contact Us</button>
-            </nav>
+                <button
+                    id="landing-mobile-menu-toggle"
+                    type="button"
+                    aria-label="Open navigation menu"
+                    aria-expanded="false"
+                    aria-controls="landing-mobile-menu"
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="4" y1="7" x2="20" y2="7"></line>
+                        <line x1="4" y1="12" x2="20" y2="12"></line>
+                        <line x1="4" y1="17" x2="20" y2="17"></line>
+                    </svg>
+                </button>
+                <div id="landing-mobile-menu" role="menu">
+                    <button type="button" class="nav-link" role="menuitem" data-nav="chat">New Chat</button>
+                    <button type="button" class="nav-link" role="menuitem" data-nav="blog">Blog</button>
+                    <button type="button" class="nav-link" role="menuitem" data-nav="resources">Resources</button>
+                    <button type="button" class="nav-link" role="menuitem" data-nav="contact">Contact Us</button>
+                    <button type="button" class="nav-link" role="menuitem" data-nav="about">About</button>
+                </div>
+            </div>
         </header>
         <div class="flex-1 relative">
             <!-- Rotating inspirational quote over the art -->
@@ -1433,112 +1523,128 @@
                 </div>
             ` },
             privacy: { title: 'Privacy Policy', body: `
-                <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 6, 2026 &nbsp;·&nbsp; Last updated: July 6, 2026</p>
+                <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 8, 2026 &nbsp;·&nbsp; Last updated: July 8, 2026</p>
 
                 <div class="space-y-6 text-left text-sm text-gray-600 leading-relaxed">
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">1. Who we are</h3>
-                        <p>Liam's Call AI ("<strong>we</strong>", "<strong>us</strong>", or "<strong>our</strong>") is a mental health support tool for caregivers and families, accessible at liamscall.onrender.com (and any future custom domain). This Privacy Policy explains how we collect, use, and protect information when you use our website and chat service.</p>
-                        <p class="mt-2">For privacy inquiries, contact us at <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a>.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">1. Our approach to your privacy</h3>
+                        <p>Liam's Call was built around a simple idea: you should be able to get help thinking through a mental health, addiction, or homelessness situation involving someone you love — or yourself — without creating an account, logging in, or leaving a permanent record. This Privacy Policy explains what limited information we do handle, why, and how we try to minimize it.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">2. Information we collect</h3>
-                        <p class="font-medium text-gray-700 mt-2 mb-1">a) Information you provide</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">2. Information we do not collect</h3>
                         <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
-                            <li><strong>Chat messages:</strong> The text you type into the chat interface is sent to our server to generate an AI response. We do not knowingly store message content on our servers beyond the duration of your session.</li>
-                        </ul>
-                        <p class="font-medium text-gray-700 mt-3 mb-1">b) Information collected automatically</p>
-                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
-                            <li><strong>IP address:</strong> Logged by our hosting provider (Render) for security and rate-limiting purposes.</li>
-                            <li><strong>Browser &amp; device information:</strong> Standard HTTP headers (browser type, operating system, referring URL) may be logged.</li>
-                            <li><strong>Usage data:</strong> Page visits and general interaction data may be aggregated anonymously.</li>
-                        </ul>
-                        <p class="font-medium text-gray-700 mt-3 mb-1">c) Information we do NOT collect</p>
-                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
-                            <li>We do not require account creation or collect names, email addresses, or phone numbers through the chat interface.</li>
-                            <li>We do not use tracking pixels or third-party analytics scripts.</li>
+                            <li>We do not require or offer account creation or login.</li>
+                            <li>We do not ask for your name, email address, or date of birth to use the chat agent.</li>
+                            <li>We do not intentionally retain a persistent, identifiable record of your chat conversations on our own servers.</li>
                         </ul>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">3. How we use your information</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">3. Information we do collect</h3>
+                        <p class="font-medium text-gray-700 mt-2 mb-1">3.1 Approximate location (country / state-or-province)</p>
+                        <p class="text-xs text-gray-500">To show you relevant regional resources and to make the chat agent's questions more realistic (for example, asking about "your province" instead of "your state"), we determine an approximate location from your device's IP address at the country and state/province level only. We do not attempt to determine, and do not ask the chat agent to ask for, your street address, precise GPS coordinates, or city-level location unless you choose to volunteer it in conversation.</p>
+                        <p class="text-xs text-gray-500 mt-2">This is still "personal information" under privacy law. Even an approximate, IP-derived location is considered personal information under Canada's PIPEDA and similar to "personal information" under U.S. state laws like the CCPA when it could reasonably be linked to a person. We treat it accordingly in our data-handling practices — see §8.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">3.2 Chat content, transiently</p>
+                        <p class="text-xs text-gray-500">The text you type is sent, in real time, to whichever third-party AI language model provider is currently generating a response, in a layered, cost-managed routing setup (see §4). We do not log, cache, or otherwise store your chat messages on our own servers — not in application logs, error logs, backups, or analytics — before, during, or after that message is sent. Once a response has been generated and delivered to your screen, we retain no copy of the conversation on our systems.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">3.3 Technical information handled by service providers we rely on</p>
+                        <p class="text-xs text-gray-500">To keep the Service secure and working, and to serve the approximate location described in §3.1, technical information such as your IP address is processed by the third-party tools that make the Service possible — including our automated bot-detection/verification tool, our advertising network(s), and our AI response provider(s). This processing happens as part of those providers' own, standard operation; we do not separately collect, log, or store this information ourselves, and we do not maintain our own copy of it after your visit ends. Each provider's use of this information is governed by that provider's own standard policies, which are outside our control — see §4 and §7 for more detail, and each provider's own published policy for specifics.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">4. Third-party AI providers</h3>
+                        <p class="text-xs text-gray-500">Your chat messages are processed by one or more third-party AI language model providers, used in a layered, cost-managed routing configuration so that different messages may be handled by different providers depending on availability. We rely on each provider's own standard data-handling, security, and retention policies to deliver this part of the Service, in the same way any website relies on the standard practices of the infrastructure it's built on — we do not separately store a copy of what is sent to or received from these providers.</p>
+                        <p class="font-medium text-gray-700 mt-3 mb-1">4.1 How your messages ("Input") are used</p>
+                        <p class="text-xs text-gray-500 mb-2">What you type into the chat ("Input") is sent to whichever provider is actively answering so that a response ("Output") can be generated and shown to you. Consistent with standard practice among AI-chatbot services in this space:</p>
                         <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
-                            <li>To generate AI responses to your chat messages in real time.</li>
-                            <li>To enforce rate limits and protect against abuse.</li>
-                            <li>To improve the reliability and safety of the service.</li>
-                            <li>To comply with applicable laws and regulations.</li>
+                            <li>Input is used to generate your Output, and is not linked to a name, account, or persistent identity, because we do not operate one.</li>
+                            <li>We do not knowingly permit our AI providers to use your Input to train their general-purpose models, and we choose provider access options designed to minimize training use of your Input wherever such options are available to us.</li>
+                            <li>If you type identifying details about yourself or a named third person (for example, a full name, address, or phone number) into the chat, we encourage you to avoid doing so where possible — the agent is designed to help without needing that level of detail.</li>
                         </ul>
-                        <p class="mt-2 text-xs text-gray-500">We do not sell, rent, or trade your personal information to any third party for marketing purposes.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">4. Third-party services</h3>
-                        <p class="text-xs text-gray-500 mb-2">We use the following third-party services to operate the site. Each has its own privacy policy.</p>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="font-medium text-gray-700 text-xs">AI model providers (OpenAI / Anthropic / Groq)</p>
-                                <p class="text-xs text-gray-500">Your chat messages are processed by one of these providers to generate responses. Messages are sent via our server — your IP address is not exposed to these providers. Each provider's data use is governed by their respective API usage policies, which prohibit training on your inputs by default.</p>
-                            </div>
-                            <div>
-                                <p class="font-medium text-gray-700 text-xs">Render (hosting)</p>
-                                <p class="text-xs text-gray-500">Our server is hosted on Render.com (San Francisco, USA). Render may process server logs that include IP addresses. See <a href="https://render.com/privacy" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">render.com/privacy</a>.</p>
-                            </div>
-                            <div>
-                                <p class="font-medium text-gray-700 text-xs">Google Fonts</p>
-                                <p class="text-xs text-gray-500">We load the Inter typeface from Google Fonts. Google may collect limited data (such as IP address) when serving font files. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">Google Privacy Policy</a>.</p>
-                            </div>
-                            <div>
-                                <p class="font-medium text-gray-700 text-xs">Google AdSense (future)</p>
-                                <p class="text-xs text-gray-500">We may in the future display ads served by Google AdSense. When active, Google and its partners may use cookies (including the DoubleClick DART cookie) to serve ads based on your prior visits to this and other websites. You can opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">Google Ad Settings</a> or <a href="https://www.aboutads.info/choices" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">aboutads.info</a>.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">5. Cookies</h3>
-                        <p class="text-xs text-gray-500">Liam's Call AI itself does not set cookies. However, third-party services integrated into this site (such as Google Fonts and, in the future, Google AdSense) may set cookies in your browser. You can manage cookie preferences through your browser settings.</p>
-                    </div>
-
-                    <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">6. Data retention &amp; security</h3>
-                        <p class="text-xs text-gray-500">Chat messages are not persistently stored on our servers. Server logs (including IP addresses) are retained by Render according to their own policies, generally no longer than 30 days. We implement industry-standard security measures including HTTPS encryption, API token authentication, and server-side rate limiting.</p>
-                    </div>
-
-                    <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">7. Children's privacy</h3>
-                        <p class="text-xs text-gray-500">This service is intended for adults (18+). We do not knowingly collect personal information from individuals under the age of 18. If you believe a minor has provided us with personal information, please contact us at <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a> and we will take steps to delete it.</p>
-                    </div>
-
-                    <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">8. Your rights (PIPEDA)</h3>
-                        <p class="text-xs text-gray-500 mb-2">Under Canada's <em>Personal Information Protection and Electronic Documents Act</em> (PIPEDA), you have the right to:</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">5. What we do not do with your information</h3>
                         <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
-                            <li>Know what personal information we hold about you.</li>
-                            <li>Request correction of inaccurate information.</li>
-                            <li>Withdraw consent to the collection or use of your information (with reasonable notice).</li>
-                            <li>Challenge our compliance with PIPEDA by contacting us or the <a href="https://www.priv.gc.ca" target="_blank" rel="noopener" class="underline text-[var(--green-dark)]">Office of the Privacy Commissioner of Canada</a>.</li>
+                            <li>We do not sell your information.</li>
+                            <li>We do not build an identifiable profile of you tied to a name or account, because none is collected.</li>
+                            <li>We do not share your chat content with our advertising partners, and our advertising is not personalized based on anything you say in the chat (see §6).</li>
                         </ul>
-                        <p class="text-xs text-gray-500 mt-2">To exercise any of these rights, email us at <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a>.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">9. Links to other websites</h3>
-                        <p class="text-xs text-gray-500">Our Resources page contains links to third-party websites (e.g. crisis lines, CAMH, 211 Ontario). We are not responsible for the privacy practices of those sites and encourage you to review their policies.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">6. Advertising — important health-sensitivity rules</h3>
+                        <p class="text-xs text-gray-500 mb-2">The Service may display third-party advertising, in placements designed to be unobtrusive. Advertising on the Service is configured to be non-personalized and based only on the general context of the page, not on your individual chat content or a profile built from your visit.</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>We do not permit chat content, or anything inferred from it, to reach any advertising or analytics pixel.</li>
+                            <li>We do not permit our advertising setup to receive, process, or infer health, mental-health, addiction, or housing-status information about any visitor.</li>
+                            <li>Advertising is not built from remarketing lists or visitor profiles derived from this Service — only from the advertising network's own general-purpose, policy-compliant audience tools, where used at all.</li>
+                        </ul>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">10. Changes to this policy</h3>
-                        <p class="text-xs text-gray-500">We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated effective date. Continued use of the service after changes constitutes acceptance of the revised policy.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">7. Cookies, bot-detection &amp; similar technologies</h3>
+                        <p class="font-medium text-gray-700 mt-2 mb-1">7.1 Essential technologies</p>
+                        <p class="text-xs text-gray-500">These are required for the Service and the chat agent to function at all — for example, maintaining your place in an active chat session or completing the automated bot-detection/verification check that screens out non-human traffic before the site loads. These essential technologies do not carry an identifiable profile of you, are not used for advertising, and cannot be switched off if you want to use the Service, in the same way a website cannot function with security checks disabled. We do not receive, log, or store the output of this check ourselves; it operates under the relevant tool's own standard policy.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">7.2 Analytics (optional)</p>
+                        <p class="text-xs text-gray-500">We may use privacy-conscious, aggregated analytics to understand which pages and resources are actually helping visitors, so we can improve the Service. Analytics data is used in aggregate and is not linked back to your chat content. Where you have a recognized browser opt-out signal enabled (such as Global Privacy Control), we will honor it for non-essential analytics.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">7.3 Advertising technologies</p>
+                        <p class="text-xs text-gray-500">Ads on the Service are delivered through one or more third-party advertising networks. Consistent with §6 above, we configure this placement to avoid personalization based on sensitive categories including health, mental health, addiction, or housing status. The advertising network may still set its own cookies or identifiers, subject to its own standard policies, to serve non-personalized or contextually relevant ads and to measure performance; we do not control that network's cookie mechanics directly, only the targeting settings we choose.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">7.4 Do Not Track / Global Privacy Control</p>
+                        <p class="text-xs text-gray-500">Some browsers send a "Do Not Track" or "Global Privacy Control" signal. Where a jurisdiction requires us to treat that signal as an opt-out request (for example, for California residents under the CCPA/CPRA), we will honor it for non-essential technologies.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">7.5 Managing this yourself</p>
+                        <p class="text-xs text-gray-500">You can block or delete cookies through your browser settings at any time. Blocking essential technologies may prevent the chat agent or the bot-detection check from working correctly.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">8. Your privacy rights</h3>
+                        <p class="font-medium text-gray-700 mt-2 mb-1">8.1 Canadian visitors (PIPEDA and applicable provincial law)</p>
+                        <p class="text-xs text-gray-500">You have the right to know why we collect information, to access information we hold about you, to request correction of inaccurate information, and to withdraw consent (understanding that some features, like regional resource suggestions, may not work without an approximate location signal). Because we do not collect identifying information by design, most requests will relate to technical/location data rather than a personal file, since none exists.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">8.2 U.S. visitors, including California (CCPA/CPRA)</p>
+                        <p class="text-xs text-gray-500">If you are a California resident, you may have rights to know, delete, or opt out of the sale/sharing of personal information the CCPA/CPRA defines broadly, and treats certain categories (including health-related information) as "sensitive personal information" with extra protection. Because we do not sell personal information and avoid collecting identifiable data, many of these requests will have limited applicability — but we will honor verifiable requests to the extent we hold any qualifying data.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">8.3 How to exercise your rights</p>
+                        <p class="text-xs text-gray-500">Contact us at <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a>. Because we may hold very little or no data tied to you, we may not be able to locate a record responsive to your request — we will tell you plainly if that is the case rather than assuming.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">9. Data retention</h3>
+                        <p class="text-xs text-gray-500">We do not retain chat content, session data, or IP addresses on our own systems, in any form, for any length of time — there is nothing tied to your visit for us to keep. Where we use optional, aggregate analytics (§7.2), that aggregate data contains no information capable of identifying you individually and is kept only as long as needed to understand overall usage trends. The third-party bot-detection, advertising, and AI response providers described in §4 and §7 process information under their own standard retention policies, independent of our systems; those providers' own published policies govern how long they individually retain anything, not this Policy.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">10. Children's privacy</h3>
+                        <p class="text-xs text-gray-500">The Service is not directed to children under 13, and we do not knowingly collect personal information from children under 13 (in line with the U.S. Children's Online Privacy Protection Act, COPPA) or the applicable minimum age under Canadian law. If we become aware that we have inadvertently collected such information, we will delete it.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">11. International data transfers</h3>
+                        <p class="text-xs text-gray-500">Because the third-party providers described in §4 and §7 may process data on servers located in the United States or elsewhere, information from Canadian visitors may be processed outside Canada. PIPEDA does not prohibit this, but requires that we be transparent about it, which this section is intended to do, and that we take reasonable contractual and technical steps to protect the information in transit and at the processor.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">12. Security</h3>
+                        <p class="text-xs text-gray-500">We use reasonable technical and organizational measures designed to protect information in transit and in any temporary processing, appropriate to the limited, largely non-identifying nature of what we collect. No method of transmission or storage is 100% secure, and we cannot guarantee absolute security.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">13. Changes to this policy</h3>
+                        <p class="text-xs text-gray-500">We may update this Privacy Policy from time to time. We will post the updated policy with a new "Last updated" date.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-[var(--beige-main)] border-0 p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">11. Contact us</h3>
-                        <p class="text-xs text-gray-500">For any privacy-related questions or to exercise your PIPEDA rights:</p>
-                        <p class="text-xs mt-2"><strong class="text-gray-700">Liam's Call AI</strong><br>
-                        Email: <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a><br>
-                        Canada</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">14. Contact</h3>
+                        <p class="text-xs text-gray-500">Questions about this Privacy Policy can be sent to:</p>
+                        <p class="text-xs mt-2"><strong class="text-gray-700">Liam's Call</strong><br>
+                        Email: <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a></p>
                     </div>
 
                 </div>
@@ -1589,80 +1695,112 @@
                 </div>
             ` },
             terms: { title: 'Terms of Use', body: `
-                <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 6, 2026 &nbsp;·&nbsp; Last updated: July 6, 2026</p>
+                <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 8, 2026 &nbsp;·&nbsp; Last updated: July 8, 2026</p>
 
                 <div class="space-y-5 text-left text-sm text-gray-600 leading-relaxed">
 
                     <div class="rounded-xl bg-amber-50 border border-amber-200 p-4">
-                        <h3 class="font-bold text-amber-800 mb-2">Important notice — not a crisis or clinical service</h3>
-                        <p class="text-xs text-amber-700">Liam's Call AI is a support and information tool only. It is <strong>not</strong> a substitute for professional mental health care, medical advice, diagnosis, or treatment. If you or someone you know is in immediate danger or experiencing a mental health emergency, please call <strong>9-1-1</strong> or the Suicide Crisis Helpline at <strong>9-8-8</strong> immediately.</p>
+                        <h3 class="font-bold text-amber-800 mb-2">Important — not a medical, emergency, or crisis service</h3>
+                        <p class="text-xs text-amber-700">The Service is informational and educational only. It is <strong>not</strong> a substitute for professional medical, psychiatric, psychological, legal, or social-work advice, diagnosis, or treatment. It cannot see you, dispatch help, or guarantee a response time. If you or someone else is in immediate danger, call <strong>911</strong> (U.S. and Canada), or contact the <strong>988 Suicide &amp; Crisis Lifeline</strong> (U.S.) or <strong>9-8-8: Suicide Crisis Helpline</strong> (Canada) by calling or texting <strong>988</strong>.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">1. Acceptance of terms</h3>
-                        <p class="text-xs text-gray-500">By accessing or using Liam's Call AI (the "Service"), you agree to be bound by these Terms of Use. If you do not agree, please do not use the Service. These terms apply to all visitors and users of the website.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">1. Who these terms are for</h3>
+                        <p class="text-xs text-gray-500">These Terms of Use ("Terms") govern your access to and use of liamscall.com and its AI chat agent, blog, and any related pages (together, the "Service"), operated by Liamscall.com ("Liam's Call," "we," "us"). By using the Service, you agree to these Terms. If you do not agree, please do not use the Service.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">2. Description of service</h3>
-                        <p class="text-xs text-gray-500">Liam's Call AI is an AI-powered conversational support tool designed to assist caregivers and family members with information, emotional support, and referrals to mental health resources. The Service is provided "as is" for informational and supportive purposes only.</p>
-                        <p class="text-xs text-gray-500 mt-2">The AI that powers this Service is a general-purpose large language model. Responses are generated automatically and may not always be accurate, complete, or appropriate to your specific situation. Always verify important information with a qualified professional.</p>
-                    </div>
-
-                    <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">3. Not a medical or clinical service</h3>
-                        <p class="text-xs text-gray-500 mb-2">The Service is not a healthcare provider, therapist, counsellor, social worker, or crisis service. Nothing in this Service constitutes:</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">2. Not a medical, emergency, or crisis service</h3>
                         <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
-                            <li>Medical advice or a medical diagnosis</li>
-                            <li>Mental health therapy or counselling</li>
-                            <li>A crisis intervention service</li>
-                            <li>A substitute for professional clinical care</li>
-                        </ul>
-                        <p class="text-xs text-gray-500 mt-2">Always seek the advice of a qualified mental health professional for any mental health concerns. Never disregard professional advice or delay seeking it because of something you read or heard through this Service.</p>
-                    </div>
-
-                    <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">4. User responsibilities</h3>
-                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
-                            <li>You must be 18 years of age or older to use this Service.</li>
-                            <li>You agree not to use the Service for any unlawful purpose or in any way that violates these Terms.</li>
-                            <li>You agree not to use the Service to harass, threaten, or harm others.</li>
-                            <li>You agree not to attempt to reverse-engineer, overload, or disrupt the Service.</li>
-                            <li>You are responsible for ensuring that any information you share through the Service is appropriate and does not violate the rights of third parties.</li>
+                            <li>The Service is informational and educational only. It is not a substitute for professional medical, psychiatric, psychological, legal, or social-work advice, diagnosis, or treatment.</li>
+                            <li>The Service is not an emergency or crisis response service. It cannot see you, dispatch help, or guarantee a response time. If you or someone else is in immediate danger, call 911 (U.S. and Canada), or contact the 988 Suicide &amp; Crisis Lifeline (U.S.) or 9-8-8: Suicide Crisis Helpline (Canada) by calling or texting 988.</li>
+                            <li>Always seek the advice of a qualified professional (physician, psychiatrist, therapist, social worker, or other licensed provider) with any questions about a medical or mental health condition, and never disregard or delay seeking professional advice because of something read or generated on the Service.</li>
                         </ul>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">5. Disclaimer of warranties</h3>
-                        <p class="text-xs text-gray-500">The Service is provided on an "as is" and "as available" basis without warranties of any kind, either express or implied. We do not warrant that the Service will be uninterrupted, error-free, or that AI responses will be accurate, appropriate, or safe for your particular circumstances. Your use of the Service is at your sole risk.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">3. Eligibility &amp; age</h3>
+                        <p class="text-xs text-gray-500">The Service is intended for use by adults (18 years or older) and, where used by a caregiver on behalf of a minor, is intended to be used with adult oversight. The Service does not knowingly collect personal information from children under 13 (U.S.) or the applicable minimum age under Canadian law, and does not knowingly direct behavioural advertising at users under 18. Visitors who appear to be minors are met with age-appropriate language and are directed toward youth-specific and general crisis resources within the Service.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">6. Limitation of liability</h3>
-                        <p class="text-xs text-gray-500">To the fullest extent permitted by applicable law, Liam's Call AI and its operators shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of, or inability to use, the Service. This includes but is not limited to reliance on AI-generated content, decisions made based on Service output, or any harm resulting from the use or misuse of information provided.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">4. No account, no login — what that means for you</h3>
+                        <p class="text-xs text-gray-500 mb-2">The Service is designed to be used without creating an account or providing a login. As a result:</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>We have no reliable way to verify your identity, age, or location beyond an approximate, non-precise signal (see Privacy Policy).</li>
+                            <li>We cannot recover, restore, or provide you a transcript of a past chat session, because we do not retain chat histories tied to you.</li>
+                            <li>You are responsible for saving, for your own records, any information from a chat session you wish to keep.</li>
+                        </ul>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">7. Intellectual property</h3>
-                        <p class="text-xs text-gray-500">All content on the Service, including text, graphics, logos, and software, is the property of Liam's Call AI or its content suppliers and is protected by applicable Canadian copyright and intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">5. AI-generated content — limitations</h3>
+                        <p class="text-xs text-gray-500">The chat agent is powered by one or more third-party AI language model providers, used in a layered, cost-managed configuration so that different messages may be answered by different underlying providers. AI-generated responses can be incomplete, out of date, or simply wrong, including specific claims about phone numbers, program names, eligibility rules, or laws. We have built guardrails intended to keep the agent empathetic, safe, and accurate, but we cannot guarantee that every response will be complete, accurate, or appropriate to your specific situation.</p>
+                        <p class="text-xs text-gray-500 mt-2">You should independently verify any specific resource, hotline, program, or eligibility information before relying on it, particularly in an urgent situation — use the direct links and phone numbers we provide to official sources rather than relying solely on the chat text.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">8. Changes to the service and terms</h3>
-                        <p class="text-xs text-gray-500">We reserve the right to modify, suspend, or discontinue the Service at any time without notice. We may also update these Terms from time to time. The revised Terms will be posted with an updated effective date. Continued use of the Service after any changes constitutes your acceptance of the new Terms.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">6. Acceptable use</h3>
+                        <p class="text-xs text-gray-500 mb-2">You agree not to use the Service to:</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>Attempt to obtain instructions or assistance for self-harm, harming others, or committing a crime.</li>
+                            <li>Attempt to extract, reverse-engineer, or misuse the underlying AI models, prompts, or guardrails.</li>
+                            <li>Impersonate another person, or misuse the Service to harass, stalk, or gather information about another identifiable individual.</li>
+                            <li>Upload or transmit malicious code, or attempt to interfere with the Service's operation or security.</li>
+                            <li>Use automated means (bots, scrapers) to access the Service, other than the accessibility and bot-detection/verification mechanisms we ourselves provide.</li>
+                        </ul>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">9. Governing law</h3>
-                        <p class="text-xs text-gray-500">These Terms are governed by and construed in accordance with the laws of the Province of Ontario and the federal laws of Canada applicable therein. Any disputes shall be resolved in the courts of Ontario, Canada.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">7. Third-party resources &amp; links</h3>
+                        <p class="text-xs text-gray-500">The Service may reference or link to third-party organizations, hotlines, shelters, treatment programs, government agencies, or articles (including on a future Resources page and blog). We do not control, endorse, or guarantee the accuracy, availability, or quality of any third-party resource, and are not responsible for your interactions with them. Inclusion of a resource is not a recommendation that it is right for your specific situation.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">8. Advertising</h3>
+                        <p class="text-xs text-gray-500">The Service may display third-party advertising served through one or more advertising networks, in placements designed to be unobtrusive. Advertising is served and funded independently of, and does not influence, the content, tone, or resources the chat agent provides. Advertising on the Service is configured to be non-personalized and context-based, and is not built from your chat content or from any profile of your health, mental-health, addiction, or housing circumstances. See our Privacy Policy for more detail.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">9. Intellectual property</h3>
+                        <p class="text-xs text-gray-500">The Service, including its design, text, graphics, and the specific configuration of the chat agent's guardrails (but excluding AI-generated chat responses themselves and third-party content), is owned by Liamscall.com or its licensors and is protected by copyright and other laws. You may not copy, reproduce, or create derivative works from the Service except for your own personal, non-commercial use of the information it provides to you.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">10. Disclaimer of warranties</h3>
+                        <p class="text-xs text-gray-500">THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, OR NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR THAT ANY INFORMATION PROVIDED (INCLUDING AI-GENERATED CONTENT) WILL BE ACCURATE OR COMPLETE.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">11. Limitation of liability</h3>
+                        <p class="text-xs text-gray-500">TO THE MAXIMUM EXTENT PERMITTED BY LAW, Liamscall.com AND ITS OWNERS, OPERATORS, AND SERVICE PROVIDERS WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF DATA, ARISING FROM YOUR USE OF, OR INABILITY TO USE, THE SERVICE, INCLUDING RELIANCE ON ANY AI-GENERATED CONTENT.</p>
+                        <p class="text-xs text-gray-500 mt-2">Nothing in this section limits or excludes liability where such limitation or exclusion is not permitted under applicable law, including liability for death or personal injury caused by gross negligence or willful misconduct, or any other liability that cannot lawfully be limited. Where a limitation above is found unenforceable in a particular jurisdiction, it will be limited or severed only to the minimum extent required, and the remainder of this section will continue to apply.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">12. Indemnification</h3>
+                        <p class="text-xs text-gray-500">You agree to indemnify and hold harmless Liamscall.com from any claims, damages, or expenses (including reasonable legal fees) arising from your violation of these Terms or your misuse of the Service.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">13. Governing law &amp; dispute resolution</h3>
+                        <p class="text-xs text-gray-500">These Terms, and any dispute arising out of or relating to them or the Service, are governed by the laws of the Province of Ontario and the federal laws of Canada applicable in Ontario, without regard to conflict-of-law principles. You and Liam's Call each agree to submit to the exclusive jurisdiction of the courts located in Ontario, Canada for any dispute not otherwise resolved informally or through the process below.</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs mt-2">
+                            <li><strong>Informal resolution first.</strong> Before filing a claim, you agree to contact us at <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a> and describe the dispute so we can attempt to resolve it informally within 30 days.</li>
+                            <li><strong>U.S. visitors.</strong> If you access the Service from the United States, choosing Ontario law governs our contract with you, but does not remove any protection you're entitled to under a mandatory consumer-protection law of your home state that cannot be waived by contract — nothing in this section is intended to override such a law where it applies.</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">14. Changes to these terms</h3>
+                        <p class="text-xs text-gray-500">We may update these Terms from time to time. We will post the updated Terms with a new "Last updated" date. Continued use of the Service after changes are posted constitutes acceptance of the revised Terms.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-[var(--beige-main)] border-0 p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">10. Contact us</h3>
-                        <p class="text-xs text-gray-500">Questions about these Terms? Contact us at:</p>
-                        <p class="text-xs mt-2"><strong class="text-gray-700">Liam's Call AI</strong><br>
-                        Email: <a href="mailto:hello@liamscall.ca" class="underline text-[var(--green-dark)]">hello@liamscall.ca</a><br>
-                        Ontario, Canada</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">15. Contact</h3>
+                        <p class="text-xs text-gray-500">Questions about these Terms can be sent to:</p>
+                        <p class="text-xs mt-2"><strong class="text-gray-700">Liam's Call</strong><br>
+                        Email: <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a></p>
                     </div>
 
                 </div>
@@ -1726,6 +1864,33 @@
         const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
         const sidebarClose = document.getElementById('sidebar-close');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const landingMobileMenuToggle = document.getElementById('landing-mobile-menu-toggle');
+        const landingMobileMenu = document.getElementById('landing-mobile-menu');
+
+        function closeLandingMobileMenu() {
+            landingMobileMenu?.classList.remove('is-open');
+            landingMobileMenuToggle?.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleLandingMobileMenu() {
+            const open = landingMobileMenu?.classList.toggle('is-open');
+            landingMobileMenuToggle?.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        landingMobileMenuToggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleLandingMobileMenu();
+        });
+
+        landingMobileMenu?.querySelectorAll('[data-nav]').forEach((link) => {
+            link.addEventListener('click', closeLandingMobileMenu);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!landingMobileMenu?.classList.contains('is-open')) return;
+            if (e.target.closest('#landing-mobile-menu') || e.target.closest('#landing-mobile-menu-toggle')) return;
+            closeLandingMobileMenu();
+        });
 
         function expandShell() {
             if (isExpanded || isExpanding) return Promise.resolve();
@@ -1860,7 +2025,10 @@
         });
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeMobileSidebar();
+            if (e.key === 'Escape') {
+                closeMobileSidebar();
+                closeLandingMobileMenu();
+            }
         });
 
         function goHome() {
