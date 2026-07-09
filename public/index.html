@@ -1055,8 +1055,10 @@
         }
         #landing-art.is-loaded #landing-art-veil { opacity: 1; }
 
-        /* Keep header + hero above the art */
-        #landing-header, #landing-hero { position: relative; z-index: 1; }
+        /* Keep header + hero above the art; header above hero so the
+           mobile dropdown menu renders (and receives clicks) over the quote */
+        #landing-hero { position: relative; z-index: 1; }
+        #landing-header { position: relative; z-index: 30; }
 
         /* Hero — flex-centers quote in visible area above docked chat widget */
         #landing-hero {
@@ -1416,9 +1418,7 @@
                     class="nav-logo-icon w-auto select-none object-contain shrink-0"
                 >
                 <button type="button" class="nav-link" data-nav="chat">New Chat</button>
-                <button type="button" class="nav-link" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link" data-nav="resources">Resources</button>
-                <button type="button" class="nav-link" data-nav="contact">Contact Us</button>
                 <button type="button" class="nav-link" data-nav="about">About</button>
             </nav>
             <!-- Mobile nav — centered logo, menu right -->
@@ -1446,9 +1446,7 @@
                 </button>
                 <div id="landing-mobile-menu" role="menu">
                     <button type="button" class="nav-link" role="menuitem" data-nav="chat">New Chat</button>
-                    <button type="button" class="nav-link" role="menuitem" data-nav="blog">Blog</button>
                     <button type="button" class="nav-link" role="menuitem" data-nav="resources">Resources</button>
-                    <button type="button" class="nav-link" role="menuitem" data-nav="contact">Contact Us</button>
                     <button type="button" class="nav-link" role="menuitem" data-nav="about">About</button>
                 </div>
             </div>
@@ -1490,9 +1488,7 @@
             </div>
             <nav class="flex flex-col gap-5 text-sm text-gray-900 shrink-0">
                 <button type="button" class="nav-link text-left" data-nav="chat">New Chat</button>
-                <button type="button" class="nav-link text-left" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link text-left" data-nav="resources">Resources</button>
-                <button type="button" class="nav-link text-left" data-nav="contact">Contact Us</button>
                 <button type="button" class="nav-link text-left" data-nav="about">About Us</button>
             </nav>
             <div class="mt-auto pt-3 sm:pt-5 md:pt-8 shrink-0">
@@ -2033,19 +2029,8 @@
                             <li>We do not store your chat messages beyond your session. Conversations are not used to train AI models.</li>
                             <li>We do not sell, share, or monetize your personal data.</li>
                             <li>We continuously review AI responses and update our safety guidelines as standards evolve.</li>
-                            <li>If the AI ever gives you a response that feels harmful or inappropriate, please report it to <a href="mailto:safety@liamscall.ca" class="underline text-[var(--green-dark)]">safety@liamscall.ca</a> — your feedback directly improves the tool.</li>
+                            <li>If the AI ever gives you a response that feels harmful or inappropriate, please report it to <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a> — your feedback directly improves the tool.</li>
                         </ul>
-                    </div>
-
-                    <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">Get in touch</h3>
-                        <p class="text-xs text-gray-500 mb-3">We'd love to hear from caregivers, community organizations, researchers, and anyone who wants to help make this resource better.</p>
-                        <div class="space-y-2 text-xs">
-                            <p><strong class="text-gray-700">General:</strong> <a href="mailto:hello@liamscall.ca" class="underline text-[var(--green-dark)]">hello@liamscall.ca</a></p>
-                            <p><strong class="text-gray-700">Safety concerns:</strong> <a href="mailto:safety@liamscall.ca" class="underline text-[var(--green-dark)]">safety@liamscall.ca</a></p>
-                            <p><strong class="text-gray-700">Privacy inquiries:</strong> <a href="mailto:privacy@liamscall.ca" class="underline text-[var(--green-dark)]">privacy@liamscall.ca</a></p>
-                            <p><strong class="text-gray-700">Media &amp; press:</strong> <a href="mailto:media@liamscall.ca" class="underline text-[var(--green-dark)]">media@liamscall.ca</a></p>
-                        </div>
                     </div>
 
                 </div>
