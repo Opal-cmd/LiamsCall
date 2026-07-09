@@ -51,6 +51,20 @@
         #chat-send { white-space: nowrap; }
         #chat-form { width: 100%; min-width: 0; }
 
+        #chat-captcha-wrap {
+            display: none;
+            justify-content: center;
+            margin-bottom: 0.65rem;
+        }
+        #chat-captcha-wrap.is-visible { display: flex; }
+        #chat-captcha-wrap.is-verified { display: none; }
+
+        #chat-input:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            background: #f3f4f6;
+        }
+
         .nav-link { cursor: pointer; }
         .nav-link:hover { opacity: 0.75; }
         .nav-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
@@ -488,7 +502,30 @@
         }
 
         #landing-header {
-            padding-top: 1.5rem;
+            padding-top: 2.75rem;
+        }
+
+        #landing-header .desktop-nav {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+
+        #landing-header .nav-logo-icon {
+            height: 2.85rem;
+        }
+
+        @media (min-width: 1024px) {
+            #landing-header .nav-logo-icon {
+                height: 3.1rem;
+            }
+        }
+
+        #chat-shell.is-docked:has(#chat-captcha-wrap.is-visible) {
+            max-height: 17.5rem;
+        }
+
+        #chat-shell.is-docked:has(#chat-captcha-wrap.is-visible) #widget-header {
+            display: none;
         }
 
         #panel-content {
@@ -984,13 +1021,13 @@
         </div>
         <div id="landing-art-credit"></div>
 
-        <header class="relative flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-12 pb-4 sm:pb-4 shrink-0" id="landing-header">
+        <header class="relative flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-12 pb-2 shrink-0" id="landing-header">
             <!-- Desktop nav — centered pill with logo -->
-            <nav class="hidden md:flex absolute left-1/2 -translate-x-1/2 pill-dark pl-4 pr-8 lg:pl-5 lg:pr-14 py-2.5 items-center gap-5 lg:gap-10 text-sm font-medium whitespace-nowrap">
+            <nav class="desktop-nav hidden md:flex absolute left-1/2 -translate-x-1/2 pill-dark pl-2.5 pr-5 lg:pl-3 lg:pr-8 py-1.5 items-center gap-4 lg:gap-7 text-[13px] font-medium whitespace-nowrap">
                 <img
                     src="/assets/logo-icon.svg"
                     alt="Liam's Call AI logo"
-                    class="nav-logo-icon h-8 lg:h-9 w-auto select-none object-contain shrink-0"
+                    class="nav-logo-icon w-auto select-none object-contain shrink-0"
                 >
                 <button type="button" class="nav-link" data-nav="chat">New Chat</button>
                 <button type="button" class="nav-link" data-nav="blog">Blog</button>
@@ -1000,11 +1037,11 @@
             </nav>
             <!-- Mobile nav — logo in pill, links on the right -->
             <nav class="md:hidden flex items-center gap-1.5 flex-wrap justify-end w-full">
-                <span class="pill-dark p-1.5 flex items-center shrink-0 mr-auto">
+                <span class="pill-dark px-2 py-1 flex items-center shrink-0 mr-auto">
                     <img
                         src="/assets/logo-icon.svg"
                         alt="Liam's Call AI logo"
-                        class="nav-logo-icon h-6 w-auto select-none object-contain"
+                        class="nav-logo-icon h-8 w-auto select-none object-contain"
                     >
                 </span>
                 <button type="button" class="nav-link pill-dark px-2.5 py-1 text-[11px] font-medium whitespace-nowrap" data-nav="chat">New Chat</button>
@@ -1114,6 +1151,12 @@
                 </div>
 
                 <div id="chat-footer">
+                    <div id="chat-captcha-wrap" aria-live="polite">
+                        <div class="flex flex-col items-center w-full">
+                            <div id="chat-captcha"></div>
+                            <p id="chat-captcha-note" class="text-[11px] text-gray-600 text-center mt-2 leading-snug">Verify you're human to start chatting.</p>
+                        </div>
+                    </div>
                     <form id="chat-form" class="flex items-end gap-2 sm:gap-3">
                         <label for="chat-input" class="sr-only">Message</label>
                         <textarea
@@ -1662,6 +1705,10 @@
         let isExpanding = false;
         let conversation = [];
         let isStreaming = false;
+        let captchaRequired = false;
+        let captchaReady = false;
+        let captchaWidgetId = null;
+        let turnstileScriptPromise = null;
 
         const landing = document.getElementById('landing');
         const chatGlow = document.getElementById('chat-glow');
@@ -1673,6 +1720,9 @@
         const chatInput = document.getElementById('chat-input');
         const chatSend = document.getElementById('chat-send');
         const chatStatus = document.getElementById('chat-status');
+        const chatCaptchaWrap = document.getElementById('chat-captcha-wrap');
+        const chatCaptchaEl = document.getElementById('chat-captcha');
+        const chatCaptchaNote = document.getElementById('chat-captcha-note');
         const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
         const sidebarClose = document.getElementById('sidebar-close');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -1870,8 +1920,12 @@
 
         function setStreamingState(active) {
             isStreaming = active;
-            chatInput.disabled = active;
-            chatSend.disabled = active;
+            if (active) {
+                chatInput.disabled = true;
+                chatSend.disabled = true;
+            } else {
+                setChatCaptchaState(captchaReady || !captchaRequired);
+            }
             chatStatus.textContent = '';
         }
 
@@ -1889,19 +1943,142 @@
             }
         }
 
+        function setChatCaptchaState(enabled) {
+            if (!captchaRequired) {
+                chatInput.disabled = false;
+                chatSend.disabled = false;
+                chatInput.placeholder = 'Type your message...';
+                return;
+            }
+            chatInput.disabled = !enabled;
+            chatSend.disabled = !enabled || isStreaming;
+            chatInput.placeholder = enabled
+                ? 'Type your message...'
+                : 'Complete verification below to start chatting…';
+        }
+
+        function loadTurnstileScript() {
+            if (window.turnstile) return Promise.resolve();
+            if (turnstileScriptPromise) return turnstileScriptPromise;
+            turnstileScriptPromise = new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+                script.async = true;
+                script.defer = true;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Could not load captcha.'));
+                document.head.appendChild(script);
+            });
+            return turnstileScriptPromise;
+        }
+
+        function showCaptchaWidget() {
+            if (!captchaRequired || !chatCaptchaWrap) return;
+            captchaReady = false;
+            setChatCaptchaState(false);
+            chatCaptchaWrap.classList.add('is-visible');
+            chatCaptchaWrap.classList.remove('is-verified');
+            if (chatCaptchaNote) {
+                chatCaptchaNote.textContent = "Verify you're human to start chatting.";
+            }
+            if (window.turnstile && captchaWidgetId !== null) {
+                window.turnstile.reset(captchaWidgetId);
+            }
+        }
+
+        async function onCaptchaSuccess(token) {
+            try {
+                const response = await fetch('/api/captcha/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ token }),
+                });
+                if (!response.ok) throw new Error('Verification failed.');
+                captchaReady = true;
+                setChatCaptchaState(true);
+                chatCaptchaWrap.classList.remove('is-visible');
+                chatCaptchaWrap.classList.add('is-verified');
+                if (chatCaptchaNote) chatCaptchaNote.textContent = '';
+                chatInput.focus();
+            } catch {
+                captchaReady = false;
+                setChatCaptchaState(false);
+                if (chatCaptchaNote) {
+                    chatCaptchaNote.textContent = 'Verification failed — please try again.';
+                }
+                if (window.turnstile && captchaWidgetId !== null) {
+                    window.turnstile.reset(captchaWidgetId);
+                }
+            }
+        }
+
+        function onCaptchaExpired() {
+            captchaReady = false;
+            setChatCaptchaState(false);
+            showCaptchaWidget();
+        }
+
+        async function initCaptcha() {
+            let config;
+            try {
+                const response = await fetch('/api/config');
+                if (!response.ok) return;
+                config = await response.json();
+            } catch {
+                return;
+            }
+
+            if (!config.captcha?.siteKey) return;
+
+            captchaRequired = true;
+            captchaReady = false;
+            setChatCaptchaState(false);
+
+            try {
+                await loadTurnstileScript();
+            } catch {
+                if (chatCaptchaNote) {
+                    chatCaptchaNote.textContent = 'Could not load verification. Please refresh the page.';
+                }
+                return;
+            }
+
+            showCaptchaWidget();
+            captchaWidgetId = window.turnstile.render(chatCaptchaEl, {
+                sitekey: config.captcha.siteKey,
+                callback: onCaptchaSuccess,
+                'expired-callback': onCaptchaExpired,
+                theme: 'light',
+                size: 'normal',
+            });
+        }
+
         async function streamChat(messages, onToken) {
             let response;
             try {
                 response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
                     body: JSON.stringify({ messages }),
                 });
             } catch {
                 throw new Error('Cannot reach the chat server. Run "npm start" and open http://localhost:3000.');
             }
             if (!response.ok || !response.body) {
-                throw new Error('Chat server error. Make sure "npm start" is running on http://localhost:3000.');
+                let message = 'Chat server error. Make sure "npm start" is running on http://localhost:3000.';
+                try {
+                    const data = await response.json();
+                    if (data.error) message = data.error;
+                    if (data.captchaRequired) {
+                        captchaReady = false;
+                        showCaptchaWidget();
+                    }
+                } catch {
+                    // Keep default message for non-JSON errors.
+                }
+                throw new Error(message);
             }
 
             const reader = response.body.getReader();
@@ -1938,6 +2115,13 @@
             e.preventDefault();
             const message = chatInput.value.trim();
             if (!message || isStreaming) return;
+            if (captchaRequired && !captchaReady) {
+                if (chatCaptchaNote) {
+                    chatCaptchaNote.textContent = 'Please complete verification before sending a message.';
+                }
+                showCaptchaWidget();
+                return;
+            }
 
             chatInput.value = '';
             chatInput.style.height = 'auto';
@@ -2004,6 +2188,8 @@
                 chatStatus.textContent = 'Server offline — run npm start, then open http://localhost:3000';
                 chatStatus.classList.add('text-red-500');
             });
+
+        initCaptcha();
 
         /* ==========================================================
            INSPIRATIONAL QUOTES — DATA LIBRARY & ART ENGINE
