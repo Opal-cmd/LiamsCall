@@ -2310,13 +2310,49 @@
         // Update this URL once the WordPress blog subdomain is live
         const BLOG_URL = 'https://blog.liamscall.ca';
 
+        // Opens Privacy, Terms, or About as a self-contained new browser tab/window.
+        function openPageInNewWindow(navKey) {
+            const page = CONTENT_PAGES[navKey];
+            if (!page) return;
+            const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${page.title} — Liam's Call</title>
+<link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"><\/script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, sans-serif; background: #f9fafb; padding: 2rem 1rem 4rem; }
+  :root { --green-dark: #0f4a3a; }
+  .pill-dark { background: var(--green-dark); color: #fff; border-radius: 9999px; }
+  a { color: var(--green-dark); }
+  @media (min-width: 640px) { body { padding: 2.5rem 2rem 4rem; } }
+</style>
+</head>
+<body>
+<div style="max-width:42rem;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.75rem;">
+    <img src="/assets/logo-icon.svg" style="height:1.75rem;width:auto;filter:invert(18%) sepia(60%) saturate(800%) hue-rotate(120deg) brightness(70%) contrast(120%);" alt="">
+    <span style="font-size:.95rem;font-weight:700;color:var(--green-dark);letter-spacing:-.02em;">Liam's Call</span>
+  </div>
+  <h1 style="font-size:1.55rem;font-weight:700;color:var(--green-dark);margin-bottom:1.25rem;letter-spacing:-.02em;">${page.title}</h1>
+  ${page.body}
+</div>
+</body>
+</html>`;
+            const win = window.open('', '_blank', 'noopener,noreferrer');
+            if (win) { win.document.write(html); win.document.close(); }
+        }
+
         async function navigate(navKey) {
             if (navKey === 'blog') {
-                if (isMobileViewport()) {
-                    window.location.assign(BLOG_URL);
-                } else {
-                    window.open(BLOG_URL, '_blank', 'noopener,noreferrer');
-                }
+                window.open(BLOG_URL, '_blank', 'noopener,noreferrer');
+                return;
+            }
+            // Legal / info pages always open in a new tab so the chat is uninterrupted
+            if (navKey === 'privacy' || navKey === 'terms' || navKey === 'about') {
+                openPageInNewWindow(navKey);
                 return;
             }
             if (navKey === 'chat') {
@@ -2406,6 +2442,48 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        // Escape plain text so it is safe to insert as innerHTML.
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // Convert phone numbers and bare URLs in escaped text to clickable links.
+        // Only applied to assistant bubbles; user bubbles stay plain text.
+        function linkifyText(escaped) {
+            // North-American / international phone numbers  e.g. 1-800-662-4357  (800) 668-6868  +1 855 242 3310  988
+            const phoneRe = /(\+?1[-.\s]?)?((\(\d{3}\)|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}|\b9-?8-?8\b|\b9-?1-?1\b)/g;
+            // Full URLs (https?://) and bare www. domains
+            const urlRe = /(?<![="'(])(?:https?:\/\/[^\s<>"')]+|www\.[a-z0-9][-a-z0-9.]+\.[a-z]{2,}(?:\/[^\s<>"']*)?)/gi;
+
+            // Replace URLs first (they may contain digits that look phone-like)
+            let out = escaped.replace(urlRe, (url) => {
+                const display = url.replace(/^https?:\/\/(www\.)?/, '');
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="underline font-medium" style="color:inherit;opacity:.85;">${display}</a>`;
+            });
+
+            // Replace phone numbers
+            out = out.replace(phoneRe, (match) => {
+                const digits = match.replace(/\D/g, '');
+                // Normalize: prefix with +1 if 10-digit North-American, keep 988/911 short codes
+                const tel = digits.length >= 10 ? `+${digits.startsWith('1') ? '' : '1'}${digits}` : digits;
+                return `<a href="tel:${tel}" class="underline font-medium" style="color:inherit;opacity:.85;">${match}</a>`;
+            });
+
+            return out;
+        }
+
+        function setBubbleContent(bubble, text, role) {
+            if (role === 'assistant') {
+                bubble.innerHTML = linkifyText(escapeHtml(text));
+            } else {
+                bubble.textContent = text;
+            }
+        }
+
         function createMessageBubble(role, text = '') {
             const wrapper = document.createElement('div');
             wrapper.className = role === 'user' ? 'flex justify-end' : 'flex justify-start';
@@ -2413,7 +2491,7 @@
             bubble.className = role === 'user'
                 ? 'bubble bubble-user'
                 : 'bubble bubble-assistant';
-            bubble.textContent = text;
+            setBubbleContent(bubble, text, role);
             wrapper.appendChild(bubble);
             chatMessages.appendChild(wrapper);
             scrollToBottom();
@@ -2667,6 +2745,7 @@
                         assistantBubble = createMessageBubble('assistant', '');
                     }
                     assistantText += token;
+                    // Stream as plain text for performance; linkify once complete
                     assistantBubble.textContent = assistantText;
                     scrollToBottom();
                 });
@@ -2675,6 +2754,8 @@
                     removeTypingIndicator();
                     throw new Error('No response was returned from the assistant.');
                 }
+                // Apply linkification now that the full response is in
+                if (assistantBubble) setBubbleContent(assistantBubble, assistantText, 'assistant');
                 conversation.push({ role: 'assistant', content: assistantText });
             } catch (error) {
                 removeTypingIndicator();
