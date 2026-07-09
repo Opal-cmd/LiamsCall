@@ -1382,7 +1382,7 @@
                     class="nav-logo-icon w-auto select-none object-contain shrink-0"
                 >
                 <button type="button" class="nav-link" data-nav="chat">New Chat</button>
-                <button type="button" class="nav-link" data-nav="blog">Blog</button>
+                <button type="button" class="nav-link dev-only-nav" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link dev-only-nav" data-nav="contact">Contact Us</button>
                 <button type="button" class="nav-link dev-only-nav" data-nav="about">About</button>
@@ -1412,7 +1412,7 @@
                 </button>
                 <div id="landing-mobile-menu" role="menu">
                     <button type="button" class="nav-link" role="menuitem" data-nav="chat">New Chat</button>
-                    <button type="button" class="nav-link" role="menuitem" data-nav="blog">Blog</button>
+                    <button type="button" class="nav-link dev-only-nav" role="menuitem" data-nav="blog">Blog</button>
                     <button type="button" class="nav-link" role="menuitem" data-nav="resources">Resources</button>
                     <button type="button" class="nav-link dev-only-nav" role="menuitem" data-nav="contact">Contact Us</button>
                     <button type="button" class="nav-link dev-only-nav" role="menuitem" data-nav="about">About</button>
@@ -1456,7 +1456,7 @@
             </div>
             <nav class="flex flex-col gap-5 text-sm text-gray-900 shrink-0">
                 <button type="button" class="nav-link text-left" data-nav="chat">New Chat</button>
-                <button type="button" class="nav-link text-left" data-nav="blog">Blog</button>
+                <button type="button" class="nav-link text-left dev-only-nav" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link text-left" data-nav="resources">Resources</button>
                 <button type="button" class="nav-link text-left dev-only-nav" data-nav="contact">Contact Us</button>
                 <button type="button" class="nav-link text-left dev-only-nav" data-nav="about">About Us</button>
@@ -2118,7 +2118,7 @@
         };
 
         const IS_LOCAL_DEV = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-        const DEV_ONLY_NAV = new Set(['contact', 'about']);
+        const DEV_ONLY_NAV = new Set(['blog', 'contact', 'about']);
 
         function applyDevOnlyNav() {
             if (IS_LOCAL_DEV) return;
