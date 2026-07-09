@@ -8,7 +8,16 @@ const app = express();
 // Required so rate limiting sees real client IPs behind Render/nginx/Cloudflare
 app.set('trust proxy', 1);
 const PORT = Number(process.env.PORT) || 3000;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
+function normalizeOrigin(value) {
+  if (!value || typeof value !== 'string') return '';
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  return trimmed.endsWith('/') ? trimmed.slice(0, -1) : trimmed;
+}
+
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGIN
+  ? process.env.ALLOWED_ORIGIN.split(',').map(normalizeOrigin).filter(Boolean)
+  : [];
 const CHAT_API_TOKEN = process.env.CHAT_API_TOKEN || '';
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000;
 const RATE_LIMIT_MAX_REQUESTS = Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 30;
@@ -128,8 +137,8 @@ app.use((req, res, next) => {
 
 function isOriginAllowed(origin) {
   if (!origin) return true;
-  if (!ALLOWED_ORIGIN) return true;
-  if (origin === ALLOWED_ORIGIN) return true;
+  if (ALLOWED_ORIGINS.length === 0) return true;
+  if (ALLOWED_ORIGINS.includes(normalizeOrigin(origin))) return true;
   // Local dev: allow localhost even when a production origin is configured.
   if (process.env.NODE_ENV !== 'production') {
     try {
@@ -143,7 +152,7 @@ function isOriginAllowed(origin) {
 }
 
 app.use((req, res, next) => {
-  if (!ALLOWED_ORIGIN) return next();
+  if (ALLOWED_ORIGINS.length === 0) return next();
   const origin = req.headers.origin || '';
   if (!isOriginAllowed(origin)) {
     return res.status(403).json({ error: 'Origin not allowed.' });
@@ -691,6 +700,11 @@ app.listen(PORT, () => {
   const configured = getProviderCandidates();
   console.log(`Provider chain: ${configured.map((c) => `${c.provider}(${c.model})`).join(' → ')}`);
   if (configured.length === 0) console.warn('WARNING: No AI providers configured — chat will fail.');
+  if (ALLOWED_ORIGINS.length) {
+    console.log(`CORS allowed origins: ${ALLOWED_ORIGINS.join(', ')}`);
+  } else {
+    console.warn('WARNING: ALLOWED_ORIGIN not set — all origins allowed (fine for local dev only).');
+  }
   if (TURNSTILE_SITE_KEY && !TURNSTILE_SECRET_KEY) {
     console.warn('WARNING: TURNSTILE_SITE_KEY is set but TURNSTILE_SECRET_KEY is missing — captcha disabled.');
   } else if (!TURNSTILE_SITE_KEY && TURNSTILE_SECRET_KEY) {
