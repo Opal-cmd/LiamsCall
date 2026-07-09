@@ -37,16 +37,37 @@
             --dur: 1.05s;
         }
 
+        :root {
+            /* Updated by syncViewportMetrics() from visualViewport / innerWidth×innerHeight */
+            --app-height: 100dvh;
+            --app-width: 100%;
+            --landing-dock-offset: 11.5rem;
+            --landing-header-offset: 4rem;
+        }
+
+        html {
+            width: 100%;
+            max-width: 100%;
+            height: var(--app-height);
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
+            overflow: hidden;
             overflow-x: hidden;
-            min-height: 100vh;
-            min-height: 100dvh;
+            width: 100%;
+            max-width: 100%;
+            height: var(--app-height);
+            margin: 0;
         }
 
         #landing {
-            min-height: 100vh;
-            min-height: 100dvh;
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            min-height: 0;
+            box-sizing: border-box;
         }
 
         .font-serif-brand { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.02em; }
@@ -510,12 +531,21 @@
 
         /* Push landing page content below the notch / Dynamic Island */
         #landing {
-            padding-top: env(safe-area-inset-top);
-            padding-top: constant(safe-area-inset-top); /* iOS < 11.2 fallback */
+            padding-top: 0;
         }
 
         #landing-header {
-            padding-top: 2.75rem;
+            padding-top: max(1rem, env(safe-area-inset-top));
+            padding-left: max(1rem, env(safe-area-inset-left));
+            padding-right: max(1rem, env(safe-area-inset-right));
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media (min-width: 768px) {
+            #landing-header {
+                padding-top: 2.75rem;
+            }
         }
 
         #landing-header .desktop-nav {
@@ -541,13 +571,30 @@
             display: none;
         }
 
-        /* Mobile landing nav — logo left, hamburger menu right */
+        /* Mobile landing nav — centered logo, menu right */
         #landing-header .mobile-nav {
             position: relative;
             z-index: 2;
+            display: none;
+        }
+
+        @media (max-width: 767px) {
+            #landing-header .mobile-nav {
+                display: grid;
+                grid-template-columns: 1fr auto 1fr;
+                align-items: center;
+                width: 100%;
+            }
+        }
+
+        #landing-header .mobile-nav-logo {
+            grid-column: 2;
+            justify-self: center;
         }
 
         #landing-mobile-menu-toggle {
+            grid-column: 3;
+            justify-self: end;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -1009,19 +1056,30 @@
         #landing-art.is-loaded #landing-art-veil { opacity: 1; }
 
         /* Keep header + hero above the art */
-        #landing-header, #landing > .flex-1 { position: relative; z-index: 1; }
+        #landing-header, #landing-hero { position: relative; z-index: 1; }
+
+        /* Hero — flex-centers quote in visible area above docked chat widget */
+        #landing-hero {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            padding-left: max(1rem, env(safe-area-inset-left));
+            padding-right: max(1rem, env(safe-area-inset-right));
+            padding-bottom: var(--landing-dock-offset);
+            box-sizing: border-box;
+        }
 
         /* Landing quote block — centered over the art */
         #landing-quote {
-            position: absolute;
-            left: 50%;
-            top: 45%;
-            transform: translate(-50%, -50%);
-            width: calc(100% - 2.5rem);
+            position: relative;
+            width: 100%;
             max-width: 42rem;
             text-align: center;
             z-index: 1;
             user-select: none;
+            margin: 0 auto;
         }
         #landing-quote blockquote {
             font-size: clamp(1.15rem, 2.8vw, 1.9rem);
@@ -1136,14 +1194,11 @@
         /* ── Responsive: small phones ───────────────────────────── */
         @media (max-width: 374px) {
             #landing-header {
-                padding-top: 2rem;
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
+                padding-top: max(0.75rem, env(safe-area-inset-top));
             }
 
             #landing-quote {
-                top: 38%;
-                width: calc(100% - 1.25rem);
+                max-width: 100%;
             }
 
             #landing-quote blockquote {
@@ -1202,10 +1257,6 @@
 
         /* ── Responsive: short / landscape mobile ─────────────── */
         @media (max-width: 767px) and (max-height: 700px) {
-            #landing-quote {
-                top: 36%;
-            }
-
             #landing-quote blockquote {
                 font-size: clamp(0.95rem, 4vw, 1.2rem);
                 line-height: 1.35;
@@ -1237,12 +1288,8 @@
         }
 
         @media (max-width: 767px) and (orientation: landscape) {
-            #landing-quote {
-                top: 42%;
-            }
-
             #landing-header {
-                padding-top: 1.5rem;
+                padding-top: max(0.5rem, env(safe-area-inset-top));
             }
 
             #chat-shell.is-docked {
@@ -1341,31 +1388,18 @@
 
         /* ── Responsive: landing quote clearance above dock ─────── */
         @media (max-width: 767px) {
-            #landing > .flex-1 {
-                padding-bottom: 11.5rem;
-            }
-
-            #landing-quote {
-                top: 40%;
-            }
-
             #landing-art-credit {
-                bottom: max(11rem, calc(0.65rem + env(safe-area-inset-bottom)));
+                bottom: calc(var(--landing-dock-offset) + 0.35rem);
+                left: max(1rem, env(safe-area-inset-left));
                 max-width: 55vw;
                 font-size: 9px;
             }
         }
-
-        @media (min-width: 768px) and (max-width: 1023px) {
-            #landing > .flex-1 {
-                padding-bottom: 10rem;
-            }
-        }
     </style>
 </head>
-<body class="h-screen w-full m-0 overflow-hidden bg-white">
+<body class="m-0 overflow-hidden bg-white">
 
-    <div id="landing" class="h-full flex flex-col">
+    <div id="landing" class="flex flex-col">
         <!-- CC0 art background (The Met Open Access / NASA) -->
         <div id="landing-art" aria-hidden="true">
             <div id="landing-art-img"></div>
@@ -1387,9 +1421,9 @@
                 <button type="button" class="nav-link" data-nav="contact">Contact Us</button>
                 <button type="button" class="nav-link" data-nav="about">About</button>
             </nav>
-            <!-- Mobile nav — logo left, hamburger menu right -->
-            <div class="mobile-nav md:hidden flex items-center justify-between w-full">
-                <span class="pill-dark px-2 py-1 flex items-center shrink-0">
+            <!-- Mobile nav — centered logo, menu right -->
+            <div class="mobile-nav md:hidden w-full">
+                <span class="mobile-nav-logo pill-dark px-2 py-1 flex items-center shrink-0">
                     <img
                         src="/assets/logo-icon.svg"
                         alt="Liam's Call AI logo"
@@ -1419,7 +1453,7 @@
                 </div>
             </div>
         </header>
-        <div class="flex-1 relative">
+        <div id="landing-hero">
             <!-- Rotating inspirational quote over the art -->
             <div id="landing-quote">
                 <blockquote id="lq-text"></blockquote>
@@ -1623,6 +1657,49 @@
     </div>
 
     <script>
+        /* ── Viewport metrics — real device/browser dimensions on mobile ── */
+        function syncViewportMetrics() {
+            const vv = window.visualViewport;
+            const h = Math.round(vv?.height ?? window.innerHeight);
+            const w = Math.round(vv?.width ?? document.documentElement.clientWidth ?? window.innerWidth);
+            const root = document.documentElement;
+
+            root.style.setProperty('--app-height', `${h}px`);
+            root.style.setProperty('--app-width', `${w}px`);
+
+            const dock = document.getElementById('chat-shell');
+            const header = document.getElementById('landing-header');
+            let dockH = 0;
+
+            if (dock?.classList.contains('is-docked')) {
+                dockH = Math.ceil(dock.getBoundingClientRect().height);
+            }
+
+            root.style.setProperty('--landing-dock-offset', `${dockH + 16}px`);
+
+            if (header) {
+                root.style.setProperty('--landing-header-offset', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+            }
+        }
+
+        (function initViewportMetrics() {
+            syncViewportMetrics();
+            window.addEventListener('resize', syncViewportMetrics, { passive: true });
+            window.addEventListener('orientationchange', () => {
+                requestAnimationFrame(syncViewportMetrics);
+            }, { passive: true });
+            window.visualViewport?.addEventListener('resize', syncViewportMetrics, { passive: true });
+            window.visualViewport?.addEventListener('scroll', syncViewportMetrics, { passive: true });
+            window.addEventListener('load', syncViewportMetrics, { passive: true });
+
+            const dock = document.getElementById('chat-shell');
+            const header = document.getElementById('landing-header');
+            if (typeof ResizeObserver !== 'undefined') {
+                if (dock) new ResizeObserver(syncViewportMetrics).observe(dock);
+                if (header) new ResizeObserver(syncViewportMetrics).observe(header);
+            }
+        })();
+
         const CONTENT_PAGES = {
             blog: { title: 'Blog', body: `
                 <p class="text-gray-400 text-xs mb-6 text-center">Practical reads for caregivers and families</p>
@@ -2176,7 +2253,7 @@
             isExpanding = true;
 
             const rect = chatShell.getBoundingClientRect();
-            const targetHeight = window.innerHeight;
+            const targetHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-height')) || window.innerHeight;
 
             // Pin shell at its current visual position (no hide, no clone, no swap)
             chatShell.classList.remove('is-docked');
@@ -2212,6 +2289,7 @@
                     chatShell.style.transform = '';
                     isExpanded = true;
                     isExpanding = false;
+                    syncViewportMetrics();
                     resolve();
                 }, EXPAND_MS);
             });
@@ -2324,8 +2402,12 @@
             chatShell.classList.add('is-docked');
             landing.classList.remove('is-hidden');
             chatGlow.classList.remove('is-hidden');
-            setTimeout(() => chatShell.classList.remove('is-animating'), 1100);
+            setTimeout(() => {
+                chatShell.classList.remove('is-animating');
+                syncViewportMetrics();
+            }, 1100);
             isExpanded = false;
+            syncViewportMetrics();
         }
 
         document.getElementById('home-btn-widget')?.addEventListener('click', goHome);
