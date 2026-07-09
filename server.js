@@ -2,11 +2,14 @@ require('dotenv').config();
 
 const crypto = require('crypto');
 const express = require('express');
+const helmet = require('helmet');
 const path = require('path');
 
 const app = express();
+const IS_PROD = process.env.NODE_ENV === 'production';
 // Required so rate limiting sees real client IPs behind Render/nginx/Cloudflare
 app.set('trust proxy', 1);
+app.disable('x-powered-by');
 const PORT = Number(process.env.PORT) || 3000;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 const CHAT_API_TOKEN = process.env.CHAT_API_TOKEN || '';
@@ -45,6 +48,49 @@ const SYSTEM_PROMPT =
 const requestBuckets = new Map();
 // Per-day limit buckets  { date: 'YYYY-MM-DD', count: number }
 const dailyBuckets = new Map();
+const jwstBuckets = new Map();
+const JWST_RATE_LIMIT_MAX = Number(process.env.JWST_RATE_LIMIT_MAX) || 20;
+
+function clientIp(req) {
+  return req.ip || req.socket?.remoteAddress || 'unknown';
+}
+
+function publicErrorMessage(error) {
+  if (!IS_PROD) return error?.message || 'Unable to complete the chat request.';
+  return 'Unable to complete the chat request. Please try again in a moment.';
+}
+
+function checkRateLimit(buckets, key, windowMs, maxRequests) {
+  const now = Date.now();
+  const bucket = buckets.get(key) || { start: now, count: 0 };
+  if (now - bucket.start > windowMs) {
+    bucket.start = now;
+    bucket.count = 0;
+  }
+  bucket.count += 1;
+  buckets.set(key, bucket);
+  return bucket.count <= maxRequests;
+}
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", 'https://cdn.jsdelivr.net'],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+        connectSrc: ["'self'", 'https:'],
+        fontSrc: ["'self'", 'data:'],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'self'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  }),
+);
 
 app.use(express.json({ limit: '32kb' }));
 
@@ -74,20 +120,8 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   if (req.path !== '/api/chat') return next();
-  const now = Date.now();
-  const key =
-    req.ip ||
-    req.headers['x-forwarded-for'] ||
-    req.socket?.remoteAddress ||
-    'unknown';
-  const bucket = requestBuckets.get(key) || { start: now, count: 0 };
-  if (now - bucket.start > RATE_LIMIT_WINDOW_MS) {
-    bucket.start = now;
-    bucket.count = 0;
-  }
-  bucket.count += 1;
-  requestBuckets.set(key, bucket);
-  if (bucket.count > RATE_LIMIT_MAX_REQUESTS) {
+  const key = clientIp(req);
+  if (!checkRateLimit(requestBuckets, key, RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS)) {
     return res.status(429).json({
       error: `Rate limit exceeded. Try again in ${Math.ceil(
         RATE_LIMIT_WINDOW_MS / 1000,
@@ -101,7 +135,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   if (req.path !== '/api/chat') return next();
   const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
-  const key = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+  const key = clientIp(req);
   const bucket = dailyBuckets.get(key) || { date: today, count: 0 };
   if (bucket.date !== today) { bucket.date = today; bucket.count = 0; }
   bucket.count += 1;
@@ -385,14 +419,23 @@ app.get('/', (_req, res) => {
 });
 
 // Public health check: intentionally minimal so internal configuration
-// (models, rate limits, auth setup) is not disclosed.
+// (models, rate limits, auth setup) is not disclosed in production.
 app.get('/api/health', (_req, res) => {
+  if (IS_PROD) {
+    return res.json({ ok: true });
+  }
   res.json({ ok: true, providers: PROVIDER_CHAIN, jwst: Boolean(JWST_API_KEY) });
 });
 
 /* Proxy James Webb Space Telescope images — keeps the API key server-side */
 app.get('/api/jwst', async (req, res) => {
   if (!JWST_API_KEY) return res.status(503).json({ error: 'JWST API key not configured.' });
+
+  const key = clientIp(req);
+  if (!checkRateLimit(jwstBuckets, key, RATE_LIMIT_WINDOW_MS, JWST_RATE_LIMIT_MAX)) {
+    return res.status(429).json({ error: 'Too many image requests. Please try again shortly.' });
+  }
+
   const page = Math.max(1, Number(req.query.page) || 1);
   const perPage = Math.min(50, Math.max(1, Number(req.query.perPage) || 50));
   try {
@@ -472,7 +515,7 @@ app.post('/api/chat', async (req, res) => {
     });
   } catch (error) {
     writeSse(res, 'error', {
-      message: error.message || 'Unable to complete the chat request.',
+      message: publicErrorMessage(error),
     });
     logInfo(req, 'chat_error', {
       message: error.message,
