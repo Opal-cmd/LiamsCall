@@ -1709,7 +1709,7 @@
                             <p>Burnout is not weakness. It is a physiological and psychological response to sustained stress without adequate recovery. Research published in journals like <em>The Gerontologist</em> consistently shows that family caregivers experience higher rates of depression, anxiety, immune suppression, and cardiovascular strain than non-caregivers of comparable age. Your body is not broken — it is responding exactly as it should to a relentlessly demanding situation.</p>
                             <p>The warning signs are worth knowing: persistent irritability or short-temperedness toward the person you care for; feeling emotionally numb or detached; changes in sleep (either too much or not enough); withdrawing from friends or activities you used to enjoy; getting sick more often; and a growing sense that nothing you do is ever enough. If several of these feel familiar, that is important information — not a reason for shame.</p>
                             <p>The first step is accepting that your own wellbeing is not optional. It is structural. A caregiver who is depleted cannot provide consistent, compassionate care — not because of a character flaw, but because humans are not built for unlimited output without rest. Protecting your health is an act of care for both of you.</p>
-                            <p>Practical starting points: tell one person you trust exactly how you are feeling; ask your family doctor about caregiver support referrals; and explore the Ontario Caregiver Organization's free helpline at 1-833-227-3778. Small conversations often open doors that feel locked.</p>
+                            <p>Practical starting points: tell one person you trust exactly how you are feeling; ask your family doctor about caregiver support referrals; and explore the <a href="https://ontariocaregiver.ca" target="_blank" rel="noopener" class="underline text-[var(--green-dark)] font-medium">Ontario Caregiver Organization</a>'s free helpline at <a href="tel:+18332273778" class="underline text-[var(--green-dark)] font-medium">1-833-227-3778</a>. Small conversations often open doors that feel locked.</p>
                         </div>
                     </article>
 
@@ -1733,7 +1733,7 @@
                             <p>The guilt spiral tends to work like this: you recognize you need help, you feel guilty for needing it, you talk yourself out of asking, you keep going alone, you get more depleted, and eventually you feel guilty about how depleted you are. The loop is self-sealing. Breaking it requires a small act of courage — not a change in personality, just a willingness to say something true to another person.</p>
                             <p>A useful reframe: asking for help is not about you. It is about the person you care for. When you are rested, supported, and not running on empty, you are measurably more patient, attentive, and effective. Accepting help is a care decision, not a surrender.</p>
                             <p>Practically, the most effective requests are specific and time-bounded. "Can you sit with Mom on Thursday afternoon so I can sleep?" is easier for someone to answer than "I need more support." Vague asks produce vague responses. Concrete ones get a yes or a no, both of which are useful.</p>
-                            <p>If family isn't available or able, look outward. The Ontario Caregiver Organization offers free peer support groups. Many municipalities have caregiver relief programs funded through Community Care Access. Your family doctor can refer you to a social worker. There is more support available than most caregivers know — it just requires asking one person who can point you toward it.</p>
+                            <p>If family isn't available or able, look outward. The <a href="https://ontariocaregiver.ca" target="_blank" rel="noopener" class="underline text-[var(--green-dark)] font-medium">Ontario Caregiver Organization</a> offers free peer support groups. Many municipalities have caregiver relief programs funded through Community Care Access. Your family doctor can refer you to a social worker. There is more support available than most caregivers know — it just requires asking one person who can point you toward it.</p>
                         </div>
                     </article>
 
@@ -1745,7 +1745,7 @@
                             <p>Psychologists call this anticipatory grief, and it is one of the most common — and least acknowledged — experiences in caregiving. Studies suggest that caregivers of people with dementia often describe their grief as more painful than the grief they feel after the person's actual death, in part because there is no social permission to mourn someone who is still alive.</p>
                             <p>What anticipatory grief can look like: deep sadness when looking at old photographs; anger that surfaces without an obvious cause; moments of wishing the situation were already over, followed by crushing guilt for having that thought; a sense of loneliness that is hard to explain to people who are not in the same position. All of these are normal responses to an abnormal amount of sustained loss.</p>
                             <p>Giving yourself permission to grieve — without waiting for a conventional endpoint — is not morbid. It is honest. Grief is not a failure of loyalty or love. It is love responding to loss, and it needs somewhere to go.</p>
-                            <p>Some things that help: naming the grief out loud to at least one person, whether a friend, a therapist, or a support group; keeping a simple journal; finding a caregiver-specific grief group (ConnexOntario can connect you to options in your area); or using a tool like Liam's Call to put words to what you are feeling in a low-stakes space. You do not have to be alone in this, even when it feels that way.</p>
+                            <p>Some things that help: naming the grief out loud to at least one person, whether a friend, a therapist, or a support group; keeping a simple journal; finding a caregiver-specific grief group (<a href="https://connexontario.ca" target="_blank" rel="noopener" class="underline text-[var(--green-dark)] font-medium">ConnexOntario</a> can connect you to options in your area); or using a tool like Liam's Call to put words to what you are feeling in a low-stakes space. You do not have to be alone in this, even when it feels that way.</p>
                         </div>
                     </article>
 
@@ -2339,10 +2339,22 @@
   <h1 style="font-size:1.55rem;font-weight:700;color:var(--green-dark);margin-bottom:1.25rem;letter-spacing:-.02em;">${page.title}</h1>
   ${page.body}
 </div>
+<script>
+  // In-app nav buttons have no SPA here — send them back to the main site.
+  document.querySelectorAll('[data-nav]').forEach(function (btn) {
+    btn.style.cursor = 'pointer';
+    btn.addEventListener('click', function () { window.location.href = '/'; });
+  });
+<\/script>
 </body>
 </html>`;
-            const win = window.open('', '_blank', 'noopener,noreferrer');
-            if (win) { win.document.write(html); win.document.close(); }
+            // NOTE: 'noopener' can't be used here — it makes window.open return
+            // null, and we need the handle to write the page content.
+            const win = window.open('', '_blank');
+            if (!win) return;
+            win.opener = null;
+            win.document.write(html);
+            win.document.close();
         }
 
         async function navigate(navKey) {
@@ -2451,29 +2463,44 @@
                 .replace(/"/g, '&quot;');
         }
 
-        // Convert phone numbers and bare URLs in escaped text to clickable links.
+        // Convert phone numbers, URLs, and bare domains in escaped text to
+        // clickable links. Single pass so earlier replacements are never
+        // re-processed (e.g. digits inside a URL becoming a tel: link).
         // Only applied to assistant bubbles; user bubbles stay plain text.
         function linkifyText(escaped) {
-            // North-American / international phone numbers  e.g. 1-800-662-4357  (800) 668-6868  +1 855 242 3310  988
-            const phoneRe = /(\+?1[-.\s]?)?((\(\d{3}\)|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}|\b9-?8-?8\b|\b9-?1-?1\b)/g;
-            // Full URLs (https?://) and bare www. domains
-            const urlRe = /(?<![="'(])(?:https?:\/\/[^\s<>"')]+|www\.[a-z0-9][-a-z0-9.]+\.[a-z]{2,}(?:\/[^\s<>"']*)?)/gi;
+            const LINK_STYLE = 'class="underline font-medium" style="color:inherit;opacity:.85;"';
+            const re = new RegExp(
+                // 1: full URL with protocol
+                '(https?:\\/\\/[^\\s<>"\')]+)' +
+                // 2: bare domain e.g. connexontario.ca, www.camh.ca, 988lifeline.org/chat
+                '|((?:www\\.)?[a-z0-9][-a-z0-9]*(?:\\.[a-z0-9-]+)*\\.(?:ca|com|org|net|gov|edu)\\b(?:\\/[^\\s<>"\']*)?)' +
+                // 3: NA phone numbers e.g. 1-800-662-4357, (800) 668-6868, +1 855 242 3310
+                '|((?:\\+?1[-.\\s]?)?(?:\\(\\d{3}\\)\\s?|\\d{3}[-.\\s])\\d{3}[-.\\s]?\\d{4})' +
+                // 4: crisis short codes e.g. 988, 9-8-8, 911, 211, 811
+                '|(\\b(?:9-?8-?8|9-?1-?1|2-?1-?1|8-?1-?1)\\b)',
+                'gi',
+            );
 
-            // Replace URLs first (they may contain digits that look phone-like)
-            let out = escaped.replace(urlRe, (url) => {
-                const display = url.replace(/^https?:\/\/(www\.)?/, '');
-                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="underline font-medium" style="color:inherit;opacity:.85;">${display}</a>`;
-            });
+            return escaped.replace(re, (match, fullUrl, domain, phone, shortCode, offset, str) => {
+                const prev = offset > 0 ? str[offset - 1] : '';
+                // Skip matches glued to a word, email, or path (e.g. hello@liamscall.ca)
+                if (/[\w@/.-]/.test(prev)) return match;
 
-            // Replace phone numbers
-            out = out.replace(phoneRe, (match) => {
+                if (fullUrl || domain) {
+                    // Trailing punctuation belongs to the sentence, not the URL
+                    const trail = match.match(/[.,;:!?)'"]+$/)?.[0] ?? '';
+                    const clean = trail ? match.slice(0, -trail.length) : match;
+                    const href = fullUrl ? clean : `https://${clean}`;
+                    const display = clean.replace(/^https?:\/\/(www\.)?/i, '');
+                    return `<a href="${href}" target="_blank" rel="noopener noreferrer" ${LINK_STYLE}>${display}</a>${trail}`;
+                }
+
                 const digits = match.replace(/\D/g, '');
-                // Normalize: prefix with +1 if 10-digit North-American, keep 988/911 short codes
+                if (!digits) return match;
+                // Normalize: prefix with +1 for 10-digit NA numbers, keep 988/911 short codes
                 const tel = digits.length >= 10 ? `+${digits.startsWith('1') ? '' : '1'}${digits}` : digits;
-                return `<a href="tel:${tel}" class="underline font-medium" style="color:inherit;opacity:.85;">${match}</a>`;
+                return `<a href="tel:${tel}" ${LINK_STYLE}>${match}</a>`;
             });
-
-            return out;
         }
 
         function setBubbleContent(bubble, text, role) {
