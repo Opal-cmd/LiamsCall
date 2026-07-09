@@ -1382,10 +1382,10 @@
                     class="nav-logo-icon w-auto select-none object-contain shrink-0"
                 >
                 <button type="button" class="nav-link" data-nav="chat">New Chat</button>
-                <button type="button" class="nav-link dev-only-nav" data-nav="blog">Blog</button>
+                <button type="button" class="nav-link" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link" data-nav="resources">Resources</button>
-                <button type="button" class="nav-link dev-only-nav" data-nav="contact">Contact Us</button>
-                <button type="button" class="nav-link dev-only-nav" data-nav="about">About</button>
+                <button type="button" class="nav-link" data-nav="contact">Contact Us</button>
+                <button type="button" class="nav-link" data-nav="about">About</button>
             </nav>
             <!-- Mobile nav — logo left, hamburger menu right -->
             <div class="mobile-nav md:hidden flex items-center justify-between w-full">
@@ -1412,10 +1412,10 @@
                 </button>
                 <div id="landing-mobile-menu" role="menu">
                     <button type="button" class="nav-link" role="menuitem" data-nav="chat">New Chat</button>
-                    <button type="button" class="nav-link dev-only-nav" role="menuitem" data-nav="blog">Blog</button>
+                    <button type="button" class="nav-link" role="menuitem" data-nav="blog">Blog</button>
                     <button type="button" class="nav-link" role="menuitem" data-nav="resources">Resources</button>
-                    <button type="button" class="nav-link dev-only-nav" role="menuitem" data-nav="contact">Contact Us</button>
-                    <button type="button" class="nav-link dev-only-nav" role="menuitem" data-nav="about">About</button>
+                    <button type="button" class="nav-link" role="menuitem" data-nav="contact">Contact Us</button>
+                    <button type="button" class="nav-link" role="menuitem" data-nav="about">About</button>
                 </div>
             </div>
         </header>
@@ -1456,10 +1456,10 @@
             </div>
             <nav class="flex flex-col gap-5 text-sm text-gray-900 shrink-0">
                 <button type="button" class="nav-link text-left" data-nav="chat">New Chat</button>
-                <button type="button" class="nav-link text-left dev-only-nav" data-nav="blog">Blog</button>
+                <button type="button" class="nav-link text-left" data-nav="blog">Blog</button>
                 <button type="button" class="nav-link text-left" data-nav="resources">Resources</button>
-                <button type="button" class="nav-link text-left dev-only-nav" data-nav="contact">Contact Us</button>
-                <button type="button" class="nav-link text-left dev-only-nav" data-nav="about">About Us</button>
+                <button type="button" class="nav-link text-left" data-nav="contact">Contact Us</button>
+                <button type="button" class="nav-link text-left" data-nav="about">About Us</button>
             </nav>
             <div class="mt-auto pt-3 sm:pt-5 md:pt-8 shrink-0">
                 <div class="ad-card rounded-xl overflow-hidden border border-gray-200 bg-[#1a2d5a] text-white text-[9px] md:text-[10px] leading-snug shadow-sm">
@@ -1545,7 +1545,7 @@
                         <a href="tel:911" class="underline font-medium">9-1-1</a> for emergencies.
                         &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="privacy" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">Privacy</button>
                         &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="terms" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">Terms</button>
-                        <span class="dev-only-nav">&nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="about" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">About</button></span>
+                        &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="about" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">About</button>
                     </p>
                 </div>
             </div>
@@ -1973,23 +1973,18 @@
 
                 </div>
             ` },
-            terms: { title: 'Terms of Use', body: `
-                <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 8, 2026 &nbsp;·&nbsp; Last updated: July 8, 2026</p>
+            terms: { title: 'Terms of Use — LiamsCall.com', body: `
+                <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 8th, 2026 &nbsp;·&nbsp; Last updated: July 8th, 2026</p>
 
                 <div class="space-y-5 text-left text-sm text-gray-600 leading-relaxed">
 
-                    <div class="rounded-xl bg-amber-50 border border-amber-200 p-4">
-                        <h3 class="font-bold text-amber-800 mb-2">Important — not a medical, emergency, or crisis service</h3>
-                        <p class="text-xs text-amber-700">The Service is informational and educational only. It is <strong>not</strong> a substitute for professional medical, psychiatric, psychological, legal, or social-work advice, diagnosis, or treatment. It cannot see you, dispatch help, or guarantee a response time. If you or someone else is in immediate danger, call <strong>911</strong> (U.S. and Canada), or contact the <strong>988 Suicide &amp; Crisis Lifeline</strong> (U.S.) or <strong>9-8-8: Suicide Crisis Helpline</strong> (Canada) by calling or texting <strong>988</strong>.</p>
-                    </div>
-
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">1. Who these terms are for</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">1. Who These Terms Are For</h3>
                         <p class="text-xs text-gray-500">These Terms of Use ("Terms") govern your access to and use of liamscall.com and its AI chat agent, blog, and any related pages (together, the "Service"), operated by Liamscall.com ("Liam's Call," "we," "us"). By using the Service, you agree to these Terms. If you do not agree, please do not use the Service.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">2. Not a medical, emergency, or crisis service</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">2. Not a Medical, Emergency, or Crisis Service</h3>
                         <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
                             <li>The Service is informational and educational only. It is not a substitute for professional medical, psychiatric, psychological, legal, or social-work advice, diagnosis, or treatment.</li>
                             <li>The Service is not an emergency or crisis response service. It cannot see you, dispatch help, or guarantee a response time. If you or someone else is in immediate danger, call 911 (U.S. and Canada), or contact the 988 Suicide &amp; Crisis Lifeline (U.S.) or 9-8-8: Suicide Crisis Helpline (Canada) by calling or texting 988.</li>
@@ -1998,12 +1993,12 @@
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">3. Eligibility &amp; age</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">3. Eligibility &amp; Age</h3>
                         <p class="text-xs text-gray-500">The Service is intended for use by adults (18 years or older) and, where used by a caregiver on behalf of a minor, is intended to be used with adult oversight. The Service does not knowingly collect personal information from children under 13 (U.S.) or the applicable minimum age under Canadian law, and does not knowingly direct behavioural advertising at users under 18. Visitors who appear to be minors are met with age-appropriate language and are directed toward youth-specific and general crisis resources within the Service.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">4. No account, no login — what that means for you</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">4. No Account, No Login — What That Means for You</h3>
                         <p class="text-xs text-gray-500 mb-2">The Service is designed to be used without creating an account or providing a login. As a result:</p>
                         <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
                             <li>We have no reliable way to verify your identity, age, or location beyond an approximate, non-precise signal (see Privacy Policy).</li>
@@ -2013,13 +2008,15 @@
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">5. AI-generated content — limitations</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">5. AI-Generated Content — Limitations</h3>
                         <p class="text-xs text-gray-500">The chat agent is powered by one or more third-party AI language model providers, used in a layered, cost-managed configuration so that different messages may be answered by different underlying providers. AI-generated responses can be incomplete, out of date, or simply wrong, including specific claims about phone numbers, program names, eligibility rules, or laws. We have built guardrails intended to keep the agent empathetic, safe, and accurate, but we cannot guarantee that every response will be complete, accurate, or appropriate to your specific situation.</p>
-                        <p class="text-xs text-gray-500 mt-2">You should independently verify any specific resource, hotline, program, or eligibility information before relying on it, particularly in an urgent situation — use the direct links and phone numbers we provide to official sources rather than relying solely on the chat text.</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs mt-2">
+                            <li>You should independently verify any specific resource, hotline, program, or eligibility information before relying on it, particularly in an urgent situation — use the direct links and phone numbers we provide to official sources rather than relying solely on the chat text.</li>
+                        </ul>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">6. Acceptable use</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">6. Acceptable Use</h3>
                         <p class="text-xs text-gray-500 mb-2">You agree not to use the Service to:</p>
                         <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
                             <li>Attempt to obtain instructions or assistance for self-harm, harming others, or committing a crime.</li>
@@ -2031,7 +2028,7 @@
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">7. Third-party resources &amp; links</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">7. Third-Party Resources &amp; Links</h3>
                         <p class="text-xs text-gray-500">The Service may reference or link to third-party organizations, hotlines, shelters, treatment programs, government agencies, or articles (including on a future Resources page and blog). We do not control, endorse, or guarantee the accuracy, availability, or quality of any third-party resource, and are not responsible for your interactions with them. Inclusion of a resource is not a recommendation that it is right for your specific situation.</p>
                     </div>
 
@@ -2041,17 +2038,17 @@
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">9. Intellectual property</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">9. Intellectual Property</h3>
                         <p class="text-xs text-gray-500">The Service, including its design, text, graphics, and the specific configuration of the chat agent's guardrails (but excluding AI-generated chat responses themselves and third-party content), is owned by Liamscall.com or its licensors and is protected by copyright and other laws. You may not copy, reproduce, or create derivative works from the Service except for your own personal, non-commercial use of the information it provides to you.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">10. Disclaimer of warranties</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">10. Disclaimer of Warranties</h3>
                         <p class="text-xs text-gray-500">THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, OR NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR THAT ANY INFORMATION PROVIDED (INCLUDING AI-GENERATED CONTENT) WILL BE ACCURATE OR COMPLETE.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">11. Limitation of liability</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">11. Limitation of Liability</h3>
                         <p class="text-xs text-gray-500">TO THE MAXIMUM EXTENT PERMITTED BY LAW, Liamscall.com AND ITS OWNERS, OPERATORS, AND SERVICE PROVIDERS WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF DATA, ARISING FROM YOUR USE OF, OR INABILITY TO USE, THE SERVICE, INCLUDING RELIANCE ON ANY AI-GENERATED CONTENT.</p>
                         <p class="text-xs text-gray-500 mt-2">Nothing in this section limits or excludes liability where such limitation or exclusion is not permitted under applicable law, including liability for death or personal injury caused by gross negligence or willful misconduct, or any other liability that cannot lawfully be limited. Where a limitation above is found unenforceable in a particular jurisdiction, it will be limited or severed only to the minimum extent required, and the remainder of this section will continue to apply.</p>
                     </div>
@@ -2062,7 +2059,7 @@
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">13. Governing law &amp; dispute resolution</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">13. Governing Law &amp; Dispute Resolution</h3>
                         <p class="text-xs text-gray-500">These Terms, and any dispute arising out of or relating to them or the Service, are governed by the laws of the Province of Ontario and the federal laws of Canada applicable in Ontario, without regard to conflict-of-law principles. You and Liam's Call each agree to submit to the exclusive jurisdiction of the courts located in Ontario, Canada for any dispute not otherwise resolved informally or through the process below.</p>
                         <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs mt-2">
                             <li><strong>Informal resolution first.</strong> Before filing a claim, you agree to contact us at <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a> and describe the dispute so we can attempt to resolve it informally within 30 days.</li>
@@ -2071,15 +2068,13 @@
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">14. Changes to these terms</h3>
+                        <h3 class="font-semibold text-gray-800 mb-2">14. Changes to These Terms</h3>
                         <p class="text-xs text-gray-500">We may update these Terms from time to time. We will post the updated Terms with a new "Last updated" date. Continued use of the Service after changes are posted constitutes acceptance of the revised Terms.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-[var(--beige-main)] border-0 p-4">
                         <h3 class="font-semibold text-gray-800 mb-2">15. Contact</h3>
-                        <p class="text-xs text-gray-500">Questions about these Terms can be sent to:</p>
-                        <p class="text-xs mt-2"><strong class="text-gray-700">Liam's Call</strong><br>
-                        Email: <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a></p>
+                        <p class="text-xs text-gray-500">Questions about these Terms can be sent to <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a>.</p>
                     </div>
 
                 </div>
@@ -2116,15 +2111,6 @@
                 </div>
             ` },
         };
-
-        const IS_LOCAL_DEV = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-        const DEV_ONLY_NAV = new Set(['blog', 'contact', 'about']);
-
-        function applyDevOnlyNav() {
-            if (IS_LOCAL_DEV) return;
-            document.querySelectorAll('.dev-only-nav').forEach((el) => el.remove());
-        }
-        applyDevOnlyNav();
 
         const EXPAND_MS = 1050;
         let isExpanded = false;
@@ -2171,7 +2157,12 @@
         });
 
         landingMobileMenu?.querySelectorAll('[data-nav]').forEach((link) => {
-            link.addEventListener('click', closeLandingMobileMenu);
+            link.addEventListener('click', () => {
+                closeLandingMobileMenu();
+                const navKey = link.dataset.nav;
+                if (navKey === 'chat') newChat();
+                else navigate(navKey);
+            });
         });
 
         document.addEventListener('click', (e) => {
@@ -2257,9 +2248,12 @@
         const BLOG_URL = 'https://blog.liamscall.ca';
 
         async function navigate(navKey) {
-            if (!IS_LOCAL_DEV && DEV_ONLY_NAV.has(navKey)) return;
             if (navKey === 'blog') {
-                window.open(BLOG_URL, '_blank', 'noopener,noreferrer');
+                if (isMobileViewport()) {
+                    window.location.assign(BLOG_URL);
+                } else {
+                    window.open(BLOG_URL, '_blank', 'noopener,noreferrer');
+                }
                 return;
             }
             if (navKey === 'chat') {
@@ -2299,6 +2293,7 @@
         }
 
         document.querySelectorAll('[data-nav]').forEach((link) => {
+            if (link.closest('#landing-mobile-menu')) return;
             link.addEventListener('click', () => {
                 if (link.dataset.nav === 'chat') newChat();
                 else navigate(link.dataset.nav);
