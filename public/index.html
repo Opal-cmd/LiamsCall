@@ -2667,6 +2667,11 @@
 
         function renderAssistantMarkdown(text) {
             let s = escapeHtml(stripIncompleteMarkdown(text));
+            // Markdown links → clickable anchors (Gemini often uses [label](url))
+            s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (_m, label, url) => {
+                const safeHref = url.replace(/"/g, '');
+                return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="underline font-medium" style="color:#1d4f91;">${label}</a>`;
+            });
             s = s.replace(/\*\*\*([^*\n]+)\*\*\*/g, '<strong>$1</strong>');
             s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
             s = s.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');

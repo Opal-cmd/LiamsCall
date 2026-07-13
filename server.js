@@ -85,8 +85,13 @@ RESOURCE LISTS (shelters, clinics, hotlines, organizations, programs):
 Whenever you give a numbered or bulleted list of places people can call or visit, every item must include all three when available: (1) the name, (2) a phone number, and (3) a website — written on or right under that item, not buried later. Prefer this shape:
 1. 🏠 **Name** — one short line of what it is / who it's for
    📞 phone number (with what happens when you call)
-   🌐 website
-Never invent a phone number or URL. If you do not have a verified number for a specific shelter or local program, do not fake one — instead list a verified directory or helpline that can look it up (from the crisis table, 211, municipal 311 where that city uses it, or that region's official housing / public-health site) and still give that directory's phone and website. Prefer real, useful options over vague tips like "search online" or "consider reaching out to local organizations" unless those search tips also name a concrete directory with its phone and site. Finish every list you start — do not cut off mid-item.
+   🌐 https://example.org
+Rules:
+- At most 3 resource items per message. Three complete options beat five cut-off ones.
+- Finish every list you start — never leave a trailing unfinished line like "4. 🏠".
+- Put websites as plain https:// URLs (or bare domains). Do not use markdown links like [label](url).
+- Never invent a phone number or URL. If you do not have a verified number for a specific shelter or local program, do not fake one — instead list a verified directory or helpline that can look it up (from the crisis table, 211, municipal 311 where that city uses it, or that region's official housing / public-health site) and still give that directory's phone and website.
+- Prefer real, useful options over vague tips like "search online" unless those tips also name a concrete directory with its phone and site.
 
 READING RISK ACROSS THE CONVERSATION (can override ask-first):
 Judge risk cumulatively across the whole conversation, not from any single word. A single soft word is not a pattern; the same language repeated, escalating, or turning specific across several messages is one.
@@ -292,7 +297,7 @@ app.use(express.static(PUBLIC_DIR));
 
 function modelForProvider(provider) {
   if (provider === 'groq')     return process.env.GROQ_MODEL    || 'llama-3.3-70b-versatile';
-  if (provider === 'gemini')   return process.env.GEMINI_MODEL  || 'gemini-2.5-flash';
+  if (provider === 'gemini')   return process.env.GEMINI_MODEL  || 'gemini-2.0-flash';
   if (provider === 'anthropic') return process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
   return process.env.OPENAI_MODEL || 'gpt-4o-mini';
 }
@@ -331,22 +336,28 @@ function getApiConfig(provider, modelOverride, systemPrompt) {
   }
 
   // Gemini via Google's OpenAI-compatible endpoint — same streaming format as Groq/OpenAI.
-  // gemini-2.5-flash thinking tokens count against max_tokens; disable them so
-  // replies don't cut off mid-sentence (reasoning_effort: "none" → thinking_budget 0).
+  // gemini-2.5-flash thinking can silently consume max_tokens and cut replies short.
+  // Prefer gemini-2.0-flash by default; if 2.5 is configured, force reasoning_effort none.
   if (provider === 'gemini') {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('Missing GEMINI_API_KEY in environment variables.');
+    const useReasoningGate = /gemini-2\.5|gemini-3/i.test(model);
     return {
       provider,
       url: `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`,
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      buildBody: (messages) => ({
-        model,
-        messages: [{ role: 'system', content: prompt }, ...messages],
-        stream: true,
-        max_tokens: MAX_TOKENS,
-        reasoning_effort: process.env.GEMINI_REASONING_EFFORT || 'none',
-      }),
+      buildBody: (messages) => {
+        const body = {
+          model,
+          messages: [{ role: 'system', content: prompt }, ...messages],
+          stream: true,
+          max_tokens: MAX_TOKENS,
+        };
+        if (useReasoningGate) {
+          body.reasoning_effort = process.env.GEMINI_REASONING_EFFORT || 'none';
+        }
+        return body;
+      },
     };
   }
 
