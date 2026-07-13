@@ -3,10 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Liams Call AI — mental health support for caregivers and families. Anywhere. Anytime.">
+    <meta name="description" content="Liam's Call is a free AI support tool for mental health, addiction, and housing challenges — for caregivers and families in Canada and the U.S. Chat anytime, no account required.">
     <meta name="theme-color" content="#0f4a3a">
-    <title>Liams Call AI</title>
+    <link rel="canonical" href="https://liamscall.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Liam's Call">
+    <meta property="og:title" content="Liam's Call — Mental Health, Addiction &amp; Housing Support">
+    <meta property="og:description" content="Free AI support for caregivers and families navigating mental health, addiction, and housing challenges. Crisis resources included. No login required.">
+    <meta property="og:url" content="https://liamscall.com/">
+    <meta property="og:image" content="https://liamscall.com/assets/logo-icon.svg">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Liam's Call — Mental Health, Addiction &amp; Housing Support">
+    <meta name="twitter:description" content="Free AI support for caregivers and families. Chat anytime — no account required.">
+    <title>Liam's Call — Mental Health, Addiction &amp; Housing Support</title>
     <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Liam's Call",
+        "url": "https://liamscall.com/",
+        "description": "Free AI support for mental health, addiction, and housing challenges — for caregivers and families.",
+        "inLanguage": "en"
+    }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         /* Self-hosted Inter — variable font, no Google Fonts request */
@@ -99,6 +119,15 @@
         .nav-link { cursor: pointer; }
         .nav-link:hover { opacity: 0.75; }
         .nav-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+        a.nav-link {
+            color: inherit;
+            text-decoration: none;
+            background: none;
+            border: none;
+            font: inherit;
+            display: inline;
+        }
+        a.nav-link.underline { text-decoration: underline; }
 
         #chat-messages { scrollbar-width: thin; scrollbar-color: #b8aea2 transparent; }
         #chat-messages::-webkit-scrollbar { width: 6px; }
@@ -1402,6 +1431,13 @@
     </style>
 </head>
 <body class="m-0 overflow-hidden bg-white">
+    <noscript>
+        <div style="max-width:40rem;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;color:#374151;line-height:1.6;">
+            <h1 style="color:#0f4a3a;font-size:1.5rem;">Liam's Call</h1>
+            <p>Free AI support for mental health, addiction, and housing challenges — for caregivers, families, and anyone who needs help thinking through next steps. Available in Canada and the U.S. No account or login required.</p>
+            <p>In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.</p>
+        </div>
+    </noscript>
 
     <div id="landing" class="flex flex-col">
         <!-- CC0 art background (The Met Open Access / NASA) -->
@@ -1421,7 +1457,7 @@
                 >
                 <button type="button" class="nav-link" data-nav="chat">New Chat</button>
                 <button type="button" class="nav-link" data-nav="resources">Resources</button>
-                <button type="button" class="nav-link" data-nav="about">About</button>
+                <a class="nav-link" href="/about">About</a>
             </nav>
             <!-- Mobile nav — centered logo, menu right -->
             <div class="mobile-nav md:hidden w-full">
@@ -1449,7 +1485,7 @@
                 <div id="landing-mobile-menu" role="menu">
                     <button type="button" class="nav-link" role="menuitem" data-nav="chat">New Chat</button>
                     <button type="button" class="nav-link" role="menuitem" data-nav="resources">Resources</button>
-                    <button type="button" class="nav-link" role="menuitem" data-nav="about">About</button>
+                    <a class="nav-link" role="menuitem" href="/about">About</a>
                 </div>
             </div>
         </header>
@@ -1491,7 +1527,7 @@
             <nav class="flex flex-col gap-5 text-sm text-gray-900 shrink-0">
                 <button type="button" class="nav-link text-left" data-nav="chat">New Chat</button>
                 <button type="button" class="nav-link text-left" data-nav="resources">Resources</button>
-                <button type="button" class="nav-link text-left" data-nav="about">About Us</button>
+                <a class="nav-link text-left" href="/about">About Us</a>
             </nav>
             <div class="mt-auto pt-3 sm:pt-5 md:pt-8 shrink-0">
                 <div class="ad-card rounded-xl overflow-hidden border border-gray-200 bg-[#1a2d5a] text-white text-[9px] md:text-[10px] leading-snug shadow-sm">
@@ -1503,9 +1539,9 @@
                 </div>
                 <!-- Legal links — small, tucked at the very bottom -->
                 <div class="flex gap-3 mt-4 pt-3 border-t border-gray-100">
-                    <button type="button" class="nav-link text-[10px] text-gray-300 hover:text-gray-500" data-nav="privacy">Privacy</button>
+                    <a class="nav-link text-[10px] text-gray-300 hover:text-gray-500" href="/privacy">Privacy</a>
                     <span class="text-[10px] text-gray-200 select-none">·</span>
-                    <button type="button" class="nav-link text-[10px] text-gray-300 hover:text-gray-500" data-nav="terms">Terms</button>
+                    <a class="nav-link text-[10px] text-gray-300 hover:text-gray-500" href="/terms">Terms</a>
                 </div>
             </div>
         </aside>
@@ -1576,9 +1612,9 @@
                         Liams Call AI is not a medical professional. In a crisis, call or text
                         <a href="tel:988" class="underline font-medium">9-8-8</a> (Canada, 24/7) or call
                         <a href="tel:911" class="underline font-medium">9-1-1</a> for emergencies.
-                        &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="privacy" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">Privacy</button>
-                        &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="terms" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">Terms</button>
-                        &nbsp;·&nbsp;<button type="button" class="nav-link underline" data-nav="about" style="background:none;border:none;padding:0;font-size:inherit;color:inherit;cursor:pointer;">About</button>
+                        &nbsp;·&nbsp;<a class="nav-link underline" href="/privacy" style="font-size:inherit;color:inherit;">Privacy</a>
+                        &nbsp;·&nbsp;<a class="nav-link underline" href="/terms" style="font-size:inherit;color:inherit;">Terms</a>
+                        &nbsp;·&nbsp;<a class="nav-link underline" href="/about" style="font-size:inherit;color:inherit;">About</a>
                     </p>
                 </div>
             </div>
@@ -2313,61 +2349,9 @@
         // Update this URL once the WordPress blog subdomain is live
         const BLOG_URL = 'https://blog.liamscall.ca';
 
-        // Opens Privacy, Terms, or About as a self-contained new browser tab/window.
-        function openPageInNewWindow(navKey) {
-            const page = CONTENT_PAGES[navKey];
-            if (!page) return;
-            const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${page.title} — Liam's Call</title>
-<link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"><\/script>
-<style>
-  body { font-family: ui-sans-serif, system-ui, sans-serif; background: #f9fafb; padding: 2rem 1rem 4rem; }
-  :root { --green-dark: #0f4a3a; }
-  .pill-dark { background: var(--green-dark); color: #fff; border-radius: 9999px; }
-  a { color: var(--green-dark); }
-  @media (min-width: 640px) { body { padding: 2.5rem 2rem 4rem; } }
-</style>
-</head>
-<body>
-<div style="max-width:42rem;margin:0 auto;">
-  <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.75rem;">
-    <img src="/assets/logo-icon.svg" style="height:1.75rem;width:auto;filter:invert(18%) sepia(60%) saturate(800%) hue-rotate(120deg) brightness(70%) contrast(120%);" alt="">
-    <span style="font-size:.95rem;font-weight:700;color:var(--green-dark);letter-spacing:-.02em;">Liam's Call</span>
-  </div>
-  <h1 style="font-size:1.55rem;font-weight:700;color:var(--green-dark);margin-bottom:1.25rem;letter-spacing:-.02em;">${page.title}</h1>
-  ${page.body}
-</div>
-<script>
-  // In-app nav buttons have no SPA here — send them back to the main site.
-  document.querySelectorAll('[data-nav]').forEach(function (btn) {
-    btn.style.cursor = 'pointer';
-    btn.addEventListener('click', function () { window.location.href = '/'; });
-  });
-<\/script>
-</body>
-</html>`;
-            // NOTE: 'noopener' can't be used here — it makes window.open return
-            // null, and we need the handle to write the page content.
-            const win = window.open('', '_blank');
-            if (!win) return;
-            win.opener = null;
-            win.document.write(html);
-            win.document.close();
-        }
-
         async function navigate(navKey) {
             if (navKey === 'blog') {
                 window.open(BLOG_URL, '_blank', 'noopener,noreferrer');
-                return;
-            }
-            // Legal / info pages always open in a new tab so the chat is uninterrupted
-            if (navKey === 'privacy' || navKey === 'terms' || navKey === 'about') {
-                openPageInNewWindow(navKey);
                 return;
             }
             if (navKey === 'chat') {

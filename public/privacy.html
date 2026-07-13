@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Privacy Policy for Liam's Call.">
+  <meta name="theme-color" content="#0f4a3a">
+  <title>Privacy Policy — Liam's Call</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    :root { --green-dark: #0f4a3a; --beige-main: #e8dfd3; --sidebar-w: 16rem; }
+    * { box-sizing: border-box; }
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f3f0ea; margin: 0; color: #1f2937; }
+    a { color: var(--green-dark); }
+    .pill-dark { background: var(--green-dark); color: #fff; border-radius: 9999px; }
+
+    .page-shell { display: flex; min-height: 100vh; align-items: stretch; }
+
+    /* Sidebar — mirrors the in-app chat sidebar's nav, ad card, and legal links */
+    .site-sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid #f3f4f6;
+      padding: 1.75rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar-home-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1.75rem;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .sidebar-home-btn img {
+      height: 1.75rem;
+      width: auto;
+      filter: invert(18%) sepia(60%) saturate(800%) hue-rotate(120deg) brightness(70%) contrast(120%);
+    }
+    .sidebar-home-btn span {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      letter-spacing: -0.02em;
+    }
+    .side-nav { display: flex; flex-direction: column; gap: 1.15rem; font-size: 0.9rem; color: #111827; flex-shrink: 0; }
+    .side-link { color: inherit; text-decoration: none; cursor: pointer; }
+    .side-link:hover { opacity: 0.75; }
+    .side-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; color: var(--green-dark); }
+    .sidebar-spacer { margin-top: auto; padding-top: 1.5rem; flex-shrink: 0; }
+    .ad-card { border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb; background: #1a2d5a; color: #fff; font-size: 10px; line-height: 1.35; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .ad-card-title { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; letter-spacing: 0.02em; }
+    .ad-card-body { padding: 0.7rem 0.75rem; }
+    .ad-card-body p { margin: 0 0 0.5rem; }
+    .ad-card-body p:last-child { margin-bottom: 0; }
+    .ad-card-body p:first-child { font-weight: 600; font-size: 11px; }
+    .ad-card-body p:last-child { color: rgba(255,255,255,0.7); }
+    .sidebar-legal { display: flex; gap: 0.6rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
+    .sidebar-legal a { font-size: 10px; color: #d1d5db; text-decoration: none; }
+    .sidebar-legal a:hover { color: #6b7280; }
+    .sidebar-legal span { font-size: 10px; color: #e5e7eb; }
+
+    /* Mobile top bar + drawer */
+    .mobile-topbar { display: none; }
+    #sidebar-overlay { display: none; }
+
+    .site-main { flex: 1; min-width: 0; }
+    main { max-width: 42rem; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+    h1 { font-size: clamp(1.45rem, 3vw, 1.85rem); font-weight: 700; color: var(--green-dark); letter-spacing: -0.02em; margin: 0 0 1.25rem; text-align: center; }
+
+    @media (max-width: 767px) {
+      .site-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 15.5rem;
+        min-width: 15.5rem;
+        transform: translateX(-100%);
+        transition: transform 260ms ease;
+        z-index: 60;
+        box-shadow: 0 12px 32px rgba(15, 74, 58, 0.2);
+      }
+      .site-sidebar.is-open { transform: translateX(0); }
+
+      #sidebar-overlay.is-open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.35);
+        z-index: 50;
+      }
+
+      .mobile-topbar {
+        display: flex;
+        align-items: center;
+        position: relative;
+        height: 3.25rem;
+        padding: 0 1rem;
+        border-bottom: 1px solid rgba(15, 74, 58, 0.08);
+        background: rgba(243, 240, 234, 0.92);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 30;
+      }
+      .mobile-menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.15rem;
+        height: 2.15rem;
+        border-radius: 0.65rem;
+        border: none;
+        background: var(--green-dark);
+        color: #fff;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .mobile-menu-toggle svg { width: 1.05rem; height: 1.05rem; stroke: currentColor; }
+      .mobile-top-brand { display: flex; align-items: center; gap: 0.5rem; margin: 0 auto; text-decoration: none; }
+      .mobile-top-brand img { height: 1.35rem; width: auto; }
+      .mobile-top-brand span { font-size: 0.92rem; font-weight: 700; color: var(--green-dark); letter-spacing: -0.02em; }
+
+      main { padding: 1.75rem 1.1rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <div id="sidebar-overlay"></div>
+    <aside id="site-sidebar" class="site-sidebar">
+      <a class="sidebar-home-btn" href="/">
+        <img src="/assets/logo-icon.svg" alt="">
+        <span>Liam's Call</span>
+      </a>
+      <nav class="side-nav">
+        <a class="side-link" href="/">New Chat</a>
+        <a class="side-link" href="/resources">Resources</a>
+        <a class="side-link" href="/about">About Us</a>
+      </nav>
+      <div class="sidebar-spacer">
+        <div class="ad-card">
+          <div class="ad-card-title">Resources</div>
+          <div class="ad-card-body">
+            <p>Mental health, addiction and housing support for you and your loved ones.</p>
+            <p>Explore guides, tips, and tools for caregivers and families.</p>
+          </div>
+        </div>
+        <div class="sidebar-legal">
+          <a class="side-link active" href="/privacy">Privacy</a>
+          <span>·</span>
+          <a class="side-link" href="/terms">Terms</a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="site-main">
+      <div class="mobile-topbar">
+        <button id="mobile-menu-toggle" type="button" class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="site-sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <a class="mobile-top-brand" href="/">
+          <img src="/assets/logo-icon.svg" alt="">
+          <span>Liam's Call</span>
+        </a>
+      </div>
+      <main>
+        <h1>Privacy Policy</h1>
+        <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 8, 2026 &nbsp;·&nbsp; Last updated: July 8, 2026</p>
+
+                <div class="space-y-6 text-left text-sm text-gray-600 leading-relaxed">
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">1. Our approach to your privacy</h3>
+                        <p>Liam's Call was built around a simple idea: you should be able to get help thinking through a mental health, addiction, or homelessness situation involving someone you love — or yourself — without creating an account, logging in, or leaving a permanent record. This Privacy Policy explains what limited information we do handle, why, and how we try to minimize it.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">2. Information we do not collect</h3>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>We do not require or offer account creation or login.</li>
+                            <li>We do not ask for your name, email address, or date of birth to use the chat agent.</li>
+                            <li>We do not intentionally retain a persistent, identifiable record of your chat conversations on our own servers.</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">3. Information we do collect</h3>
+                        <p class="font-medium text-gray-700 mt-2 mb-1">3.1 Approximate location (country / state-or-province)</p>
+                        <p class="text-xs text-gray-500">To show you relevant regional resources and to make the chat agent's questions more realistic (for example, asking about "your province" instead of "your state"), we determine an approximate location from your device's IP address at the country and state/province level only. We do not attempt to determine, and do not ask the chat agent to ask for, your street address, precise GPS coordinates, or city-level location unless you choose to volunteer it in conversation.</p>
+                        <p class="text-xs text-gray-500 mt-2">This is still "personal information" under privacy law. Even an approximate, IP-derived location is considered personal information under Canada's PIPEDA and similar to "personal information" under U.S. state laws like the CCPA when it could reasonably be linked to a person. We treat it accordingly in our data-handling practices — see §8.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">3.2 Chat content, transiently</p>
+                        <p class="text-xs text-gray-500">The text you type is sent, in real time, to whichever third-party AI language model provider is currently generating a response, in a layered, cost-managed routing setup (see §4). We do not log, cache, or otherwise store your chat messages on our own servers — not in application logs, error logs, backups, or analytics — before, during, or after that message is sent. Once a response has been generated and delivered to your screen, we retain no copy of the conversation on our systems.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">3.3 Technical information handled by service providers we rely on</p>
+                        <p class="text-xs text-gray-500">To keep the Service secure and working, and to serve the approximate location described in §3.1, technical information such as your IP address is processed by the third-party tools that make the Service possible — including our automated bot-detection/verification tool, our advertising network(s), and our AI response provider(s). This processing happens as part of those providers' own, standard operation; we do not separately collect, log, or store this information ourselves, and we do not maintain our own copy of it after your visit ends. Each provider's use of this information is governed by that provider's own standard policies, which are outside our control — see §4 and §7 for more detail, and each provider's own published policy for specifics.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">4. Third-party AI providers</h3>
+                        <p class="text-xs text-gray-500">Your chat messages are processed by one or more third-party AI language model providers, used in a layered, cost-managed routing configuration so that different messages may be handled by different providers depending on availability. We rely on each provider's own standard data-handling, security, and retention policies to deliver this part of the Service, in the same way any website relies on the standard practices of the infrastructure it's built on — we do not separately store a copy of what is sent to or received from these providers.</p>
+                        <p class="font-medium text-gray-700 mt-3 mb-1">4.1 How your messages ("Input") are used</p>
+                        <p class="text-xs text-gray-500 mb-2">What you type into the chat ("Input") is sent to whichever provider is actively answering so that a response ("Output") can be generated and shown to you. Consistent with standard practice among AI-chatbot services in this space:</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>Input is used to generate your Output, and is not linked to a name, account, or persistent identity, because we do not operate one.</li>
+                            <li>We do not knowingly permit our AI providers to use your Input to train their general-purpose models, and we choose provider access options designed to minimize training use of your Input wherever such options are available to us.</li>
+                            <li>If you type identifying details about yourself or a named third person (for example, a full name, address, or phone number) into the chat, we encourage you to avoid doing so where possible — the agent is designed to help without needing that level of detail.</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">5. What we do not do with your information</h3>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>We do not sell your information.</li>
+                            <li>We do not build an identifiable profile of you tied to a name or account, because none is collected.</li>
+                            <li>We do not share your chat content with our advertising partners, and our advertising is not personalized based on anything you say in the chat (see §6).</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">6. Advertising — important health-sensitivity rules</h3>
+                        <p class="text-xs text-gray-500 mb-2">The Service may display third-party advertising, in placements designed to be unobtrusive. Advertising on the Service is configured to be non-personalized and based only on the general context of the page, not on your individual chat content or a profile built from your visit.</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-500 text-xs">
+                            <li>We do not permit chat content, or anything inferred from it, to reach any advertising or analytics pixel.</li>
+                            <li>We do not permit our advertising setup to receive, process, or infer health, mental-health, addiction, or housing-status information about any visitor.</li>
+                            <li>Advertising is not built from remarketing lists or visitor profiles derived from this Service — only from the advertising network's own general-purpose, policy-compliant audience tools, where used at all.</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">7. Cookies, bot-detection &amp; similar technologies</h3>
+                        <p class="font-medium text-gray-700 mt-2 mb-1">7.1 Essential technologies</p>
+                        <p class="text-xs text-gray-500">These are required for the Service and the chat agent to function at all — for example, maintaining your place in an active chat session or completing the automated bot-detection/verification check that screens out non-human traffic before the site loads. These essential technologies do not carry an identifiable profile of you, are not used for advertising, and cannot be switched off if you want to use the Service, in the same way a website cannot function with security checks disabled. We do not receive, log, or store the output of this check ourselves; it operates under the relevant tool's own standard policy.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">7.2 Analytics (optional)</p>
+                        <p class="text-xs text-gray-500">We may use privacy-conscious, aggregated analytics to understand which pages and resources are actually helping visitors, so we can improve the Service. Analytics data is used in aggregate and is not linked back to your chat content. Where you have a recognized browser opt-out signal enabled (such as Global Privacy Control), we will honor it for non-essential analytics.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">7.3 Advertising technologies</p>
+                        <p class="text-xs text-gray-500">Ads on the Service are delivered through one or more third-party advertising networks. Consistent with §6 above, we configure this placement to avoid personalization based on sensitive categories including health, mental health, addiction, or housing status. The advertising network may still set its own cookies or identifiers, subject to its own standard policies, to serve non-personalized or contextually relevant ads and to measure performance; we do not control that network's cookie mechanics directly, only the targeting settings we choose.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">7.4 Do Not Track / Global Privacy Control</p>
+                        <p class="text-xs text-gray-500">Some browsers send a "Do Not Track" or "Global Privacy Control" signal. Where a jurisdiction requires us to treat that signal as an opt-out request (for example, for California residents under the CCPA/CPRA), we will honor it for non-essential technologies.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">7.5 Managing this yourself</p>
+                        <p class="text-xs text-gray-500">You can block or delete cookies through your browser settings at any time. Blocking essential technologies may prevent the chat agent or the bot-detection check from working correctly.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">8. Your privacy rights</h3>
+                        <p class="font-medium text-gray-700 mt-2 mb-1">8.1 Canadian visitors (PIPEDA and applicable provincial law)</p>
+                        <p class="text-xs text-gray-500">You have the right to know why we collect information, to access information we hold about you, to request correction of inaccurate information, and to withdraw consent (understanding that some features, like regional resource suggestions, may not work without an approximate location signal). Because we do not collect identifying information by design, most requests will relate to technical/location data rather than a personal file, since none exists.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">8.2 U.S. visitors, including California (CCPA/CPRA)</p>
+                        <p class="text-xs text-gray-500">If you are a California resident, you may have rights to know, delete, or opt out of the sale/sharing of personal information the CCPA/CPRA defines broadly, and treats certain categories (including health-related information) as "sensitive personal information" with extra protection. Because we do not sell personal information and avoid collecting identifiable data, many of these requests will have limited applicability — but we will honor verifiable requests to the extent we hold any qualifying data.</p>
+
+                        <p class="font-medium text-gray-700 mt-3 mb-1">8.3 How to exercise your rights</p>
+                        <p class="text-xs text-gray-500">Contact us at <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a>. Because we may hold very little or no data tied to you, we may not be able to locate a record responsive to your request — we will tell you plainly if that is the case rather than assuming.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">9. Data retention</h3>
+                        <p class="text-xs text-gray-500">We do not retain chat content, session data, or IP addresses on our own systems, in any form, for any length of time — there is nothing tied to your visit for us to keep. Where we use optional, aggregate analytics (§7.2), that aggregate data contains no information capable of identifying you individually and is kept only as long as needed to understand overall usage trends. The third-party bot-detection, advertising, and AI response providers described in §4 and §7 process information under their own standard retention policies, independent of our systems; those providers' own published policies govern how long they individually retain anything, not this Policy.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">10. Children's privacy</h3>
+                        <p class="text-xs text-gray-500">The Service is not directed to children under 13, and we do not knowingly collect personal information from children under 13 (in line with the U.S. Children's Online Privacy Protection Act, COPPA) or the applicable minimum age under Canadian law. If we become aware that we have inadvertently collected such information, we will delete it.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">11. International data transfers</h3>
+                        <p class="text-xs text-gray-500">Because the third-party providers described in §4 and §7 may process data on servers located in the United States or elsewhere, information from Canadian visitors may be processed outside Canada. PIPEDA does not prohibit this, but requires that we be transparent about it, which this section is intended to do, and that we take reasonable contractual and technical steps to protect the information in transit and at the processor.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">12. Security</h3>
+                        <p class="text-xs text-gray-500">We use reasonable technical and organizational measures designed to protect information in transit and in any temporary processing, appropriate to the limited, largely non-identifying nature of what we collect. No method of transmission or storage is 100% secure, and we cannot guarantee absolute security.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">13. Changes to this policy</h3>
+                        <p class="text-xs text-gray-500">We may update this Privacy Policy from time to time. We will post the updated policy with a new "Last updated" date.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-[var(--beige-main)] border-0 p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">14. Contact</h3>
+                        <p class="text-xs text-gray-500">Questions about this Privacy Policy can be sent to:</p>
+                        <p class="text-xs mt-2"><strong class="text-gray-700">Liam's Call</strong><br>
+                        Email: <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a></p>
+                    </div>
+
+                </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var sidebar = document.getElementById('site-sidebar');
+      var overlay = document.getElementById('sidebar-overlay');
+      var toggle = document.getElementById('mobile-menu-toggle');
+      function closeMenu() {
+        sidebar.classList.remove('is-open');
+        overlay.classList.remove('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+      }
+      function openMenu() {
+        sidebar.classList.add('is-open');
+        overlay.classList.add('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'true');
+      }
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          if (sidebar.classList.contains('is-open')) closeMenu();
+          else openMenu();
+        });
+      }
+      overlay.addEventListener('click', closeMenu);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+      });
+    })();
+  </script>
+</body>
+</html>

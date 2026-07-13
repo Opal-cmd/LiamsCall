@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="About Liam's Call — caregiver and family mental health support.">
+  <meta name="theme-color" content="#0f4a3a">
+  <title>About Us — Liam's Call</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    :root { --green-dark: #0f4a3a; --beige-main: #e8dfd3; --sidebar-w: 16rem; }
+    * { box-sizing: border-box; }
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f3f0ea; margin: 0; color: #1f2937; }
+    a { color: var(--green-dark); }
+    .pill-dark { background: var(--green-dark); color: #fff; border-radius: 9999px; }
+
+    .page-shell { display: flex; min-height: 100vh; align-items: stretch; }
+
+    /* Sidebar — mirrors the in-app chat sidebar's nav, ad card, and legal links */
+    .site-sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid #f3f4f6;
+      padding: 1.75rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar-home-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1.75rem;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .sidebar-home-btn img {
+      height: 1.75rem;
+      width: auto;
+      filter: invert(18%) sepia(60%) saturate(800%) hue-rotate(120deg) brightness(70%) contrast(120%);
+    }
+    .sidebar-home-btn span {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      letter-spacing: -0.02em;
+    }
+    .side-nav { display: flex; flex-direction: column; gap: 1.15rem; font-size: 0.9rem; color: #111827; flex-shrink: 0; }
+    .side-link { color: inherit; text-decoration: none; cursor: pointer; }
+    .side-link:hover { opacity: 0.75; }
+    .side-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; color: var(--green-dark); }
+    .sidebar-spacer { margin-top: auto; padding-top: 1.5rem; flex-shrink: 0; }
+    .ad-card { border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb; background: #1a2d5a; color: #fff; font-size: 10px; line-height: 1.35; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .ad-card-title { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; letter-spacing: 0.02em; }
+    .ad-card-body { padding: 0.7rem 0.75rem; }
+    .ad-card-body p { margin: 0 0 0.5rem; }
+    .ad-card-body p:last-child { margin-bottom: 0; }
+    .ad-card-body p:first-child { font-weight: 600; font-size: 11px; }
+    .ad-card-body p:last-child { color: rgba(255,255,255,0.7); }
+    .sidebar-legal { display: flex; gap: 0.6rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
+    .sidebar-legal a { font-size: 10px; color: #d1d5db; text-decoration: none; }
+    .sidebar-legal a:hover { color: #6b7280; }
+    .sidebar-legal span { font-size: 10px; color: #e5e7eb; }
+
+    /* Mobile top bar + drawer */
+    .mobile-topbar { display: none; }
+    #sidebar-overlay { display: none; }
+
+    .site-main { flex: 1; min-width: 0; }
+    main { max-width: 42rem; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+    h1 { font-size: clamp(1.45rem, 3vw, 1.85rem); font-weight: 700; color: var(--green-dark); letter-spacing: -0.02em; margin: 0 0 1.25rem; text-align: center; }
+
+    @media (max-width: 767px) {
+      .site-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 15.5rem;
+        min-width: 15.5rem;
+        transform: translateX(-100%);
+        transition: transform 260ms ease;
+        z-index: 60;
+        box-shadow: 0 12px 32px rgba(15, 74, 58, 0.2);
+      }
+      .site-sidebar.is-open { transform: translateX(0); }
+
+      #sidebar-overlay.is-open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.35);
+        z-index: 50;
+      }
+
+      .mobile-topbar {
+        display: flex;
+        align-items: center;
+        position: relative;
+        height: 3.25rem;
+        padding: 0 1rem;
+        border-bottom: 1px solid rgba(15, 74, 58, 0.08);
+        background: rgba(243, 240, 234, 0.92);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 30;
+      }
+      .mobile-menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.15rem;
+        height: 2.15rem;
+        border-radius: 0.65rem;
+        border: none;
+        background: var(--green-dark);
+        color: #fff;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .mobile-menu-toggle svg { width: 1.05rem; height: 1.05rem; stroke: currentColor; }
+      .mobile-top-brand { display: flex; align-items: center; gap: 0.5rem; margin: 0 auto; text-decoration: none; }
+      .mobile-top-brand img { height: 1.35rem; width: auto; }
+      .mobile-top-brand span { font-size: 0.92rem; font-weight: 700; color: var(--green-dark); letter-spacing: -0.02em; }
+
+      main { padding: 1.75rem 1.1rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <div id="sidebar-overlay"></div>
+    <aside id="site-sidebar" class="site-sidebar">
+      <a class="sidebar-home-btn" href="/">
+        <img src="/assets/logo-icon.svg" alt="">
+        <span>Liam's Call</span>
+      </a>
+      <nav class="side-nav">
+        <a class="side-link" href="/">New Chat</a>
+        <a class="side-link" href="/resources">Resources</a>
+        <a class="side-link active" href="/about">About Us</a>
+      </nav>
+      <div class="sidebar-spacer">
+        <div class="ad-card">
+          <div class="ad-card-title">Resources</div>
+          <div class="ad-card-body">
+            <p>Mental health, addiction and housing support for you and your loved ones.</p>
+            <p>Explore guides, tips, and tools for caregivers and families.</p>
+          </div>
+        </div>
+        <div class="sidebar-legal">
+          <a class="side-link" href="/privacy">Privacy</a>
+          <span>·</span>
+          <a class="side-link" href="/terms">Terms</a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="site-main">
+      <div class="mobile-topbar">
+        <button id="mobile-menu-toggle" type="button" class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="site-sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <a class="mobile-top-brand" href="/">
+          <img src="/assets/logo-icon.svg" alt="">
+          <span>Liam's Call</span>
+        </a>
+      </div>
+      <main>
+        <h1>About Us</h1>
+        <div class="space-y-5 text-left text-sm text-gray-600 leading-relaxed">
+
+                    <div class="rounded-xl bg-[var(--beige-main)] p-5">
+                        <h3 class="font-bold text-gray-800 text-base mb-2">Our mission</h3>
+                        <p>Liam's Call exists for one reason: to make sure no caregiver or family member facing a mental health challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.</p>
+                        <p class="mt-2">We built Liam's Call as a safe starting point: a place to put words to what you are feeling, to find crisis resources in one place, and to take a breath before deciding what to do next.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">Who we are</h3>
+                        <p>Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.</p>
+                        <p class="mt-2">We are based in Ontario, Canada, and we are committed to making this tool relevant to Canadians — including Ontario-specific crisis resources, PIPEDA-compliant data practices, and content informed by Canadian mental health guidelines.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">How the AI works</h3>
+                        <p>Liam's Call uses a large language model (AI) to have supportive, open-ended conversations. The AI is specifically guided to respond with warmth and care to caregiving challenges, emotional distress, and questions about mental health resources.</p>
+                        <p class="mt-2"><strong class="text-gray-700">Important:</strong> Liam's Call is a support tool, not a clinical service. The AI is not a therapist, counsellor, or medical professional. It does not diagnose conditions, prescribe treatment, or replace professional mental health care. If you or someone you know is in crisis, please use the resources on our <a href="/resources" class="underline text-[var(--green-dark)] font-medium">Resources page</a> or call 9-8-8 immediately.</p>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">Our commitment to safety</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-500 text-xs">
+                            <li>The AI is trained to recognize crisis language and always direct users to emergency services and crisis lines first.</li>
+                            <li>We do not store your chat messages beyond your session. Conversations are not used to train AI models.</li>
+                            <li>We do not sell, share, or monetize your personal data.</li>
+                            <li>We continuously review AI responses and update our safety guidelines as standards evolve.</li>
+                            <li>If the AI ever gives you a response that feels harmful or inappropriate, please report it to <a href="mailto:hello@liamscall.com" class="underline text-[var(--green-dark)]">hello@liamscall.com</a> — your feedback directly improves the tool.</li>
+                        </ul>
+                    </div>
+
+                </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var sidebar = document.getElementById('site-sidebar');
+      var overlay = document.getElementById('sidebar-overlay');
+      var toggle = document.getElementById('mobile-menu-toggle');
+      function closeMenu() {
+        sidebar.classList.remove('is-open');
+        overlay.classList.remove('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+      }
+      function openMenu() {
+        sidebar.classList.add('is-open');
+        overlay.classList.add('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'true');
+      }
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          if (sidebar.classList.contains('is-open')) closeMenu();
+          else openMenu();
+        });
+      }
+      overlay.addEventListener('click', closeMenu);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+      });
+    })();
+  </script>
+</body>
+</html>
