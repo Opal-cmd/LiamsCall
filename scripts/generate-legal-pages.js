@@ -91,10 +91,24 @@ function shell(title, description, active, body) {
     .ad-card-body p:last-child { margin-bottom: 0; }
     .ad-card-body p:first-child { font-weight: 600; font-size: 11px; }
     .ad-card-body p:last-child { color: rgba(255,255,255,0.7); }
-    .sidebar-legal { display: flex; gap: 0.6rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
-    .sidebar-legal a { font-size: 10px; color: #d1d5db; text-decoration: none; }
-    .sidebar-legal a:hover { color: #6b7280; }
-    .sidebar-legal span { font-size: 10px; color: #e5e7eb; }
+    .sidebar-legal { display: flex; align-items: center; gap: 0.55rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
+    .sidebar-legal a,
+    .sidebar-legal a.side-link {
+      font-size: 10px !important;
+      line-height: 1.3;
+      font-weight: 400 !important;
+      color: #d1d5db !important;
+      text-decoration: none !important;
+    }
+    .sidebar-legal a:hover,
+    .sidebar-legal a.side-link:hover { color: #6b7280 !important; }
+    .sidebar-legal a.side-link.active {
+      color: #9ca3af !important;
+      font-weight: 500 !important;
+      text-decoration: underline !important;
+      text-underline-offset: 2px;
+    }
+    .sidebar-legal span { font-size: 10px; color: #e5e7eb; line-height: 1; }
 
     /* Mobile top bar + drawer */
     .mobile-topbar { display: none; }
