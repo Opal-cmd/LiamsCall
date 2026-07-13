@@ -2582,7 +2582,7 @@
 
             function paint() {
                 // Render completed **bold** pairs live; hide unfinished markers mid-stream.
-                bubble.innerHTML = renderAssistantMarkdown(target.slice(0, shownLen));
+                bubble.innerHTML = renderAssistantMarkdown(target.slice(0, shownLen), { streaming: true });
                 scrollToBottom(false);
             }
 
@@ -2665,8 +2665,10 @@
                 .replace(/`[^`]*$/g, '');
         }
 
-        function renderAssistantMarkdown(text) {
-            let s = escapeHtml(stripIncompleteMarkdown(text));
+        function renderAssistantMarkdown(text, { streaming = false } = {}) {
+            let s = streaming
+                ? escapeHtml(stripIncompleteMarkdown(text))
+                : escapeHtml(String(text || ''));
             // Markdown links → clickable anchors (Gemini often uses [label](url))
             s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (_m, label, url) => {
                 const safeHref = url.replace(/"/g, '');

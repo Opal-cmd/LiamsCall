@@ -22,7 +22,7 @@ const CHAT_API_TOKEN = process.env.CHAT_API_TOKEN || '';
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000;
 const RATE_LIMIT_MAX_REQUESTS = Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 30;
 const DAILY_LIMIT_PER_IP = Number(process.env.DAILY_LIMIT_PER_IP) || 50;
-const MAX_TOKENS = Number(process.env.MAX_TOKENS) || 2048;
+const MAX_TOKENS = Number(process.env.MAX_TOKENS) || 4096;
 const JWST_API_KEY = process.env.JWST_API_KEY || '';
 const TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY || '';
 const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '';
@@ -82,16 +82,15 @@ TONE & LANGUAGE:
 - Light emojis for warmth and scannability — use a few relevant emojis like ChatGPT does (one per list item or section label is plenty), e.g. 🏠 shelters, 📞 phone lines, 🌐 websites, 💚 support, 🧭 next steps. Keep them calm and useful, never decorative spam, party/celebration vibes, or forced cheer. Skip playful emojis in Tier 3 / acute crisis messages — stay plain and steady there.
 
 RESOURCE LISTS (shelters, clinics, hotlines, organizations, programs):
-Whenever you give a numbered or bulleted list of places people can call or visit, every item must include all three when available: (1) the name, (2) a phone number, and (3) a website — written on or right under that item, not buried later. Prefer this shape:
-1. 🏠 **Name** — one short line of what it is / who it's for
-   📞 phone number (with what happens when you call)
-   🌐 https://example.org
+When listing resources, use this ultra-compact shape — one line for name, one line for contact:
+1. 🏠 **Name** — 6–10 words max on what it is
+   📞 phone · 🌐 https://site.org
 Rules:
-- At most 3 resource items per message. Three complete options beat five cut-off ones.
-- Finish every list you start — never leave a trailing unfinished line like "4. 🏠".
-- Put websites as plain https:// URLs (or bare domains). Do not use markdown links like [label](url).
-- Never invent a phone number or URL. If you do not have a verified number for a specific shelter or local program, do not fake one — instead list a verified directory or helpline that can look it up (from the crisis table, 211, municipal 311 where that city uses it, or that region's official housing / public-health site) and still give that directory's phone and website.
-- Prefer real, useful options over vague tips like "search online" unless those tips also name a concrete directory with its phone and site.
+- Exactly 3 items when listing shelters/resources (not more). Keep each item to those 2 lines.
+- One short intro sentence max before the list. No long paragraphs.
+- Finish all 3 items — if running long, shorten descriptions, never drop an item mid-line.
+- Plain https:// URLs only (no markdown links). Never invent phone numbers or URLs.
+- If a specific local number is unverified, use a verified directory (211, 311, Central Intake, etc.) with its real phone and site instead.
 
 READING RISK ACROSS THE CONVERSATION (can override ask-first):
 Judge risk cumulatively across the whole conversation, not from any single word. A single soft word is not a pattern; the same language repeated, escalating, or turning specific across several messages is one.
@@ -182,21 +181,47 @@ async function getGeoForIp(ip) {
   }
 }
 
-function buildSystemPrompt(geo) {
-  const base = SYSTEM_PROMPT;
-  if (!geo) return base;
-  const location = [geo.city, geo.region, geo.country].filter(Boolean).join(', ');
-  const inVerifiedCountry = geo.countryCode === 'US' || geo.countryCode === 'CA';
+function buildSystemPrompt(geo, messages) {
+  let base = SYSTEM_PROMPT;
+  if (geo) {
+    const location = [geo.city, geo.region, geo.country].filter(Boolean).join(', ');
+    const inVerifiedCountry = geo.countryCode === 'US' || geo.countryCode === 'CA';
 
-  if (inVerifiedCountry) {
-    return base + ` The user appears to be located in ${location}. Use the verified US/Canada resource table above as relevant to their country.`;
+    if (inVerifiedCountry) {
+      base += ` The user appears to be located in ${location}. Use the verified US/Canada resource table above as relevant to their country.`;
+    } else {
+      base +=
+        ` The user appears to be located in ${location}, outside the US/Canada verified resource table.` +
+        ` Do not invent a local hotline number for their country — say plainly you don't have a verified crisis line for their location,` +
+        ` tell them to call their own country's emergency number if there is immediate danger, and suggest they search` +
+        ` "${geo.country} mental health crisis line" or "${geo.country} caregiver support" for an official, verified source.`;
+    }
   }
 
-  return base +
-    ` The user appears to be located in ${location}, outside the US/Canada verified resource table.` +
-    ` Do not invent a local hotline number for their country — say plainly you don't have a verified crisis line for their location,` +
-    ` tell them to call their own country's emergency number if there is immediate danger, and suggest they search` +
-    ` "${geo.country} mental health crisis line" or "${geo.country} caregiver support" for an official, verified source.`;
+  if (isResourceListRequest(messages)) {
+    base +=
+      ' ACTIVE REQUEST: The visitor wants a local resource list. Reply with exactly 3 compact items using the 2-line list format above.' +
+      ' Intro: 1 short sentence only. Each item: name line + "📞 number · 🌐 url" line. Do not start a 4th item.';
+  }
+
+  return base;
+}
+
+function isResourceListRequest(messages) {
+  const last = (messages[messages.length - 1]?.content || '').toLowerCase();
+  return /\b(list|near me|nearby|shelters?|resources?|hotlines?|clinics?|programs?|where can|options?)\b/.test(last);
+}
+
+function looksTruncated(text) {
+  const tail = String(text || '').trimEnd();
+  if (!tail) return false;
+  // Unfinished resource list (e.g. stops at "3. 🏠" with no name/contact lines)
+  if (/\d+\.\s*🏠\s*$/.test(tail)) return true;
+  if (/(?:^|\n)\d+\.\s*📞\s*$/.test(tail)) return true;
+  if (/\*\*[^*\n]*$/.test(tail)) return true;
+  // Contact line started but no website yet
+  if (/📞[^·\n]{0,80}$/.test(tail) && !/🌐/.test(tail)) return true;
+  return false;
 }
 
 // Per-minute rate limit buckets
@@ -473,12 +498,16 @@ function writeSse(res, event, data) {
 
 function parseOpenAiDelta(line) {
   const payload = line.replace(/^data:\s*/, '').trim();
-  if (!payload || payload === '[DONE]') return null;
+  if (!payload || payload === '[DONE]') return { content: '', finishReason: null };
   try {
     const parsed = JSON.parse(payload);
-    return parsed.choices?.[0]?.delta?.content || '';
+    const choice = parsed.choices?.[0];
+    return {
+      content: choice?.delta?.content || choice?.message?.content || '',
+      finishReason: choice?.finish_reason || null,
+    };
   } catch {
-    return null;
+    return { content: '', finishReason: null };
   }
 }
 
@@ -518,6 +547,8 @@ async function streamProviderResponse(provider, upstream, res) {
   let buffer = '';
   let currentEvent = 'message';
   let tokensSent = 0;
+  let finishReason = null;
+  let fullText = '';
 
   try {
     while (true) {
@@ -534,11 +565,18 @@ async function streamProviderResponse(provider, upstream, res) {
           continue;
         }
         if (!line.startsWith('data:')) continue;
-        const delta =
-          provider === 'anthropic'
-            ? parseAnthropicEvent(currentEvent, line)
-            : parseOpenAiDelta(line);
+
+        let delta = '';
+        if (provider === 'anthropic') {
+          delta = parseAnthropicEvent(currentEvent, line) || '';
+        } else {
+          const parsed = parseOpenAiDelta(line);
+          delta = parsed.content || '';
+          if (parsed.finishReason) finishReason = parsed.finishReason;
+        }
+
         if (delta) {
+          fullText += delta;
           writeSse(res, 'token', { text: delta });
           tokensSent += 1;
         }
@@ -550,6 +588,45 @@ async function streamProviderResponse(provider, upstream, res) {
     error.tokensSent = tokensSent;
     throw error;
   }
+
+  return { tokensSent, finishReason, fullText };
+}
+
+async function streamProviderWithContinuation(provider, config, baseMessages, res) {
+  let messagesForRequest = baseMessages;
+  let accumulated = '';
+  let totalTokensSent = 0;
+  let finishReason = null;
+  const maxRounds = 3;
+
+  for (let round = 0; round < maxRounds; round += 1) {
+    const upstream = await fetch(config.url, {
+      method: 'POST',
+      headers: config.headers,
+      body: JSON.stringify(config.buildBody(messagesForRequest)),
+    });
+    const result = await streamProviderResponse(provider, upstream, res);
+    totalTokensSent += result.tokensSent;
+    accumulated += result.fullText;
+    finishReason = result.finishReason;
+
+    const hitLengthCap = result.finishReason === 'length';
+    const seemsCutOff = looksTruncated(accumulated);
+    if (!hitLengthCap && !seemsCutOff) break;
+    if (round === maxRounds - 1) break;
+
+    messagesForRequest = [
+      ...baseMessages,
+      { role: 'assistant', content: accumulated },
+      {
+        role: 'user',
+        content:
+          'Continue exactly where you stopped. Finish the current list item, complete any remaining items (same compact 2-line format), then stop. Do not repeat items already listed.',
+      },
+    ];
+  }
+
+  return { tokensSent: totalTokensSent, finishReason, fullText: accumulated };
 }
 
 function logInfo(req, message, extra = {}) {
@@ -856,7 +933,7 @@ app.post('/api/chat', async (req, res) => {
 
     // Geo-detect user country for localised resources (best-effort, non-blocking)
     const geo = await getGeoForIp(getClientIp(req));
-    const systemPrompt = buildSystemPrompt(geo);
+    const systemPrompt = buildSystemPrompt(geo, messages);
 
     // Pre-filter: block off-topic requests before spending any tokens
     const offTopic = checkOffTopic(messages);
@@ -877,14 +954,21 @@ app.post('/api/chat', async (req, res) => {
       const { provider, model } = candidate;
       try {
         const config = getApiConfig(provider, model, systemPrompt);
-        const upstream = await fetch(config.url, {
-          method: 'POST',
-          headers: config.headers,
-          body: JSON.stringify(config.buildBody(messages)),
-        });
-        await streamProviderResponse(provider, upstream, res);
+        const streamResult = await streamProviderWithContinuation(
+          provider,
+          config,
+          messages,
+          res,
+        );
         providerUsed = provider;
         modelUsed = model;
+        logInfo(req, 'stream_complete', {
+          provider,
+          model,
+          finishReason: streamResult.finishReason,
+          chars: streamResult.fullText.length,
+          tokensSent: streamResult.tokensSent,
+        });
         break;
       } catch (error) {
         lastError = error;
@@ -926,6 +1010,7 @@ app.listen(PORT, () => {
   console.log(`Liams Call AI server running at http://localhost:${PORT}`);
   const configured = getProviderCandidates();
   console.log(`Provider chain: ${configured.map((c) => `${c.provider}(${c.model})`).join(' → ')}`);
+  console.log(`Max output tokens: ${MAX_TOKENS}`);
   if (configured.length === 0) console.warn('WARNING: No AI providers configured — chat will fail.');
   if (ALLOWED_ORIGINS.length) {
     console.log(`CORS allowed origins: ${ALLOWED_ORIGINS.join(', ')}`);
