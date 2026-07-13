@@ -182,14 +182,92 @@
             border: 1px solid rgba(255, 255, 255, 0.72);
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(246, 247, 250, 0.9));
             box-shadow: 0 8px 20px rgba(15, 74, 58, 0.08);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 2.15rem;
+            padding: 0.6rem 0.9rem;
         }
 
-        .typing-dot { animation: bounce 1.2s infinite ease-in-out; }
-        .typing-dot:nth-child(2) { animation-delay: 0.15s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.3s; }
-        @keyframes bounce {
-            0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
-            40% { transform: translateY(-4px); opacity: 1; }
+        /* Soft dual-beat “heartbeat” while Liam’s Call is listening / writing */
+        .heartbeat {
+            position: relative;
+            width: 0.7rem;
+            height: 0.7rem;
+            flex-shrink: 0;
+        }
+        .heartbeat-core,
+        .heartbeat-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, rgba(124, 188, 158, 0.75) 0%, rgba(31, 107, 82, 0.55) 55%, rgba(15, 74, 58, 0.45) 100%);
+        }
+        .heartbeat-core {
+            animation: heartbeat-core 1.7s ease-in-out infinite;
+            box-shadow: 0 0 6px rgba(31, 107, 82, 0.18);
+            opacity: 0.55;
+        }
+        .heartbeat-ring {
+            opacity: 0;
+            transform: scale(1);
+            animation: heartbeat-ring 1.7s ease-in-out infinite;
+            background: rgba(31, 107, 82, 0.16);
+        }
+        .heartbeat-label {
+            font-size: 0.74rem;
+            color: #9ca3af;
+            letter-spacing: 0.01em;
+            font-weight: 450;
+            opacity: 0.85;
+        }
+
+        @keyframes heartbeat-core {
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            18% { transform: scale(1.12); opacity: 0.7; }
+            32% { transform: scale(0.98); opacity: 0.5; }
+            48% { transform: scale(1.08); opacity: 0.65; }
+            64% { transform: scale(1); opacity: 0.4; }
+        }
+        @keyframes heartbeat-ring {
+            0%, 16% { transform: scale(1); opacity: 0; }
+            18% { opacity: 0.28; }
+            55% { transform: scale(1.85); opacity: 0; }
+            56%, 100% { transform: scale(1); opacity: 0; }
+        }
+
+        /* Gentle pulse + soft caret while the reply reveals */
+        .bubble-streaming {
+            animation: bubble-heartbeat 1.7s ease-in-out infinite;
+        }
+        .bubble-streaming::after {
+            content: '';
+            display: inline-block;
+            width: 0.28rem;
+            height: 0.28rem;
+            margin-left: 0.3rem;
+            border-radius: 50%;
+            background: rgba(31, 107, 82, 0.55);
+            vertical-align: 0.08em;
+            box-shadow: 0 0 5px rgba(31, 107, 82, 0.22);
+            animation: heartbeat-core 1.7s ease-in-out infinite;
+        }
+        @keyframes bubble-heartbeat {
+            0%, 100% { box-shadow: 0 8px 22px rgba(15, 74, 58, 0.06); }
+            18% { box-shadow: 0 9px 24px rgba(31, 107, 82, 0.1); }
+            48% { box-shadow: 0 8px 23px rgba(31, 107, 82, 0.08); }
+            64% { box-shadow: 0 8px 22px rgba(15, 74, 58, 0.06); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .heartbeat-core,
+            .heartbeat-ring,
+            .bubble-streaming,
+            .bubble-streaming::after {
+                animation: none;
+            }
+            .heartbeat-core { opacity: 0.9; }
+            .heartbeat-ring { display: none; }
         }
 
         #landing {
@@ -2452,8 +2530,97 @@
         document.getElementById('home-btn-mobile')?.addEventListener('click', goHome);
         document.getElementById('sidebar-home-btn')?.addEventListener('click', goHome);
 
-        function scrollToBottom() {
+        function scrollToBottom(force = false) {
+            // Throttle during streaming so mobile doesn't judder on every token.
+            const now = performance.now();
+            if (!force && now - (scrollToBottom._last || 0) < 70) return;
+            scrollToBottom._last = now;
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Smooth typewriter reveal for streamed assistant replies.
+        // Tokens arrive in uneven chunks from the model; this drains a backlog
+        // at an adaptive rate so the UI feels conversational, not robotic.
+        function createSmoothStreamer(bubble) {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            let target = '';
+            let shownLen = 0;
+            let rafId = null;
+            let lastTs = 0;
+            let finished = false;
+            let resolveDone = null;
+            const donePromise = new Promise((resolve) => { resolveDone = resolve; });
+
+            function paint() {
+                bubble.textContent = target.slice(0, shownLen);
+                scrollToBottom(false);
+            }
+
+            function tick(ts) {
+                if (!lastTs) lastTs = ts;
+                const dt = Math.min(0.05, (ts - lastTs) / 1000);
+                lastTs = ts;
+
+                const lag = target.length - shownLen;
+                if (lag > 0) {
+                    // Caught-up: ~42 chars/sec. Behind: speed up so backlog clears in ~0.45s.
+                    const rate = Math.max(42, Math.min(220, lag / 0.45));
+                    let advance = Math.max(1, Math.ceil(rate * dt));
+                    // Prefer breaking near spaces/punctuation when draining a backlog.
+                    if (lag > 8 && advance < lag) {
+                        const slice = target.slice(shownLen, shownLen + advance + 8);
+                        const breakAt = slice.search(/[\s.,;:!?…]/);
+                        if (breakAt >= 0 && breakAt <= advance + 6) advance = Math.max(advance, breakAt + 1);
+                    }
+                    shownLen = Math.min(target.length, shownLen + advance);
+                    paint();
+                }
+
+                if (finished && shownLen >= target.length) {
+                    rafId = null;
+                    bubble.classList.remove('bubble-streaming');
+                    resolveDone();
+                    return;
+                }
+                rafId = requestAnimationFrame(tick);
+            }
+
+            function ensureLoop() {
+                if (rafId == null) {
+                    lastTs = 0;
+                    rafId = requestAnimationFrame(tick);
+                }
+            }
+
+            return {
+                push(chunk) {
+                    if (!chunk) return;
+                    target += chunk;
+                    if (reduceMotion) {
+                        shownLen = target.length;
+                        paint();
+                        return;
+                    }
+                    if (!bubble.classList.contains('bubble-streaming')) {
+                        bubble.classList.add('bubble-streaming');
+                    }
+                    ensureLoop();
+                },
+                async finish() {
+                    finished = true;
+                    if (reduceMotion || shownLen >= target.length) {
+                        shownLen = target.length;
+                        paint();
+                        bubble.classList.remove('bubble-streaming');
+                        resolveDone();
+                        return target;
+                    }
+                    ensureLoop();
+                    await donePromise;
+                    return target;
+                },
+                get text() { return target; },
+            };
         }
 
         // Escape plain text so it is safe to insert as innerHTML.
@@ -2530,14 +2697,15 @@
         function createTypingIndicator() {
             const wrapper = document.createElement('div');
             wrapper.className = 'typing-wrapper flex justify-start';
-            wrapper.innerHTML = `<div class="bubble bubble-typing">
-                <div class="flex items-center gap-1.5">
-                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 inline-block"></span>
-                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 inline-block"></span>
-                    <span class="typing-dot w-2 h-2 rounded-full bg-gray-400 inline-block"></span>
-                </div></div>`;
+            wrapper.innerHTML = `<div class="bubble bubble-typing" aria-label="Liam's Call is responding">
+                <span class="heartbeat" aria-hidden="true">
+                    <span class="heartbeat-ring"></span>
+                    <span class="heartbeat-core"></span>
+                </span>
+                <span class="heartbeat-label">Here with you…</span>
+            </div>`;
             chatMessages.appendChild(wrapper);
-            scrollToBottom();
+            scrollToBottom(true);
         }
 
         function removeTypingIndicator() {
@@ -2857,30 +3025,35 @@
             setStreamingState(true);
             createTypingIndicator();
 
-            let assistantBubble = null, assistantText = '';
+            let assistantBubble = null;
+            let streamer = null;
 
             try {
                 await streamChat(conversation, (token) => {
                     if (!assistantBubble) {
                         removeTypingIndicator();
                         assistantBubble = createMessageBubble('assistant', '');
+                        streamer = createSmoothStreamer(assistantBubble);
                     }
-                    assistantText += token;
-                    // Stream as plain text for performance; linkify once complete
-                    assistantBubble.textContent = assistantText;
-                    scrollToBottom();
+                    streamer.push(token);
                 });
 
+                const assistantText = streamer ? await streamer.finish() : '';
                 if (!assistantText) {
                     removeTypingIndicator();
                     throw new Error('No response was returned from the assistant.');
                 }
                 // Apply linkification now that the full response is in
-                if (assistantBubble) setBubbleContent(assistantBubble, assistantText, 'assistant');
+                setBubbleContent(assistantBubble, assistantText, 'assistant');
+                scrollToBottom(true);
                 conversation.push({ role: 'assistant', content: assistantText });
             } catch (error) {
                 removeTypingIndicator();
+                if (streamer) {
+                    try { await streamer.finish(); } catch { /* ignore */ }
+                }
                 createMessageBubble('assistant', error.message || 'Something went wrong. Please try again.');
+                scrollToBottom(true);
             } finally {
                 setStreamingState(false);
                 chatInput.focus();
