@@ -22,7 +22,7 @@ const CHAT_API_TOKEN = process.env.CHAT_API_TOKEN || '';
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000;
 const RATE_LIMIT_MAX_REQUESTS = Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 30;
 const DAILY_LIMIT_PER_IP = Number(process.env.DAILY_LIMIT_PER_IP) || 50;
-const MAX_TOKENS = Number(process.env.MAX_TOKENS) || 1536;
+const MAX_TOKENS = Number(process.env.MAX_TOKENS) || 2048;
 const JWST_API_KEY = process.env.JWST_API_KEY || '';
 const TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY || '';
 const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '';
@@ -330,7 +330,9 @@ function getApiConfig(provider, modelOverride, systemPrompt) {
     };
   }
 
-  // Gemini via Google's OpenAI-compatible endpoint — same streaming format as Groq/OpenAI
+  // Gemini via Google's OpenAI-compatible endpoint — same streaming format as Groq/OpenAI.
+  // gemini-2.5-flash thinking tokens count against max_tokens; disable them so
+  // replies don't cut off mid-sentence (reasoning_effort: "none" → thinking_budget 0).
   if (provider === 'gemini') {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('Missing GEMINI_API_KEY in environment variables.');
@@ -343,6 +345,7 @@ function getApiConfig(provider, modelOverride, systemPrompt) {
         messages: [{ role: 'system', content: prompt }, ...messages],
         stream: true,
         max_tokens: MAX_TOKENS,
+        reasoning_effort: process.env.GEMINI_REASONING_EFFORT || 'none',
       }),
     };
   }
