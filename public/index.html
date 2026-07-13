@@ -2715,64 +2715,114 @@
         }
 
         async function streamChat(messages, onToken) {
-            let response;
-            try {
-                response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({ messages }),
-                });
-            } catch {
-                const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-                throw new Error(
-                    isLocal
-                        ? 'Cannot reach the chat server. Run "npm start" and open http://localhost:3000.'
-                        : 'Cannot reach the chat server right now. Please check your connection and try again in a moment.',
-                );
-            }
-            if (!response.ok || !response.body) {
-                const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-                let message = isLocal
-                    ? 'Chat server error. Make sure "npm start" is running on http://localhost:3000.'
-                    : 'Something went wrong with the chat. Please try again in a moment.';
+            const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+            const maxAttempts = 3;
+            const retryDelaysMs = [700, 1600, 3200];
+            let lastError = null;
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                let receivedTokens = false;
+                let response;
+
                 try {
-                    const data = await response.json();
-                    if (data.error) message = data.error;
-                    if (data.captchaRequired) {
-                        captchaReady = false;
-                        await showCaptchaWidget();
-                    }
-                } catch {
-                    // Keep default message for non-JSON errors.
-                }
-                throw new Error(message);
-            }
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '', streamError = null;
-
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-                buffer += decoder.decode(value, { stream: true });
-                const parts = buffer.split('\n\n');
-                buffer = parts.pop() || '';
-                for (const part of parts) {
-                    parseSseChunk(part, (eventName, data) => {
-                        if (eventName === 'token' && data.text) onToken(data.text);
-                        else if (eventName === 'error') streamError = new Error(data.message || 'Could not respond.');
+                    response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ messages }),
                     });
+                } catch {
+                    lastError = new Error(
+                        isLocal
+                            ? 'Cannot reach the chat server. Run "npm start" and open http://localhost:3000.'
+                            : 'Cannot reach the chat server right now. Please check your connection and try again in a moment.',
+                    );
+                    if (attempt === maxAttempts) throw lastError;
+                    if (chatStatus) {
+                        chatStatus.textContent = `Connection issue — retrying (${attempt}/${maxAttempts - 1})…`;
+                        chatStatus.classList.remove('hidden');
+                    }
+                    await wait(retryDelaysMs[attempt - 1]);
+                    continue;
+                }
+
+                if (!response.ok || !response.body) {
+                    let message = isLocal
+                        ? 'Chat server error. Make sure "npm start" is running on http://localhost:3000.'
+                        : 'Something went wrong with the chat. Please try again in a moment.';
+                    let captchaNeeded = false;
+                    try {
+                        const data = await response.json();
+                        if (data.error) message = data.error;
+                        if (data.captchaRequired) {
+                            captchaNeeded = true;
+                            captchaReady = false;
+                            await showCaptchaWidget();
+                        }
+                    } catch {
+                        // Keep default message for non-JSON errors.
+                    }
+                    // Retry transient gateway / overload responses — not captcha or auth.
+                    const retryable = !captchaNeeded && [408, 429, 502, 503, 504].includes(response.status);
+                    if (retryable && attempt < maxAttempts) {
+                        if (chatStatus) {
+                            chatStatus.textContent = `Server busy — retrying (${attempt}/${maxAttempts - 1})…`;
+                            chatStatus.classList.remove('hidden');
+                        }
+                        await wait(retryDelaysMs[attempt - 1]);
+                        continue;
+                    }
+                    throw new Error(message);
+                }
+
+                try {
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '', streamError = null;
+
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        buffer += decoder.decode(value, { stream: true });
+                        const parts = buffer.split('\n\n');
+                        buffer = parts.pop() || '';
+                        for (const part of parts) {
+                            parseSseChunk(part, (eventName, data) => {
+                                if (eventName === 'token' && data.text) {
+                                    receivedTokens = true;
+                                    onToken(data.text);
+                                } else if (eventName === 'error') {
+                                    streamError = new Error(data.message || 'Could not respond.');
+                                }
+                            });
+                        }
+                    }
+                    if (buffer.trim()) {
+                        parseSseChunk(buffer, (eventName, data) => {
+                            if (eventName === 'token' && data.text) {
+                                receivedTokens = true;
+                                onToken(data.text);
+                            } else if (eventName === 'error') {
+                                streamError = new Error(data.message || 'Could not respond.');
+                            }
+                        });
+                    }
+                    if (streamError) throw streamError;
+                    if (chatStatus) chatStatus.textContent = '';
+                    return;
+                } catch (streamErr) {
+                    // Don't auto-retry mid-stream once tokens were shown — that would duplicate text.
+                    if (receivedTokens || attempt === maxAttempts) throw streamErr;
+                    lastError = streamErr;
+                    if (chatStatus) {
+                        chatStatus.textContent = `Connection dropped — retrying (${attempt}/${maxAttempts - 1})…`;
+                        chatStatus.classList.remove('hidden');
+                    }
+                    await wait(retryDelaysMs[attempt - 1]);
                 }
             }
-            if (buffer.trim()) {
-                parseSseChunk(buffer, (eventName, data) => {
-                    if (eventName === 'token' && data.text) onToken(data.text);
-                    else if (eventName === 'error') streamError = new Error(data.message || 'Could not respond.');
-                });
-            }
-            if (streamError) throw streamError;
+
+            throw lastError || new Error('Could not complete the chat request.');
         }
 
         function wait(ms) {

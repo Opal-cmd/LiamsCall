@@ -29,6 +29,13 @@ const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '';
 const CAPTCHA_ENABLED = Boolean(TURNSTILE_SITE_KEY && TURNSTILE_SECRET_KEY);
 const CAPTCHA_COOKIE_NAME = 'lc_captcha';
 const CAPTCHA_TTL_MS = 24 * 60 * 60 * 1000;
+// Soft threshold: force captcha once an IP is this close to the per-minute rate limit.
+const CAPTCHA_RATE_FORCE_RATIO = Number(process.env.CAPTCHA_RATE_FORCE_RATIO) || 0.7;
+
+// IPs that must solve captcha before more chat (cleared after a successful verify).
+const captchaForcedIps = new Map(); // ip → expiresAt
+const CAPTCHA_FORCE_TTL_MS = 60 * 60 * 1000;
+const BOT_UA_RE = /bot|crawl|spider|scrapy|curl|wget|python-requests|python-urllib|httpclient|go-http|libwww|node-fetch|axios\//i;
 
 // Provider chain: comma-separated list of providers to try in order.
 // e.g. PROVIDER_CHAIN=groq,gemini,openai
@@ -226,11 +233,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   if (req.path !== '/api/chat') return next();
   const now = Date.now();
-  const key =
-    req.ip ||
-    req.headers['x-forwarded-for'] ||
-    req.socket?.remoteAddress ||
-    'unknown';
+  const key = getClientIp(req);
   const bucket = requestBuckets.get(key) || { start: now, count: 0 };
   if (now - bucket.start > RATE_LIMIT_WINDOW_MS) {
     bucket.start = now;
@@ -252,7 +255,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   if (req.path !== '/api/chat') return next();
   const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
-  const key = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+  const key = getClientIp(req);
   const bucket = dailyBuckets.get(key) || { date: today, count: 0 };
   if (bucket.date !== today) { bucket.date = today; bucket.count = 0; }
   bucket.count += 1;
@@ -585,6 +588,116 @@ function hasValidCaptchaCookie(req) {
   return sig === expected;
 }
 
+function markCaptchaRequired(ip, reason) {
+  if (!ip || ip === 'unknown') return;
+  captchaForcedIps.set(ip, { until: Date.now() + CAPTCHA_FORCE_TTL_MS, reason: reason || 'risk' });
+}
+
+function clearCaptchaRequired(ip) {
+  if (!ip) return;
+  captchaForcedIps.delete(ip);
+}
+
+function isCaptchaForcedForIp(ip) {
+  const entry = captchaForcedIps.get(ip);
+  if (!entry) return false;
+  if (Date.now() > entry.until) {
+    captchaForcedIps.delete(ip);
+    return false;
+  }
+  return true;
+}
+
+function getRateBucketCount(ip) {
+  const bucket = requestBuckets.get(ip);
+  if (!bucket) return 0;
+  if (Date.now() - bucket.start > RATE_LIMIT_WINDOW_MS) return 0;
+  return bucket.count;
+}
+
+/**
+ * Moderate "suspicious visitor" heuristics.
+ * Returns { force: boolean, reasons: string[], score: number }.
+ * Any hard signal forces captcha; softer signals need score >= 2.
+ */
+function assessCaptchaRisk(req) {
+  const reasons = [];
+  let score = 0;
+  let force = false;
+
+  const ip = getClientIp(req);
+  const ua = String(req.headers['user-agent'] || '').trim();
+  const acceptLang = String(req.headers['accept-language'] || '').trim();
+  const origin = String(req.headers.origin || '').trim();
+  const referer = String(req.headers.referer || req.headers.referrer || '').trim();
+  const accept = String(req.headers.accept || '').trim();
+
+  if (isCaptchaForcedForIp(ip)) {
+    force = true;
+    reasons.push('previously_flagged');
+  }
+
+  if (!ua) {
+    force = true;
+    reasons.push('missing_ua');
+  } else if (BOT_UA_RE.test(ua)) {
+    force = true;
+    reasons.push('bot_ua');
+  }
+
+  const rateCount = getRateBucketCount(ip);
+  const rateForceAt = Math.max(3, Math.ceil(RATE_LIMIT_MAX_REQUESTS * CAPTCHA_RATE_FORCE_RATIO));
+  if (rateCount >= rateForceAt) {
+    force = true;
+    reasons.push('rate_proximity');
+  }
+
+  if (!acceptLang) {
+    score += 1;
+    reasons.push('missing_accept_language');
+  }
+
+  // Browser POSTs to /api/chat normally include Origin. Direct API hammers often don't.
+  if (req.method === 'POST' && req.path === '/api/chat') {
+    if (!origin) {
+      score += 1;
+      reasons.push('missing_origin');
+    } else if (ALLOWED_ORIGINS.length && !isOriginAllowed(origin)) {
+      // CORS middleware may already reject; still treat as risk if we get here.
+      force = true;
+      reasons.push('bad_origin');
+    }
+    if (!referer) {
+      score += 1;
+      reasons.push('missing_referer');
+    }
+  }
+
+  if (accept && !/text\/html|application\/json|\*\//i.test(accept)) {
+    score += 1;
+    reasons.push('odd_accept');
+  }
+
+  if (!force && score >= 2) {
+    force = true;
+    reasons.push('soft_score');
+  }
+
+  return { force, score, reasons, ip };
+}
+
+function captchaGateResult(req) {
+  if (!CAPTCHA_ENABLED) return { required: false, verified: true };
+  if (hasValidCaptchaCookie(req)) return { required: false, verified: true };
+  const risk = assessCaptchaRisk(req);
+  if (risk.force) {
+    markCaptchaRequired(risk.ip, risk.reasons.join(','));
+    return { required: true, verified: false, reasons: risk.reasons };
+  }
+  // Trusted-enough visitor: allow chat without a captcha cookie.
+  return { required: false, verified: false, trusted: true };
+}
+
 async function verifyTurnstileToken(token, remoteip) {
   if (!CAPTCHA_ENABLED) return { success: true, skipped: true };
   if (!token || typeof token !== 'string') {
@@ -635,11 +748,20 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true, providers: PROVIDER_CHAIN, jwst: Boolean(JWST_API_KEY) });
 });
 
-app.get('/api/config', (_req, res) => {
+app.get('/api/config', (req, res) => {
+  if (!CAPTCHA_ENABLED) {
+    return res.json({ captcha: null });
+  }
+  const gate = captchaGateResult(req);
   res.json({
-    captcha: CAPTCHA_ENABLED
-      ? { provider: 'turnstile', siteKey: TURNSTILE_SITE_KEY }
-      : null,
+    captcha: {
+      provider: 'turnstile',
+      siteKey: TURNSTILE_SITE_KEY,
+      // Only force a visible challenge for suspicious visitors.
+      // Normal browsers get required:false and can chat without a widget.
+      required: gate.required,
+      appearance: 'interaction-only',
+    },
   });
 });
 
@@ -650,15 +772,18 @@ app.post('/api/captcha/verify', async (req, res) => {
 
   try {
     const token = req.body?.token;
-    const result = await verifyTurnstileToken(token, getClientIp(req));
+    const ip = getClientIp(req);
+    const result = await verifyTurnstileToken(token, ip);
     if (!result.success) {
+      markCaptchaRequired(ip, 'verify_failed');
       return res.status(403).json({
         error: 'Captcha verification failed. Please try again.',
         captchaRequired: true,
       });
     }
 
-    res.setHeader('Set-Cookie', buildCaptchaCookie(getClientIp(req)));
+    clearCaptchaRequired(ip);
+    res.setHeader('Set-Cookie', buildCaptchaCookie(ip));
     return res.json({ ok: true });
   } catch (error) {
     return res.status(502).json({ error: 'Could not verify captcha. Please try again.' });
@@ -684,11 +809,14 @@ app.get('/api/jwst', async (req, res) => {
 });
 
 app.post('/api/chat', async (req, res) => {
-  if (CAPTCHA_ENABLED && !hasValidCaptchaCookie(req)) {
-    return res.status(403).json({
-      error: 'Please complete the verification check before chatting.',
-      captchaRequired: true,
-    });
+  if (CAPTCHA_ENABLED) {
+    const gate = captchaGateResult(req);
+    if (gate.required) {
+      return res.status(403).json({
+        error: 'Please complete the verification check before chatting.',
+        captchaRequired: true,
+      });
+    }
   }
 
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
@@ -784,7 +912,7 @@ app.listen(PORT, () => {
   } else if (!TURNSTILE_SITE_KEY && TURNSTILE_SECRET_KEY) {
     console.warn('WARNING: TURNSTILE_SECRET_KEY is set but TURNSTILE_SITE_KEY is missing — captcha disabled.');
   } else if (CAPTCHA_ENABLED) {
-    console.log('Captcha: Cloudflare Turnstile enabled.');
+    console.log('Captcha: Cloudflare Turnstile enabled (suspicious visitors only).');
   } else {
     console.warn('WARNING: Turnstile keys not set — captcha protection is disabled.');
   }
