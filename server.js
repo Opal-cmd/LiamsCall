@@ -38,12 +38,12 @@ const CAPTCHA_FORCE_TTL_MS = 60 * 60 * 1000;
 const BOT_UA_RE = /bot|crawl|spider|scrapy|curl|wget|python-requests|python-urllib|httpclient|go-http|libwww|node-fetch|axios\//i;
 
 // Provider chain: comma-separated list of providers to try in order.
-// e.g. PROVIDER_CHAIN=groq,gemini,openai
+// e.g. PROVIDER_CHAIN=gemini,openai
 // Falls back to legacy AI_PROVIDER / FALLBACK_PROVIDER if not set.
 const PROVIDER_CHAIN = process.env.PROVIDER_CHAIN
   ? process.env.PROVIDER_CHAIN.split(',').map((p) => p.trim().toLowerCase()).filter(Boolean)
   : [
-      (process.env.AI_PROVIDER || 'groq').toLowerCase(),
+      (process.env.AI_PROVIDER || 'gemini').toLowerCase(),
       ...(process.env.FALLBACK_PROVIDER ? [process.env.FALLBACK_PROVIDER.toLowerCase()] : []),
     ];
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -78,6 +78,7 @@ TONE & LANGUAGE:
 - No performative AI warmth — avoid "I know exactly how you feel" or "I care about you deeply"; prefer "That sounds incredibly heavy to carry. I'm glad you reached out."
 - Never use exclamation points — not once, in any response. Warmth, encouragement, and urgency are carried by calm, plain words — not punctuation.
 - No manufactured positivity — never respond to pain with forced cheerfulness, dismissal, or minimization. Lift spirits the way a wise, steady friend does: through calm, honest words and real options — not enthusiasm.
+- Light bold only when helpful — you may wrap short list labels in double asterisks so they display as bold (e.g. "1. **Seek Immediate Shelter**: then the plain explanation"). Do not use italic *single asterisks*, underscores, backticks, or # headings. Never leave bare unpaired asterisks. Prefer numbered lists and short paragraphs for structure.
 
 READING RISK ACROSS THE CONVERSATION (can override ask-first):
 Judge risk cumulatively across the whole conversation, not from any single word. A single soft word is not a pattern; the same language repeated, escalating, or turning specific across several messages is one.
@@ -281,7 +282,7 @@ app.use(express.static(PUBLIC_DIR));
 
 function modelForProvider(provider) {
   if (provider === 'groq')     return process.env.GROQ_MODEL    || 'llama-3.3-70b-versatile';
-  if (provider === 'gemini')   return process.env.GEMINI_MODEL  || 'gemini-2.0-flash';
+  if (provider === 'gemini')   return process.env.GEMINI_MODEL  || 'gemini-2.5-flash';
   if (provider === 'anthropic') return process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
   return process.env.OPENAI_MODEL || 'gpt-4o-mini';
 }
