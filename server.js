@@ -497,7 +497,13 @@ function parseCookies(req) {
       .map((part) => {
         const idx = part.indexOf('=');
         if (idx === -1) return [part, ''];
-        return [part.slice(0, idx), decodeURIComponent(part.slice(idx + 1))];
+        const name = part.slice(0, idx);
+        const value = part.slice(idx + 1);
+        try {
+          return [name, decodeURIComponent(value)];
+        } catch {
+          return [name, value];
+        }
       }),
   );
 }
