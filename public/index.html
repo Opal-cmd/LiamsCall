@@ -145,10 +145,17 @@
             font-size: 0.92rem;
             line-height: 1.45;
             white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            word-break: break-word;
             border-radius: 1.1rem;
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
             box-shadow: 0 8px 22px rgba(15, 74, 58, 0.08);
+        }
+
+        .bubble a {
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
         .bubble-assistant {
@@ -2225,9 +2232,11 @@
         let conversation = [];
         let isStreaming = false;
         let captchaRequired = false;
-        let captchaReady = false;
+        let captchaReady = true; // allow chat until server says a challenge is required
+        let captchaSiteKey = null;
         let captchaWidgetId = null;
         let turnstileScriptPromise = null;
+        let captchaWidgetMounted = false;
 
         const landing = document.getElementById('landing');
         const chatGlow = document.getElementById('chat-glow');
@@ -2589,17 +2598,54 @@
             return turnstileScriptPromise;
         }
 
-        function showCaptchaWidget() {
-            if (!captchaRequired || !chatCaptchaWrap) return;
+        async function ensureCaptchaWidget() {
+            if (!captchaSiteKey || !chatCaptchaEl) return false;
+            if (captchaWidgetMounted && captchaWidgetId !== null) return true;
+            try {
+                await loadTurnstileScript();
+            } catch {
+                if (chatCaptchaNote) {
+                    chatCaptchaNote.textContent = 'Could not load verification. Please refresh the page.';
+                }
+                return false;
+            }
+            if (captchaWidgetId !== null && window.turnstile) {
+                try { window.turnstile.remove(captchaWidgetId); } catch { /* ignore */ }
+                captchaWidgetId = null;
+            }
+            captchaWidgetId = window.turnstile.render(chatCaptchaEl, {
+                sitekey: captchaSiteKey,
+                callback: onCaptchaSuccess,
+                'expired-callback': onCaptchaExpired,
+                theme: 'light',
+                size: 'normal',
+                // Managed widgets stay quiet until Cloudflare (or our force-show) needs input.
+                appearance: 'interaction-only',
+            });
+            captchaWidgetMounted = true;
+            return true;
+        }
+
+        async function showCaptchaWidget() {
+            if (!chatCaptchaWrap) return;
+            captchaRequired = true;
             captchaReady = false;
             setChatCaptchaState(false);
             chatCaptchaWrap.classList.add('is-visible');
             chatCaptchaWrap.classList.remove('is-verified');
             if (chatCaptchaNote) {
-                chatCaptchaNote.textContent = "Verify you're human to start chatting.";
+                chatCaptchaNote.textContent = "Quick check — verify you're human to keep chatting.";
             }
+            const ok = await ensureCaptchaWidget();
+            if (!ok) return;
             if (window.turnstile && captchaWidgetId !== null) {
-                window.turnstile.reset(captchaWidgetId);
+                try {
+                    // Force a visible challenge when our risk gate trips.
+                    window.turnstile.reset(captchaWidgetId);
+                    if (typeof window.turnstile.execute === 'function') {
+                        window.turnstile.execute(captchaWidgetId);
+                    }
+                } catch { /* ignore */ }
             }
         }
 
@@ -2612,6 +2658,7 @@
                     body: JSON.stringify({ token }),
                 });
                 if (!response.ok) throw new Error('Verification failed.');
+                captchaRequired = false;
                 captchaReady = true;
                 setChatCaptchaState(true);
                 chatCaptchaWrap.classList.remove('is-visible');
@@ -2631,6 +2678,7 @@
         }
 
         function onCaptchaExpired() {
+            if (!captchaRequired) return;
             captchaReady = false;
             setChatCaptchaState(false);
             showCaptchaWidget();
@@ -2639,36 +2687,31 @@
         async function initCaptcha() {
             let config;
             try {
-                const response = await fetch('/api/config');
+                const response = await fetch('/api/config', { credentials: 'same-origin' });
                 if (!response.ok) return;
                 config = await response.json();
             } catch {
                 return;
             }
 
-            if (!config.captcha?.siteKey) return;
-
-            captchaRequired = true;
-            captchaReady = false;
-            setChatCaptchaState(false);
-
-            try {
-                await loadTurnstileScript();
-            } catch {
-                if (chatCaptchaNote) {
-                    chatCaptchaNote.textContent = 'Could not load verification. Please refresh the page.';
-                }
+            if (!config.captcha?.siteKey) {
+                captchaRequired = false;
+                captchaReady = true;
+                setChatCaptchaState(true);
                 return;
             }
 
-            showCaptchaWidget();
-            captchaWidgetId = window.turnstile.render(chatCaptchaEl, {
-                sitekey: config.captcha.siteKey,
-                callback: onCaptchaSuccess,
-                'expired-callback': onCaptchaExpired,
-                theme: 'light',
-                size: 'normal',
-            });
+            captchaSiteKey = config.captcha.siteKey;
+
+            // Normal visitors: chat immediately, no widget.
+            // Suspicious / previously flagged: show challenge now.
+            if (config.captcha.required) {
+                await showCaptchaWidget();
+            } else {
+                captchaRequired = false;
+                captchaReady = true;
+                setChatCaptchaState(true);
+            }
         }
 
         async function streamChat(messages, onToken) {
@@ -2681,16 +2724,24 @@
                     body: JSON.stringify({ messages }),
                 });
             } catch {
-                throw new Error('Cannot reach the chat server. Run "npm start" and open http://localhost:3000.');
+                const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+                throw new Error(
+                    isLocal
+                        ? 'Cannot reach the chat server. Run "npm start" and open http://localhost:3000.'
+                        : 'Cannot reach the chat server right now. Please check your connection and try again in a moment.',
+                );
             }
             if (!response.ok || !response.body) {
-                let message = 'Chat server error. Make sure "npm start" is running on http://localhost:3000.';
+                const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+                let message = isLocal
+                    ? 'Chat server error. Make sure "npm start" is running on http://localhost:3000.'
+                    : 'Something went wrong with the chat. Please try again in a moment.';
                 try {
                     const data = await response.json();
                     if (data.error) message = data.error;
                     if (data.captchaRequired) {
                         captchaReady = false;
-                        showCaptchaWidget();
+                        await showCaptchaWidget();
                     }
                 } catch {
                     // Keep default message for non-JSON errors.
