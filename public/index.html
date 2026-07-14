@@ -3,28 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Liam's Call is a free AI support tool for mental health, addiction, and housing challenges — for caregivers and families in Canada and the U.S. Chat anytime, no account required.">
+    <meta name="description" content="Liam's Call (liamscall.com) is a free AI chat for caregivers and families facing mental health, addiction, and housing challenges in Canada and the U.S. Not a sales or receptionist app. No account required.">
     <meta name="theme-color" content="#0f4a3a">
+    <meta name="keywords" content="Liam's Call, liamscall, caregiver support, mental health chat, addiction resources, homelessness help, 988, Canada, United States">
     <link rel="canonical" href="https://liamscall.com/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Liam's Call">
     <meta property="og:title" content="Liam's Call — Mental Health, Addiction &amp; Housing Support">
-    <meta property="og:description" content="Free AI support for caregivers and families navigating mental health, addiction, and housing challenges. Crisis resources included. No login required.">
+    <meta property="og:description" content="Free AI chat for caregivers and families navigating mental health, addiction, and housing challenges. Crisis resources for Canada and the U.S. No login required.">
     <meta property="og:url" content="https://liamscall.com/">
     <meta property="og:image" content="https://liamscall.com/assets/logo-icon.svg">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Liam's Call — Mental Health, Addiction &amp; Housing Support">
-    <meta name="twitter:description" content="Free AI support for caregivers and families. Chat anytime — no account required.">
+    <meta name="twitter:description" content="Free AI support for caregivers and families facing mental health, addiction, and housing challenges. Chat anytime — no account required.">
     <title>Liam's Call — Mental Health, Addiction &amp; Housing Support</title>
     <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Liam's Call",
-        "url": "https://liamscall.com/",
-        "description": "Free AI support for mental health, addiction, and housing challenges — for caregivers and families.",
-        "inLanguage": "en"
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": "https://liamscall.com/#organization",
+                "name": "Liam's Call",
+                "alternateName": ["Liams Call", "liamscall.com", "LiamsCall"],
+                "url": "https://liamscall.com/",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://liamscall.com/assets/logo-icon.svg"
+                },
+                "email": "hello@liamscall.ca",
+                "description": "Canadian mental health technology project offering free AI chat support for caregivers, families, and people navigating mental health, addiction, and housing challenges.",
+                "areaServed": ["CA", "US"],
+                "knowsAbout": [
+                    "mental health",
+                    "caregiving",
+                    "family support",
+                    "addiction",
+                    "substance use",
+                    "homelessness",
+                    "housing instability",
+                    "crisis resources"
+                ]
+            },
+            {
+                "@type": "WebSite",
+                "@id": "https://liamscall.com/#website",
+                "name": "Liam's Call",
+                "url": "https://liamscall.com/",
+                "description": "Free AI support for mental health, addiction, and housing challenges — for caregivers and families in Canada and the U.S.",
+                "inLanguage": "en",
+                "publisher": { "@id": "https://liamscall.com/#organization" }
+            },
+            {
+                "@type": "WebApplication",
+                "@id": "https://liamscall.com/#app",
+                "name": "Liam's Call AI",
+                "url": "https://liamscall.com/",
+                "applicationCategory": "HealthApplication",
+                "operatingSystem": "Any",
+                "browserRequirements": "Requires JavaScript",
+                "isAccessibleForFree": true,
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "CAD"
+                },
+                "description": "Free, no-login AI chat that helps people find next steps and crisis resources for mental health, addiction, and homelessness. Not a medical provider, crisis line, sales platform, or AI phone receptionist.",
+                "provider": { "@id": "https://liamscall.com/#organization" },
+                "about": [
+                    "mental health support",
+                    "caregiver support",
+                    "addiction resources",
+                    "homeless shelter information"
+                ]
+            }
+        ]
     }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -130,6 +184,19 @@
         .nav-link { cursor: pointer; }
         .nav-link:hover { opacity: 0.75; }
         .nav-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+
+        /* Screen-reader / crawler-visible identity copy (keeps landing visual clean) */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
         a.nav-link {
             color: inherit;
             text-decoration: none;
@@ -1555,10 +1622,26 @@
     <noscript>
         <div style="max-width:40rem;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;color:#374151;line-height:1.6;">
             <h1 style="color:#0f4a3a;font-size:1.5rem;">Liam's Call</h1>
-            <p>Free AI support for mental health, addiction, and housing challenges — for caregivers, families, and anyone who needs help thinking through next steps. Available in Canada and the U.S. No account or login required.</p>
-            <p>In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.</p>
+            <p><strong>Liam's Call (liamscall.com)</strong> is a free AI chat for caregivers, families, and anyone facing mental health, addiction, or housing challenges in Canada and the United States. It helps you think through next steps and find crisis resources. It is not a medical clinic, crisis line, sales call platform, AI receptionist, or marketing/email tool.</p>
+            <p>No account or login required. In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.</p>
+            <p><a href="/about">About</a> · <a href="/resources">Crisis resources</a> · <a href="/privacy">Privacy</a></p>
         </div>
     </noscript>
+
+    <section id="seo-intro" class="sr-only" aria-label="About Liam's Call">
+        <h1>Liam's Call — free AI support for mental health, addiction, and housing</h1>
+        <p>
+            Liam's Call (liamscall.com) is a free, no-login AI chat that helps caregivers, families,
+            and people in hard situations find next steps for mental health, addiction, and homelessness
+            support in Canada and the United States. Crisis resources include 9-8-8 and 9-1-1.
+            Liam's Call is not LimeCall, not a sales or telephony receptionist product, and not a
+            promotional email or inbox-management platform.
+        </p>
+        <p>
+            Learn more on our <a href="/about">About</a> page or browse
+            <a href="/resources">crisis and support resources</a>.
+        </p>
+    </section>
 
     <div id="landing" class="flex flex-col">
         <!-- CC0 art background (The Met Open Access / NASA) -->
@@ -1704,7 +1787,7 @@
 
                 <div id="chat-messages" class="space-y-3" aria-live="polite" aria-label="Chat messages">
                     <div class="flex justify-start welcome-msg">
-                        <div class="bubble bubble-assistant">Hi, I'm here to help with caregiving questions, stress, routines, and support. What would you like to talk about today?</div>
+                        <div class="bubble bubble-assistant">Hi — I'm Liam's Call AI. I help with caregiving, mental health, addiction, and housing questions for you or someone you love. What would you like to talk about today?</div>
                     </div>
                 </div>
 
@@ -2165,8 +2248,8 @@
 
                     <div class="rounded-xl bg-[var(--beige-main)] p-5">
                         <h3 class="font-bold text-gray-800 text-base mb-2">Our mission</h3>
-                        <p>Liam's Call exists for one reason: to make sure no caregiver or family member facing a mental health challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.</p>
-                        <p class="mt-2">We built Liam's Call as a safe starting point: a place to put words to what you are feeling, to find crisis resources in one place, and to take a breath before deciding what to do next.</p>
+                        <p>Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.</p>
+                        <p class="mt-2">We built Liam's Call as a safe starting point: a free AI chat where you can put words to what you are feeling, find crisis resources in one place, and take a breath before deciding what to do next. We are not a sales or phone receptionist product, and we are not a marketing or email platform — we focus only on caregiver and family wellbeing.</p>
                     </div>
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
@@ -2507,7 +2590,7 @@
             conversation = [];
             chatMessages.innerHTML = `
                 <div class="flex justify-start welcome-msg">
-                    <div class="bubble bubble-assistant">Hi, I'm here to help with caregiving questions, stress, routines, and support. What would you like to talk about today?</div>
+                    <div class="bubble bubble-assistant">Hi — I'm Liam's Call AI. I help with caregiving, mental health, addiction, and housing questions for you or someone you love. What would you like to talk about today?</div>
                 </div>`;
             navigate('chat');
         }

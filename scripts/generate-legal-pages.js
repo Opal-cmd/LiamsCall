@@ -22,9 +22,14 @@ function extractPage(key) {
 // structure (logo/home, New Chat, Resources, About Us, ad card, legal
 // links) as the in-app chat sidebar, so leaving the SPA to visit a real
 // URL never feels like a different site.
-function shell(title, description, active, body) {
+function shell(title, description, active, body, extras = {}) {
   const navLink = (key, href, label) =>
     `<a class="side-link${active === key ? ' active' : ''}" href="${href}">${label}</a>`;
+  const canonical = extras.canonical || `https://liamscall.com/${active === 'home' ? '' : active}`;
+  const ogTitle = extras.ogTitle || `${title} — Liam's Call`;
+  const schema = extras.schema
+    ? `\n  <script type="application/ld+json">\n${JSON.stringify(extras.schema, null, 4)}\n  </script>`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -33,8 +38,18 @@ function shell(title, description, active, body) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="${description}">
   <meta name="theme-color" content="#0f4a3a">
+  <link rel="canonical" href="${canonical}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Liam's Call">
+  <meta property="og:title" content="${ogTitle}">
+  <meta property="og:description" content="${description}">
+  <meta property="og:url" content="${canonical}">
+  <meta property="og:image" content="https://liamscall.com/assets/logo-icon.svg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="${ogTitle}">
+  <meta name="twitter:description" content="${description}">
   <title>${title} — Liam's Call</title>
-  <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">${schema}
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
     :root { --green-dark: #0f4a3a; --beige-main: #e8dfd3; --sidebar-w: 16rem; }
@@ -259,10 +274,47 @@ function shell(title, description, active, body) {
 }
 
 const pages = [
-  { key: 'about', file: 'public/about.html', description: "About Liam's Call — caregiver and family mental health support." },
-  { key: 'privacy', file: 'public/privacy.html', description: "Privacy Policy for Liam's Call." },
-  { key: 'terms', file: 'public/terms.html', description: 'Terms of Use for Liamscall.com.' },
-  { key: 'resources', file: 'public/resources.html', description: 'Crisis and support resources from Liam\'s Call.' },
+  {
+    key: 'about',
+    file: 'public/about.html',
+    description:
+      "About Liam's Call (liamscall.com): a free Canadian AI chat for caregivers and families facing mental health, addiction, and housing challenges — not a sales or receptionist app.",
+    schema: {
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      name: "About Liam's Call",
+      url: 'https://liamscall.com/about',
+      description:
+        "Liam's Call is a Canadian mental health technology project offering free AI chat support for caregivers and families.",
+      isPartOf: { '@id': 'https://liamscall.com/#website' },
+      about: { '@id': 'https://liamscall.com/#organization' },
+    },
+  },
+  {
+    key: 'privacy',
+    file: 'public/privacy.html',
+    description: "Privacy Policy for Liam's Call — how we handle chat data, approximate location, and third-party providers.",
+  },
+  {
+    key: 'terms',
+    file: 'public/terms.html',
+    description: 'Terms of Use for Liamscall.com — rules for using Liam\'s Call AI support chat.',
+  },
+  {
+    key: 'resources',
+    file: 'public/resources.html',
+    description:
+      "Crisis and support resources from Liam's Call — 988, Kids Help Phone, SAMHSA, caregiver supports, and more for Canada and the U.S.",
+    schema: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Crisis & Support Resources — Liam\'s Call',
+      url: 'https://liamscall.com/resources',
+      description:
+        'Verified crisis lines and caregiver support resources for mental health, addiction, and housing challenges.',
+      isPartOf: { '@id': 'https://liamscall.com/#website' },
+    },
+  },
 ];
 
 for (const p of pages) {
@@ -281,6 +333,6 @@ for (const p of pages) {
       'See our <a href="/privacy" class="underline text-[var(--green-dark)]">Privacy Policy</a> for more detail.',
     );
   const out = path.join(root, p.file);
-  fs.writeFileSync(out, shell(title, p.description, p.key, body));
+  fs.writeFileSync(out, shell(title, p.description, p.key, body, { schema: p.schema }));
   console.log('wrote', p.file, fs.statSync(out).size);
 }

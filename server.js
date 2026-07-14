@@ -86,9 +86,9 @@ When listing resources, use this ultra-compact shape — one line for name, one 
 1. 🏠 **Name** — 6–10 words max on what it is
    📞 phone · 🌐 https://site.org
 Rules:
-- Exactly 3 items when listing shelters/resources (not more). Keep each item to those 2 lines.
+- Exactly 5 items when listing shelters/resources (not more). Keep each item to those 2 lines.
 - One short intro sentence max before the list. No long paragraphs.
-- Finish all 3 items — if running long, shorten descriptions, never drop an item mid-line.
+- Finish all 5 items — if running long, shorten descriptions, never drop an item mid-line.
 - Plain https:// URLs only (no markdown links). Never invent phone numbers or URLs.
 - If a specific local number is unverified, use a verified directory (211, 311, Central Intake, etc.) with its real phone and site instead.
 
@@ -212,8 +212,8 @@ function buildSystemPrompt(geo, messages) {
 
   if (isResourceListRequest(messages)) {
     base +=
-      ' ACTIVE REQUEST: The visitor wants a local resource list. Reply with exactly 3 compact items using the 2-line list format above.' +
-      ' Intro: 1 short sentence only. Each item: name line + "📞 number · 🌐 url" line. Do not start a 4th item.';
+      ' ACTIVE REQUEST: The visitor wants a local resource list. Reply with exactly 5 compact items using the 2-line list format above.' +
+      ' Intro: 1 short sentence only. Each item: name line + "📞 number · 🌐 url" line. Do not start a 6th item.';
   }
 
   const prevAssistant = getPreviousAssistantMessage(messages);
@@ -256,7 +256,7 @@ function isResourceItemComplete(section) {
 function resourceListIncomplete(text) {
   const sections = splitResourceListSections(text);
   if (sections.length === 0) return false;
-  if (sections.length < 3) return true;
+  if (sections.length < 5) return true;
   return sections.some((section) => !isResourceItemComplete(section));
 }
 
