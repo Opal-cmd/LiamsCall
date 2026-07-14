@@ -41,15 +41,49 @@ npm start
 | `CHAT_API_TOKEN` | Optional shared token required in `x-chat-token` header |
 | `SYSTEM_PROMPT` | Override the default bot persona |
 
+## Blog (`/blog`)
+
+Crawlable Markdown → HTML blog for SEO.
+
+```bash
+npm run blog:build                 # rebuild public/blog + sitemap
+npm run blog:discover              # pull idea angles from allowlisted RSS/seeds into topics.yaml
+npm run blog:generate              # next topic from topics.yaml (needs GEMINI_API_KEY)
+npm run blog:approve -- my-slug    # publish a draft from content/blog/drafts/
+```
+
+- Published posts: `content/blog/*.md`
+- Review drafts: `content/blog/drafts/`
+- Topic queue: `content/blog/topics.yaml` (`risk: safe` can auto-publish; `risk: review` lands in Blog desk drafts for a human to approve)
+- Idea sources: `content/blog/sources.yaml` (RSS + curated seeds - inspiration only, never copied)
+- **Blog desk (for non-coders):** open [http://localhost:3000/admin/blog](http://localhost:3000/admin/blog) (or `/admin/blog` on the live site). Set `BLOG_ADMIN_PASSWORD` in `.env` / Render. Log in → **Needs review** → edit if needed → **Approve & publish**. **Live on site** can move a post back to drafts.
+- Cron: [`.github/workflows/blog-cron.yml`](.github/workflows/blog-cron.yml) (Mon/Thu generate) + [`.github/workflows/blog-discover.yml`](.github/workflows/blog-discover.yml) (weekly ideas) — set repo secret `GEMINI_API_KEY`
+
 ## Deploy (Render)
 
-1. Push this repo to GitHub.
-2. On https://render.com create a **Web Service** from the repo:
-   - Build command: `npm install`
+### Production
+1. Push `main` to GitHub.
+2. On https://render.com create a **Web Service** from the repo (branch `main`):
+   - Build command: `npm install && npm run blog:build`
    - Start command: `npm start`
-3. Add environment variables in the Render dashboard (`GROQ_API_KEY`,
-   `AI_PROVIDER`, and `ALLOWED_ORIGIN=https://your-domain.com`).
+3. Add environment variables in the Render dashboard (`GEMINI_API_KEY`,
+   `BLOG_ADMIN_PASSWORD`, and `ALLOWED_ORIGIN=https://your-domain.com`).
 4. Attach a custom domain under Settings → Custom Domains. TLS is automatic.
+
+### Staging (share with supervisor before merging to main)
+1. Push the `staging` branch to GitHub.
+2. Create a **second** Web Service on Render (do not reuse production):
+   - Name: `liamscall-staging` (or similar)
+   - Branch: `staging`
+   - Build: `npm install && npm run blog:build`
+   - Start: `npm start`
+   - Or use the Blueprint in [`render.yaml`](render.yaml)
+3. Copy the same API keys as production, plus:
+   - `BLOG_ADMIN_PASSWORD` — share only with reviewers
+   - `ALLOWED_ORIGIN=https://liamscall-staging.onrender.com` (use your real staging URL)
+4. Send reviewers: the staging site URL + `/admin/blog` + the blog desk password.
+
+Staging is separate from production. Merging `staging` → `main` is what updates the live site.
 
 The server already sets `trust proxy`, so rate limiting works correctly behind
 Render's proxy.

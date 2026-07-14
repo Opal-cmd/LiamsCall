@@ -8,4 +8,6 @@ html/
 shadcn-chatbot-kit-main/
 bg1.webp
 logo/
-index.html
+/index.html
+.blog-generate-result.json
+.blog-discover-result.json

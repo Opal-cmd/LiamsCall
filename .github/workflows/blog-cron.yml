@@ -1,0 +1,85 @@
+# Automated / hybrid blog publisher — Mon & Thu 14:00 UTC
+name: Blog generate
+
+on:
+  schedule:
+    - cron: '0 14 * * 1,4'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate next topic
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+        run: |
+          export GEMINI_MODEL="${GEMINI_MODEL:-gemini-2.0-flash}"
+          node scripts/blog-generate.js
+
+      - name: Read generate result
+        id: result
+        run: |
+          MODE=$(node -e "console.log(require('./.blog-generate-result.json').mode)")
+          SLUG=$(node -e "console.log(require('./.blog-generate-result.json').slug)")
+          RISK=$(node -e "console.log(require('./.blog-generate-result.json').risk)")
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "risk=$RISK" >> "$GITHUB_OUTPUT"
+
+      - name: Build blog HTML
+        if: steps.result.outputs.mode == 'published'
+        run: node scripts/blog-build.js
+
+      - name: Commit published post to main
+        if: steps.result.outputs.mode == 'published'
+        run: |
+          git config user.name "liamscall-blog-bot"
+          git config user.email "blog-bot@liamscall.com"
+          git add content/blog public/blog public/sitemap.xml
+          git add -u content/blog/topics.yaml
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Publish blog post: ${{ steps.result.outputs.slug }}"
+            git push
+          fi
+
+      - name: Open PR for review draft
+        if: steps.result.outputs.mode == 'draft'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="blog-draft/${{ steps.result.outputs.slug }}"
+          git config user.name "liamscall-blog-bot"
+          git config user.email "blog-bot@liamscall.com"
+          git checkout -b "$BRANCH"
+          git add content/blog/drafts content/blog/topics.yaml
+          git commit -m "Draft blog post for review: ${{ steps.result.outputs.slug }}"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "Review blog draft: ${{ steps.result.outputs.slug }}" \
+            --body "Hybrid blog automation created a **review-tier** draft.
+
+          1. Read \`content/blog/drafts/${{ steps.result.outputs.slug }}.md\`
+          2. Edit if needed (especially any resources or claims)
+          3. Locally run: \`node scripts/blog-approve.js ${{ steps.result.outputs.slug }}\`
+             Or move the file into \`content/blog/\`, set \`risk: safe\`, run \`npm run blog:build\`, and merge.
+
+          Do not merge into \`main\` without rebuilding \`public/blog\` HTML."

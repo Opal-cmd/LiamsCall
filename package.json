@@ -5,7 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "blog:build": "node scripts/blog-build.js",
+    "blog:generate": "node scripts/blog-generate.js",
+    "blog:discover": "node scripts/blog-discover.js",
+    "blog:approve": "node scripts/blog-approve.js"
   },
   "engines": {
     "node": ">=18.0.0"

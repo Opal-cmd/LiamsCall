@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const crypto = require('crypto');
 const express = require('express');
+const fs = require('fs');
 const path = require('path');
 
 const app = express();
@@ -27,6 +28,8 @@ const JWST_API_KEY = process.env.JWST_API_KEY || '';
 const TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY || '';
 const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '';
 const CAPTCHA_ENABLED = Boolean(TURNSTILE_SITE_KEY && TURNSTILE_SECRET_KEY);
+const BLOG_ADMIN_PASSWORD = process.env.BLOG_ADMIN_PASSWORD || '';
+const blogAdminOps = require('./scripts/lib/blog-admin-ops');
 const CAPTCHA_COOKIE_NAME = 'lc_captcha';
 const CAPTCHA_TTL_MS = 24 * 60 * 60 * 1000;
 // Soft threshold: force captcha once an IP is this close to the per-minute rate limit.
@@ -931,6 +934,146 @@ app.get('/resources', (_req, res) => {
   sendPublicHtml(res, 'resources.html');
 });
 
+app.get('/blog', (_req, res) => {
+  sendPublicHtml(res, path.join('blog', 'index.html'));
+});
+
+app.get('/blog/:slug', (req, res) => {
+  const slug = String(req.params.slug || '');
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    return res.status(404).send('Not found');
+  }
+  const file = path.join(PUBLIC_DIR, 'blog', slug, 'index.html');
+  if (!fs.existsSync(file)) {
+    return res.status(404).send('Not found');
+  }
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  return res.sendFile(file);
+});
+
+app.get('/admin/blog', (_req, res) => {
+  sendPublicHtml(res, path.join('admin', 'blog.html'));
+});
+
+function blogAdminConfigured() {
+  return Boolean(BLOG_ADMIN_PASSWORD);
+}
+
+function signBlogAdminToken() {
+  const exp = Date.now() + 12 * 60 * 60 * 1000;
+  const payload = `blog:${exp}`;
+  const sig = crypto.createHmac('sha256', BLOG_ADMIN_PASSWORD).update(payload).digest('hex');
+  return Buffer.from(`${payload}.${sig}`).toString('base64url');
+}
+
+function verifyBlogAdminToken(token) {
+  try {
+    const decoded = Buffer.from(String(token || ''), 'base64url').toString('utf8');
+    const [payload, sig] = decoded.split('.');
+    if (!payload || !sig || !payload.startsWith('blog:')) return false;
+    const exp = Number(payload.slice(5));
+    if (!exp || Date.now() > exp) return false;
+    const expected = crypto.createHmac('sha256', BLOG_ADMIN_PASSWORD).update(payload).digest('hex');
+    if (expected.length !== sig.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig));
+  } catch {
+    return false;
+  }
+}
+
+function requireBlogAdmin(req, res, next) {
+  if (!blogAdminConfigured()) {
+    return res.status(503).json({
+      error: 'Blog desk is not set up yet. Ask the site owner to set BLOG_ADMIN_PASSWORD.',
+    });
+  }
+  const token = req.headers['x-blog-admin-token'] || '';
+  if (!verifyBlogAdminToken(token)) {
+    return res.status(401).json({ error: 'Please log in again.' });
+  }
+  return next();
+}
+
+app.post('/api/blog-admin/login', (req, res) => {
+  if (!blogAdminConfigured()) {
+    return res.status(503).json({
+      error: 'Blog desk is not set up yet. Ask the site owner to set BLOG_ADMIN_PASSWORD in the server settings.',
+    });
+  }
+  const password = String(req.body?.password || '');
+  const expected = Buffer.from(BLOG_ADMIN_PASSWORD);
+  const got = Buffer.from(password);
+  const ok =
+    expected.length === got.length && crypto.timingSafeEqual(expected, got);
+  if (!ok) return res.status(401).json({ error: 'That password did not work.' });
+
+  const persistHint =
+    process.env.NODE_ENV === 'production'
+      ? 'Tip: after you publish here on the live site, ask the site owner to save a backup of the post files so a server restart does not wipe recent publishes. Publishing from this desk on the office computer, then deploying, is the safest routine.'
+      : 'You are on the local desk on this computer. Approved posts update the blog files here right away.';
+
+  return res.json({ ok: true, token: signBlogAdminToken(), persistHint });
+});
+
+app.get('/api/blog-admin/posts', requireBlogAdmin, (_req, res) => {
+  try {
+    res.json({
+      drafts: blogAdminOps.listDrafts(),
+      published: blogAdminOps.listPublished(),
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message || 'Could not load posts.' });
+  }
+});
+
+app.get('/api/blog-admin/drafts/:slug', requireBlogAdmin, (req, res) => {
+  try {
+    res.json(blogAdminOps.getDraft(req.params.slug));
+  } catch (error) {
+    res.status(404).json({ error: error.message || 'Draft not found.' });
+  }
+});
+
+app.put('/api/blog-admin/drafts/:slug', requireBlogAdmin, (req, res) => {
+  try {
+    res.json(blogAdminOps.saveDraft(req.params.slug, req.body || {}));
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not save draft.' });
+  }
+});
+
+app.delete('/api/blog-admin/drafts/:slug', requireBlogAdmin, (req, res) => {
+  try {
+    res.json(blogAdminOps.deleteDraft(req.params.slug));
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not delete draft.' });
+  }
+});
+
+app.post('/api/blog-admin/drafts/:slug/approve', requireBlogAdmin, (req, res) => {
+  try {
+    res.json(blogAdminOps.approveDraft(req.params.slug));
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not publish draft.' });
+  }
+});
+
+app.post('/api/blog-admin/published/:slug/unpublish', requireBlogAdmin, (req, res) => {
+  try {
+    res.json(blogAdminOps.unpublish(req.params.slug));
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not move post back to drafts.' });
+  }
+});
+
+app.post('/api/blog-admin/preview', requireBlogAdmin, (req, res) => {
+  try {
+    res.json(blogAdminOps.previewMarkdown(req.body || {}));
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not preview.' });
+  }
+});
+
 // Public health check: intentionally minimal so internal configuration
 // (models, rate limits, auth setup) is not disclosed.
 app.get('/api/health', (_req, res) => {
@@ -1112,5 +1255,10 @@ app.listen(PORT, () => {
     console.log('Captcha: Cloudflare Turnstile enabled (suspicious visitors only).');
   } else {
     console.warn('WARNING: Turnstile keys not set — captcha protection is disabled.');
+  }
+  if (BLOG_ADMIN_PASSWORD) {
+    console.log('Blog desk: /admin/blog (password protected)');
+  } else {
+    console.warn('WARNING: BLOG_ADMIN_PASSWORD not set — /admin/blog login disabled.');
   }
 });

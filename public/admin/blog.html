@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Blog desk - Liam's Call</title>
+  <style>
+    :root {
+      --green: #0f4a3a;
+      --green-soft: #1f6b52;
+      --beige: #f3f0ea;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --danger: #b42318;
+      --warn: #9a6700;
+      --ok: #0f4a3a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--beige);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+    h1 { margin: 0 0 0.35rem; font-size: 1.55rem; color: var(--green); letter-spacing: -0.02em; }
+    .sub { margin: 0 0 1.25rem; color: var(--muted); font-size: 0.95rem; line-height: 1.45; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.15rem 1.2rem;
+      box-shadow: 0 1px 2px rgba(15, 74, 58, 0.04);
+    }
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 0.7rem 1.05rem;
+      font-size: 0.92rem;
+      font-weight: 650;
+      cursor: pointer;
+      background: var(--green);
+      color: #fff;
+    }
+    .btn:hover { background: var(--green-soft); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn.secondary { background: #fff; color: var(--green); border: 1px solid rgba(15,74,58,0.25); }
+    .btn.danger { background: #fff; color: var(--danger); border: 1px solid rgba(180,35,24,0.3); }
+    .btn.row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .stack { display: flex; flex-direction: column; gap: 0.85rem; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center; }
+    .row.spread { justify-content: space-between; }
+    label { display: block; font-size: 0.8rem; font-weight: 650; color: #374151; margin-bottom: 0.3rem; }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 0.7rem;
+      padding: 0.7rem 0.8rem;
+      font: inherit;
+      background: #fff;
+      color: var(--text);
+    }
+    textarea { min-height: 280px; line-height: 1.5; resize: vertical; }
+    .tabs { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
+    .tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .tab.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .list { display: flex; flex-direction: column; gap: 0.65rem; }
+    .item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.75rem;
+      align-items: start;
+      padding: 0.95rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 0.85rem;
+      background: #fff;
+    }
+    .item h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+    .item p { margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.4; }
+    .meta { font-size: 0.75rem; color: #9ca3af; margin-top: 0.35rem; }
+    .badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.45rem;
+      border-radius: 999px;
+      background: #ecfdf3;
+      color: var(--ok);
+    }
+    .badge.review { background: #fff7ed; color: var(--warn); }
+    .badge.live { background: #eff6ff; color: #1d4ed8; }
+    .notice {
+      padding: 0.8rem 0.95rem;
+      border-radius: 0.75rem;
+      background: #fff7ed;
+      border: 1px solid #fdead7;
+      color: #9a6700;
+      font-size: 0.86rem;
+      line-height: 1.45;
+      margin-bottom: 1rem;
+    }
+    .notice.ok { background: #ecfdf3; border-color: #bbf7d0; color: #166534; }
+    .notice.err { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .hidden { display: none !important; }
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 900px) {
+      .editor-grid { grid-template-columns: 1fr; }
+      .item { grid-template-columns: 1fr; }
+    }
+    .preview {
+      border: 1px solid var(--line);
+      border-radius: 0.85rem;
+      padding: 1rem;
+      background: #fafafa;
+      min-height: 280px;
+      overflow: auto;
+    }
+    .preview h1 { font-size: 1.25rem; margin-top: 0; }
+    .preview p { color: #4b5563; line-height: 1.6; }
+    .empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .field { margin-bottom: 0.75rem; }
+    .help { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Blog desk</h1>
+        <p class="sub">Review drafts, make small edits, then publish. No coding needed.</p>
+      </div>
+      <div class="row">
+        <a class="btn secondary" href="/blog" target="_blank" rel="noopener">View public blog</a>
+        <button id="logout-btn" class="btn secondary hidden" type="button">Log out</button>
+      </div>
+    </div>
+
+    <div id="banner" class="notice hidden"></div>
+
+    <section id="login-panel" class="card stack">
+      <p style="margin:0;color:var(--muted);font-size:0.92rem;">
+        This is the private blog desk for reviewing and publishing posts.
+        Ask the site owner for the blog desk password if you do not have it yet.
+      </p>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Blog desk password">
+      </div>
+      <div class="row">
+        <button id="login-btn" class="btn" type="button">Open blog desk</button>
+      </div>
+      <p class="help" style="margin:0;">
+        Site owner setup (one time): put <code>BLOG_ADMIN_PASSWORD=your-password</code> in the project <code>.env</code> file, restart the server, then share that password with whoever reviews drafts.
+      </p>
+    </section>
+
+    <section id="app-panel" class="hidden">
+      <div class="notice" style="background:#eff6ff;border-color:#bfdbfe;color:#1e3a8a;">
+        <strong style="display:block;margin-bottom:0.35rem;">Simple 3-step flow</strong>
+        <ol style="margin:0;padding-left:1.2rem;line-height:1.55;">
+          <li>Open a draft under <strong>Needs review</strong></li>
+          <li>Read the preview. Change the title or text if something feels off</li>
+          <li>Click <strong>Approve &amp; publish</strong> — it goes live on the blog right away</li>
+        </ol>
+        <p style="margin:0.65rem 0 0;">Use <strong>Live on site</strong> later if you need to take a post down and turn it back into a draft.</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="drafts" type="button">1. Needs review</button>
+        <button class="tab" data-tab="live" type="button">2. Live on site</button>
+      </div>
+
+      <div id="list-view">
+        <div id="drafts-view" class="card">
+          <div class="row spread" style="margin-bottom:0.85rem;">
+            <strong>Drafts waiting for you</strong>
+            <button id="refresh-btn" class="btn secondary" type="button">Refresh</button>
+          </div>
+          <div id="drafts-list" class="list"></div>
+        </div>
+
+        <div id="live-view" class="card hidden">
+          <div class="row spread" style="margin-bottom:0.85rem;">
+            <strong>Already published</strong>
+            <button id="refresh-live-btn" class="btn secondary" type="button">Refresh</button>
+          </div>
+          <div id="live-list" class="list"></div>
+        </div>
+      </div>
+
+      <div id="editor-view" class="hidden stack">
+        <div class="card">
+          <div class="row spread">
+            <button id="back-list-btn" class="btn secondary" type="button">&larr; Back to list</button>
+            <div class="row">
+              <button id="save-btn" class="btn secondary" type="button">Save changes</button>
+              <button id="approve-btn" class="btn" type="button" style="font-size:1rem;padding:0.8rem 1.2rem;">Approve &amp; publish</button>
+              <button id="delete-btn" class="btn danger" type="button">Delete draft</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="field">
+            <label for="title">Title</label>
+            <input id="title" type="text">
+          </div>
+          <div class="row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;">
+            <div class="field">
+              <label for="category">Category</label>
+              <input id="category" type="text">
+            </div>
+            <div class="field">
+              <label for="date">Date</label>
+              <input id="date" type="date">
+            </div>
+            <div class="field">
+              <label for="risk">How careful should we be?</label>
+              <select id="risk">
+                <option value="review">Careful (crisis / medical / housing)</option>
+                <option value="safe">Everyday caregiver tip</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="description">Short summary (for Google / social)</label>
+            <input id="description" type="text">
+            <div class="help">One sentence. Keep it calm and clear.</div>
+          </div>
+        </div>
+
+        <div class="editor-grid">
+          <div class="card">
+            <label for="body">Post text</label>
+            <textarea id="body" placeholder="Write the article here..."></textarea>
+            <div class="help">Plain sentences are fine. Optional: wrap important words in **like this** for bold, or paste a full https:// link.</div>
+          </div>
+          <div class="card">
+            <div class="row spread" style="margin-bottom:0.5rem;">
+              <label style="margin:0;">Preview</label>
+              <button id="preview-btn" class="btn secondary" type="button">Update preview</button>
+            </div>
+            <div id="preview" class="preview"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      token: sessionStorage.getItem('lc_blog_admin') || '',
+      tab: 'drafts',
+      currentSlug: null,
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const banner = $('banner');
+
+    function showBanner(msg, kind = '') {
+      banner.textContent = msg;
+      banner.className = 'notice' + (kind ? ' ' + kind : '');
+      banner.classList.remove('hidden');
+    }
+    function hideBanner() {
+      banner.classList.add('hidden');
+    }
+
+    async function api(path, options = {}) {
+      const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+      if (state.token) headers['x-blog-admin-token'] = state.token;
+      const res = await fetch(path, { ...options, headers });
+      let data = null;
+      try { data = await res.json(); } catch { data = {}; }
+      if (!res.ok) {
+        const err = new Error(data.error || 'Something went wrong.');
+        err.status = res.status;
+        throw err;
+      }
+      return data;
+    }
+
+    function setLoggedIn(on) {
+      $('login-panel').classList.toggle('hidden', on);
+      $('app-panel').classList.toggle('hidden', !on);
+      $('logout-btn').classList.toggle('hidden', !on);
+    }
+
+    function switchTab(tab) {
+      state.tab = tab;
+      document.querySelectorAll('.tab').forEach((el) => {
+        el.classList.toggle('active', el.dataset.tab === tab);
+      });
+      $('drafts-view').classList.toggle('hidden', tab !== 'drafts');
+      $('live-view').classList.toggle('hidden', tab !== 'live');
+    }
+
+    function showList() {
+      $('list-view').classList.remove('hidden');
+      $('editor-view').classList.add('hidden');
+      state.currentSlug = null;
+    }
+
+    function showEditor() {
+      $('list-view').classList.add('hidden');
+      $('editor-view').classList.remove('hidden');
+    }
+
+    function renderDrafts(items) {
+      const box = $('drafts-list');
+      if (!items.length) {
+        box.innerHTML = '<div class="empty">No drafts right now.<br>When the automatic writer creates a careful post, it will show up here for you to review.</div>';
+        return;
+      }
+      box.innerHTML = items.map((item) => `
+        <div class="item">
+          <div>
+            <span class="badge review">Needs review</span>
+            <h3>${escapeHtml(item.title)}</h3>
+            <p>${escapeHtml(item.description || '')}</p>
+            <div class="meta">${escapeHtml(item.category || '')} · ${escapeHtml(item.date || '')}</div>
+          </div>
+          <div class="row">
+            <button class="btn" data-open="${escapeHtml(item.slug)}" type="button">Review</button>
+          </div>
+        </div>
+      `).join('');
+      box.querySelectorAll('[data-open]').forEach((btn) => {
+        btn.addEventListener('click', () => openDraft(btn.getAttribute('data-open')));
+      });
+    }
+
+    function renderLive(items) {
+      const box = $('live-list');
+      if (!items.length) {
+        box.innerHTML = '<div class="empty">No live posts yet.</div>';
+        return;
+      }
+      box.innerHTML = items.map((item) => `
+        <div class="item">
+          <div>
+            <span class="badge live">Live</span>
+            <h3>${escapeHtml(item.title)}</h3>
+            <p>${escapeHtml(item.description || '')}</p>
+            <div class="meta">${escapeHtml(item.category || '')} · ${escapeHtml(item.date || '')}</div>
+          </div>
+          <div class="row">
+            <a class="btn secondary" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open</a>
+            <button class="btn danger" data-unpublish="${escapeHtml(item.slug)}" type="button">Move back to drafts</button>
+          </div>
+        </div>
+      `).join('');
+      box.querySelectorAll('[data-unpublish]').forEach((btn) => {
+        btn.addEventListener('click', () => unpublish(btn.getAttribute('data-unpublish')));
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    async function refreshLists() {
+      const data = await api('/api/blog-admin/posts');
+      renderDrafts(data.drafts || []);
+      renderLive(data.published || []);
+    }
+
+    async function openDraft(slug) {
+      hideBanner();
+      const draft = await api('/api/blog-admin/drafts/' + encodeURIComponent(slug));
+      state.currentSlug = draft.slug;
+      $('title').value = draft.title || '';
+      $('category').value = draft.category || '';
+      $('date').value = draft.date || '';
+      $('risk').value = draft.risk === 'safe' ? 'safe' : 'review';
+      $('description').value = draft.description || '';
+      $('body').value = draft.body || '';
+      $('preview').innerHTML = draft.html || '';
+      showEditor();
+    }
+
+    async function saveDraft() {
+      if (!state.currentSlug) return;
+      hideBanner();
+      const payload = {
+        title: $('title').value.trim(),
+        category: $('category').value.trim(),
+        date: $('date').value,
+        risk: $('risk').value,
+        description: $('description').value.trim(),
+        body: $('body').value,
+      };
+      const saved = await api('/api/blog-admin/drafts/' + encodeURIComponent(state.currentSlug), {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
+      state.currentSlug = saved.slug;
+      $('preview').innerHTML = saved.html || '';
+      showBanner('Saved. Nothing is live yet until you approve & publish.', 'ok');
+    }
+
+    async function approveDraft() {
+      if (!state.currentSlug) return;
+      if (!confirm('Publish this post on the public blog now?\n\nVisitors will be able to read it right away.')) return;
+      hideBanner();
+      try {
+        await saveDraft();
+      } catch (err) {
+        showBanner(err.message || 'Could not save before publishing.', 'err');
+        return;
+      }
+      try {
+        const result = await api('/api/blog-admin/drafts/' + encodeURIComponent(state.currentSlug) + '/approve', {
+          method: 'POST',
+          body: '{}',
+        });
+        showList();
+        await refreshLists();
+        switchTab('live');
+        if (result.url) {
+          banner.innerHTML = 'Published. <a href="' + escapeHtml(result.url) + '" target="_blank" rel="noopener">Open the live post</a>';
+          banner.className = 'notice ok';
+          banner.classList.remove('hidden');
+        } else {
+          showBanner('Published. You can open it under Live on site.', 'ok');
+        }
+      } catch (err) {
+        showBanner(err.message || 'Could not publish.', 'err');
+      }
+    }
+
+    async function deleteDraft() {
+      if (!state.currentSlug) return;
+      if (!confirm('Delete this draft permanently?')) return;
+      await api('/api/blog-admin/drafts/' + encodeURIComponent(state.currentSlug), { method: 'DELETE' });
+      showBanner('Draft deleted.', 'ok');
+      showList();
+      await refreshLists();
+    }
+
+    async function unpublish(slug) {
+      if (!confirm('Move this live post back to drafts? It will leave the public blog.')) return;
+      await api('/api/blog-admin/published/' + encodeURIComponent(slug) + '/unpublish', {
+        method: 'POST',
+        body: '{}',
+      });
+      showBanner('Moved back to drafts.', 'ok');
+      await refreshLists();
+      switchTab('drafts');
+    }
+
+    async function updatePreview() {
+      const data = await api('/api/blog-admin/preview', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: $('title').value,
+          body: $('body').value,
+        }),
+      });
+      $('preview').innerHTML = '<h1>' + escapeHtml(data.title || '') + '</h1>' + (data.html || '');
+    }
+
+    $('login-btn').addEventListener('click', async () => {
+      hideBanner();
+      try {
+        const password = $('password').value;
+        const data = await api('/api/blog-admin/login', {
+          method: 'POST',
+          body: JSON.stringify({ password }),
+        });
+        state.token = data.token;
+        sessionStorage.setItem('lc_blog_admin', data.token);
+        setLoggedIn(true);
+        await refreshLists();
+        if (data.persistHint) showBanner(data.persistHint);
+      } catch (err) {
+        showBanner(err.message || 'Login failed.', 'err');
+      }
+    });
+
+    $('password').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') $('login-btn').click();
+    });
+
+    $('logout-btn').addEventListener('click', () => {
+      state.token = '';
+      sessionStorage.removeItem('lc_blog_admin');
+      setLoggedIn(false);
+      hideBanner();
+    });
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+    $('refresh-btn').addEventListener('click', () => refreshLists().catch((e) => showBanner(e.message, 'err')));
+    $('refresh-live-btn').addEventListener('click', () => refreshLists().catch((e) => showBanner(e.message, 'err')));
+    $('back-list-btn').addEventListener('click', () => { showList(); refreshLists(); });
+    $('save-btn').addEventListener('click', () => saveDraft().catch((e) => showBanner(e.message, 'err')));
+    $('approve-btn').addEventListener('click', () => approveDraft().catch((e) => showBanner(e.message, 'err')));
+    $('delete-btn').addEventListener('click', () => deleteDraft().catch((e) => showBanner(e.message, 'err')));
+    $('preview-btn').addEventListener('click', () => updatePreview().catch((e) => showBanner(e.message, 'err')));
+
+    (async function boot() {
+      if (!state.token) {
+        setLoggedIn(false);
+        return;
+      }
+      try {
+        await api('/api/blog-admin/posts');
+        setLoggedIn(true);
+        await refreshLists();
+      } catch {
+        state.token = '';
+        sessionStorage.removeItem('lc_blog_admin');
+        setLoggedIn(false);
+      }
+    })();
+  </script>
+</body>
+</html>

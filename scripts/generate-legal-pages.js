@@ -201,6 +201,7 @@ function shell(title, description, active, body, extras = {}) {
       </a>
       <nav class="side-nav">
         ${navLink('chat', '/', 'New Chat')}
+        ${navLink('blog', '/blog', 'Blog')}
         ${navLink('resources', '/resources', 'Resources')}
         ${navLink('about', '/about', 'About Us')}
       </nav>
