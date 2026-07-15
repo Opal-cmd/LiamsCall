@@ -476,6 +476,17 @@ app.get('/.well-known/brand.json', (_req, res) => {
   return res.sendFile(file);
 });
 
+app.get('/llms.txt', (_req, res) => {
+  const file = path.join(PUBLIC_DIR, 'llms.txt');
+  if (!fs.existsSync(file)) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  return res.sendFile(file);
+});
+
 // Permanent redirects so crawlers that cached old logo URLs land on the new icon.
 const LOGO_REDIRECTS = {
   '/assets/logo-icon.svg': '/assets/logo-icon.png',
