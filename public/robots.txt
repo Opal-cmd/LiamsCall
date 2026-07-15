@@ -1,3 +1,10 @@
+# Crawler instructions for Liam's Call (liamscall.com)
+# Site category: Health Sciences, Social/Civic Services
+# Sub-category: Mental Health, Addiction, Homelessness
+#
+# Sitemap is for crawlers only — it is not linked in site navigation.
+# Do not index /admin.
+
 User-agent: *
 Allow: /
 Disallow: /admin

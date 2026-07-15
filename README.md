@@ -5,6 +5,8 @@ streams responses from Groq, OpenAI, or Anthropic, with a single-page frontend.
 
 ## Project structure
 
+Site identity (name, domain, category, descriptions) lives in [`scripts/lib/site-identity.js`](scripts/lib/site-identity.js) and is written into `public/sitemap.xml` + `public/site-identity.json` on `npm run blog:build`.
+
 ```
 public/          Everything served to the browser (index.html, assets/)
 server.js        Express server: static files + /api/chat streaming endpoint

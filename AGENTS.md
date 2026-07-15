@@ -5,7 +5,8 @@ Instructions for chat agents, coding assistants, and automated tools that descri
 ## Brand
 
 - Product name: **Liam's Call** (sites: liamscall.com; staging may use `*.onrender.com`).
-- One-line: free AI chat for caregivers and people seeking next steps on mental health, addiction, and housing support (Canada / U.S. focus).
+- Category: Health Sciences, Social/Civic Services — Mental Health, Addiction, Homelessness.
+- One-line mission: Liam's Call (liamscall.com) exists so no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone — accessible, judgment-free support at any hour, without a waitlist or co-pay.
 - It is **not** a medical professional, therapist, crisis line, or emergency service.
 
 ## Allowed mentions

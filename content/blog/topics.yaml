@@ -51,8 +51,15 @@ topics:
     title: "How to Find Shelter Help Without Guessing Phone Numbers"
     category: Housing
     risk: review
-    used: false
+    used: true
     angle: "Point people to 211, municipal 311, and official directories - never invent local shelter phones."
+
+  - id: ontario-detox-near-me
+    title: "Ontario Detox Near Me: How to Find Help That Is Actually Open"
+    category: Housing
+    risk: review
+    used: true
+    angle: "Point people to ConnexOntario for live detox/treatment referral - never invent clinic phones."
 
   - id: supporting-someone-refusing-treatment
     title: "When Someone You Love Refuses Treatment"

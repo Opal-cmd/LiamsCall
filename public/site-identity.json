@@ -1,0 +1,59 @@
+{
+  "siteName": "Liam's Call",
+  "domain": "liamscall.com",
+  "url": "https://liamscall.com",
+  "category": "Health Sciences, Social/Civic Services",
+  "subCategory": "Mental Health, Addiction, Homelessness",
+  "shortDescription": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+  "fullDescription": "Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.\n\nLiam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+  "languages": [
+    "en-CA",
+    "en"
+  ],
+  "organization": {
+    "@type": "Organization",
+    "@id": "https://liamscall.com/#organization",
+    "name": "Liam's Call",
+    "alternateName": [
+      "Liams Call",
+      "liamscall.com",
+      "LiamsCall"
+    ],
+    "url": "https://liamscall.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://liamscall.com/assets/logo-icon.svg"
+    },
+    "email": "hello@liamscall.ca",
+    "description": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+    "disambiguatingDescription": "Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.",
+    "areaServed": [
+      "CA",
+      "US"
+    ],
+    "knowsAbout": [
+      "mental health",
+      "addiction",
+      "homelessness",
+      "housing instability",
+      "caregiving",
+      "family support",
+      "crisis resources",
+      "Health Sciences",
+      "Social/Civic Services"
+    ],
+    "category": "Health Sciences, Social/Civic Services",
+    "additionalType": [
+      "https://schema.org/HealthAndBeautyBusiness",
+      "https://schema.org/CivicStructure"
+    ]
+  },
+  "sitemap": {
+    "url": "https://liamscall.com/sitemap.xml",
+    "extensions": [
+      "xhtml/hreflang",
+      "image"
+    ],
+    "notes": "Video and Google News sitemap extensions are omitted until video/news publishing is live."
+  }
+}

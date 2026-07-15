@@ -10,6 +10,11 @@ const PUBLIC_BLOG_DIR = path.join(ROOT, 'public', 'blog');
 const SITEMAP_PATH = path.join(ROOT, 'public', 'sitemap.xml');
 const TOPICS_PATH = path.join(CONTENT_DIR, 'topics.yaml');
 const SITE = 'https://liamscall.com';
+const {
+  SITE_IDENTITY,
+  sitemapXmlComment,
+  organizationSchema,
+} = require('./site-identity');
 
 /** Verified numbers that may appear in posts (digits only, with and without country code). */
 const ALLOWED_PHONE_DIGITS = new Set([
@@ -49,6 +54,8 @@ const ALLOWED_HOSTS = new Set([
   'www.211.ca',
   '211.org',
   'www.211.org',
+  '211ontario.ca',
+  'www.211ontario.ca',
   'toronto.ca',
   'www.toronto.ca',
   'samhsa.gov',
@@ -776,29 +783,257 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
 `;
 }
 
-function writeSitemap(posts) {
-  const staticUrls = [
-    { loc: `${SITE}/`, priority: '1.0', changefreq: 'weekly' },
-    { loc: `${SITE}/blog`, priority: '0.9', changefreq: 'weekly' },
-    { loc: `${SITE}/resources`, priority: '0.8', changefreq: 'monthly' },
-    { loc: `${SITE}/about`, priority: '0.7', changefreq: 'monthly' },
-    { loc: `${SITE}/privacy`, priority: '0.5', changefreq: 'monthly' },
-    { loc: `${SITE}/terms`, priority: '0.5', changefreq: 'monthly' },
-  ];
-  const postUrls = posts.map((p) => ({
-    loc: `${SITE}/blog/${p.slug}`,
-    priority: '0.75',
-    changefreq: 'monthly',
-    lastmod: p.date,
-  }));
-  const urls = [...staticUrls, ...postUrls]
-    .map((u) => {
-      const last = u.lastmod ? `\n    <lastmod>${u.lastmod}</lastmod>` : '';
-      return `  <url>\n    <loc>${u.loc}</loc>${last}\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`;
+function fileLastmod(absPath) {
+  try {
+    return fs.statSync(absPath).mtime.toISOString();
+  } catch {
+    return '';
+  }
+}
+
+function toIsoDate(value) {
+  if (!value) return '';
+  const s = String(value).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return `${s}T12:00:00.000Z`;
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toISOString();
+}
+
+/** Prefer the newest signal Google can use for recrawl scheduling. */
+function bestLastmod(...candidates) {
+  const times = candidates
+    .map((c) => {
+      if (!c) return 0;
+      const t = Date.parse(c);
+      return Number.isNaN(t) ? 0 : t;
     })
-    .join('\n');
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+    .filter(Boolean);
+  if (!times.length) return '';
+  return new Date(Math.max(...times)).toISOString();
+}
+
+function absoluteAssetUrl(src) {
+  const raw = String(src || '').trim();
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith('/')) return `${SITE}${raw}`;
+  return `${SITE}/${raw.replace(/^\.\//, '')}`;
+}
+
+function extractBodyImages(body) {
+  const out = [];
+  const md = String(body || '');
+  for (const m of md.matchAll(/!\[([^\]]*)\]\(([^)\s]+)\)/g)) {
+    const loc = absoluteAssetUrl(m[2]);
+    if (!loc || !loc.startsWith(SITE)) continue;
+    out.push({
+      loc,
+      title: (m[1] || '').trim() || undefined,
+      caption: (m[1] || '').trim() || undefined,
+    });
+  }
+  return out;
+}
+
+function defaultBrandImage() {
+  return {
+    loc: `${SITE}/assets/logo-icon.svg`,
+    title: SITE_IDENTITY.siteName,
+    caption: `${SITE_IDENTITY.siteName} — ${SITE_IDENTITY.subCategory}`,
+    geoLocation: 'Ontario, Canada',
+    license: `${SITE}/terms`,
+  };
+}
+
+function hreflangLinks(loc) {
+  // Single-language CA-focused site: self-referencing alternates (Google best practice).
+  return [
+    { hreflang: 'en-CA', href: loc },
+    { hreflang: 'en', href: loc },
+    { hreflang: 'x-default', href: loc },
+  ];
+}
+
+function xmlEscape(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function renderImageBlock(img) {
+  if (!img?.loc) return '';
+  const lines = ['    <image:image>', `      <image:loc>${xmlEscape(img.loc)}</image:loc>`];
+  if (img.title) lines.push(`      <image:title>${xmlEscape(img.title)}</image:title>`);
+  if (img.caption) lines.push(`      <image:caption>${xmlEscape(img.caption)}</image:caption>`);
+  if (img.geoLocation) {
+    lines.push(`      <image:geo_location>${xmlEscape(img.geoLocation)}</image:geo_location>`);
+  }
+  if (img.license) lines.push(`      <image:license>${xmlEscape(img.license)}</image:license>`);
+  lines.push('    </image:image>');
+  return lines.join('\n');
+}
+
+function renderUrlEntry(entry) {
+  const lines = ['  <url>', `    <loc>${xmlEscape(entry.loc)}</loc>`];
+  if (entry.lastmod) lines.push(`    <lastmod>${xmlEscape(entry.lastmod)}</lastmod>`);
+  if (entry.changefreq) lines.push(`    <changefreq>${xmlEscape(entry.changefreq)}</changefreq>`);
+  if (entry.priority) lines.push(`    <priority>${xmlEscape(entry.priority)}</priority>`);
+  for (const alt of entry.hreflang || []) {
+    lines.push(
+      `    <xhtml:link rel="alternate" hreflang="${xmlEscape(alt.hreflang)}" href="${xmlEscape(alt.href)}"/>`,
+    );
+  }
+  const seen = new Set();
+  for (const img of entry.images || []) {
+    if (!img?.loc || seen.has(img.loc)) continue;
+    seen.add(img.loc);
+    lines.push(renderImageBlock(img));
+  }
+  lines.push('  </url>');
+  return lines.join('\n');
+}
+
+function writeSitemap(posts) {
+  const publicDir = path.join(ROOT, 'public');
+  const brandImage = defaultBrandImage();
+
+  // Standalone content pages (generated HTML in public/) — keep in sync with server routes.
+  const contentPages = [
+    {
+      route: '/',
+      file: 'index.html',
+      priority: '1.0',
+      changefreq: 'daily',
+      images: [
+        brandImage,
+        {
+          loc: `${SITE}/assets/logo-horizontal.svg`,
+          title: `${SITE_IDENTITY.siteName} wordmark`,
+          caption: 'Primary horizontal logo for Liam\'s Call',
+          geoLocation: 'Ontario, Canada',
+          license: `${SITE}/terms`,
+        },
+      ],
+    },
+    {
+      route: '/blog',
+      file: path.join('blog', 'index.html'),
+      priority: '0.9',
+      changefreq: 'daily',
+      images: [brandImage],
+    },
+    {
+      route: '/resources',
+      file: 'resources.html',
+      priority: '0.8',
+      changefreq: 'weekly',
+      images: [brandImage],
+    },
+    {
+      route: '/about',
+      file: 'about.html',
+      priority: '0.7',
+      changefreq: 'monthly',
+      images: [brandImage],
+    },
+    {
+      route: '/privacy',
+      file: 'privacy.html',
+      priority: '0.5',
+      changefreq: 'yearly',
+      images: [brandImage],
+    },
+    {
+      route: '/terms',
+      file: 'terms.html',
+      priority: '0.5',
+      changefreq: 'yearly',
+      images: [brandImage],
+    },
+  ];
+
+  const staticUrls = contentPages
+    .filter((p) => fs.existsSync(path.join(publicDir, p.file)))
+    .map((p) => {
+      const loc = `${SITE}${p.route}`;
+      return {
+        loc,
+        priority: p.priority,
+        changefreq: p.changefreq,
+        lastmod: bestLastmod(fileLastmod(path.join(publicDir, p.file))),
+        hreflang: hreflangLinks(loc),
+        images: p.images || [brandImage],
+      };
+    });
+
+  const postUrls = posts.map((p) => {
+    const loc = `${SITE}/blog/${p.slug}`;
+    const htmlPath = path.join(PUBLIC_BLOG_DIR, p.slug, 'index.html');
+    const mdPath = p.filePath || path.join(CONTENT_DIR, `${p.slug}.md`);
+    const images = [brandImage];
+    if (p.image) {
+      images.push({
+        loc: absoluteAssetUrl(p.image),
+        title: p.title,
+        caption: p.description || p.title,
+        geoLocation: p.region || 'Canada',
+        license: `${SITE}/terms`,
+      });
+    }
+    images.push(...extractBodyImages(p.body));
+
+    return {
+      loc,
+      priority: '0.75',
+      changefreq: 'weekly',
+      lastmod: bestLastmod(toIsoDate(p.date), fileLastmod(mdPath), fileLastmod(htmlPath)),
+      hreflang: hreflangLinks(loc),
+      images,
+    };
+  });
+
+  const entries = [...staticUrls, ...postUrls];
+  const body = entries.map(renderUrlEntry).join('\n');
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+${sitemapXmlComment()}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${body}
+</urlset>
+`;
   fs.writeFileSync(SITEMAP_PATH, xml);
+
+  // Machine-readable identity for directories / partners (not for human nav).
+  const identityPath = path.join(ROOT, 'public', 'site-identity.json');
+  fs.writeFileSync(
+    identityPath,
+    `${JSON.stringify(
+      {
+        siteName: SITE_IDENTITY.siteName,
+        domain: SITE_IDENTITY.domain,
+        url: SITE_IDENTITY.url,
+        category: SITE_IDENTITY.category,
+        subCategory: SITE_IDENTITY.subCategory,
+        shortDescription: SITE_IDENTITY.shortDescription,
+        fullDescription: SITE_IDENTITY.fullDescription,
+        languages: ['en-CA', 'en'],
+        organization: organizationSchema(),
+        sitemap: {
+          url: `${SITE}/sitemap.xml`,
+          extensions: ['xhtml/hreflang', 'image'],
+          notes:
+            'Video and Google News sitemap extensions are omitted until video/news publishing is live.',
+        },
+      },
+      null,
+      2,
+    )}\n`,
+  );
 }
 
 module.exports = {

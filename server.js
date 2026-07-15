@@ -389,6 +389,29 @@ app.use((req, res, next) => {
 
 // Serve ONLY the public folder — server code, env files, and backups
 // live outside the web root and can never be downloaded.
+// Sitemap / site-identity are registered first so we can set crawler-only headers.
+app.get('/sitemap.xml', (_req, res) => {
+  const file = path.join(PUBLIC_DIR, 'sitemap.xml');
+  if (!fs.existsSync(file)) {
+    return res.status(404).type('text/plain').send('Sitemap not found');
+  }
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  return res.sendFile(file);
+});
+
+app.get('/site-identity.json', (_req, res) => {
+  const file = path.join(PUBLIC_DIR, 'site-identity.json');
+  if (!fs.existsSync(file)) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  return res.sendFile(file);
+});
+
 app.use(express.static(PUBLIC_DIR));
 
 function modelForProvider(provider) {

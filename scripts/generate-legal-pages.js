@@ -298,14 +298,14 @@ const pages = [
     key: 'about',
     file: 'public/about.html',
     description:
-      "About Liam's Call (liamscall.com): a free Canadian AI chat for caregivers and families facing mental health, addiction, and housing challenges — not a sales or receptionist app.",
+      "About Liam's Call (liamscall.com): a Canadian mental health technology project for caregivers and families — Mental Health, Addiction, Homelessness support without a waitlist or co-pay.",
     schema: {
       '@context': 'https://schema.org',
       '@type': 'AboutPage',
       name: "About Liam's Call",
       url: 'https://liamscall.com/about',
       description:
-        "Liam's Call is a Canadian mental health technology project offering free AI chat support for caregivers and families.",
+        "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone.",
       isPartOf: { '@id': 'https://liamscall.com/#website' },
       about: { '@id': 'https://liamscall.com/#organization' },
     },
@@ -324,14 +324,14 @@ const pages = [
     key: 'resources',
     file: 'public/resources.html',
     description:
-      "Crisis and support resources from Liam's Call — 988, Kids Help Phone, SAMHSA, caregiver supports, and more for Canada and the U.S.",
+      "Crisis and local Ontario resources from Liam's Call — Toronto shelter Central Intake, Ontario detox via ConnexOntario, 988, 211, Kids Help Phone, and caregiver supports.",
     schema: {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
       name: 'Crisis & Support Resources — Liam\'s Call',
       url: 'https://liamscall.com/resources',
       description:
-        'Verified crisis lines and caregiver support resources for mental health, addiction, and housing challenges.',
+        'Verified crisis lines and local Ontario directories for Toronto shelters, detox and addiction treatment, mental health, and caregiver support.',
       isPartOf: { '@id': 'https://liamscall.com/#website' },
     },
   },
