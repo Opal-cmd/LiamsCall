@@ -1,24 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Liam's Call | liamscall.com
-  Health Sciences, Social/Civic Services / Mental Health, Addiction, Homelessness
-  Machine-readable sitemap for search engines (see robots.txt).
-  Human-readable map: https://liamscall.com/sitemap
--->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-
-  <!-- ========== Core pages (production) ========== -->
-  <!-- Home / Chat -->
   <url>
     <loc>https://liamscall.com/</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://liamscall.com/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://liamscall.com/"/>
     <image:image>
       <image:loc>https://liamscall.com/assets/logo-icon.svg</image:loc>
       <image:title>Liam's Call</image:title>
@@ -30,60 +17,34 @@
       <image:caption>Primary horizontal logo for Liam's Call</image:caption>
     </image:image>
   </url>
-
-  <!-- Crisis & Support Resources -->
   <url>
     <loc>https://liamscall.com/resources</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/resources"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://liamscall.com/resources"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://liamscall.com/resources"/>
   </url>
-
-  <!-- About Us -->
   <url>
     <loc>https://liamscall.com/about</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/about"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://liamscall.com/about"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://liamscall.com/about"/>
   </url>
-
-  <!-- Sitemap -->
   <url>
     <loc>https://liamscall.com/sitemap</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
-    <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/sitemap"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://liamscall.com/sitemap"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://liamscall.com/sitemap"/>
   </url>
-
-  <!-- Privacy Policy -->
   <url>
     <loc>https://liamscall.com/privacy</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
-    <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/privacy"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://liamscall.com/privacy"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://liamscall.com/privacy"/>
   </url>
-
-  <!-- Terms of Use -->
   <url>
     <loc>https://liamscall.com/terms</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
-    <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/terms"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://liamscall.com/terms"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://liamscall.com/terms"/>
   </url>
-
 </urlset>
