@@ -390,7 +390,8 @@ app.get('/sitemap.xsl', (_req, res) => {
   if (!fs.existsSync(file)) {
     return res.status(404).type('text/plain').send('Stylesheet not found');
   }
-  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  // text/xsl is what browsers expect when applying <?xml-stylesheet?>.
+  res.setHeader('Content-Type', 'text/xsl; charset=utf-8');
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   res.setHeader('Cache-Control', 'public, max-age=86400');
   return res.sendFile(file);
@@ -404,17 +405,19 @@ app.get('/sitemap.xml', (req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   res.setHeader('Cache-Control', 'public, max-age=3600');
 
-  // Chrome removed client-side XSLT — serve the same table view as HTML for browsers.
-  // Crawlers and explicit XML clients still get the protocol sitemap.
+  // Chrome removed client-side XSLT — serve the styled table as HTML for browsers.
+  // Crawlers and XML clients still get the protocol sitemap (+ XSL PI for Firefox/Safari).
   const ua = String(req.get('user-agent') || '').toLowerCase();
   const accept = String(req.get('accept') || '');
   const isBot = /googlebot|bingbot|yandex|duckduckbot|slurp|baiduspider|semrush|ahrefs|dotbot|mj12bot|facebookexternalhit|twitterbot|linkedinbot|applebot|gptbot|claudebot|bytespider/.test(
     ua,
   );
+  const looksLikeBrowser = /mozilla|chrome|safari|firefox|edg|opr|msie|trident/.test(ua);
+  const prefersXml =
+    /\bapplication\/(xml|xhtml\+xml)\b/.test((accept.split(',')[0] || '').trim()) ||
+    /\btext\/xml\b/.test((accept.split(',')[0] || '').trim());
   const wantsHtml =
-    !isBot &&
-    accept.includes('text/html') &&
-    !/\bapplication\/(xml|xhtml\+xml)\b/.test(accept.split(',')[0] || '');
+    !isBot && !prefersXml && (accept.includes('text/html') || looksLikeBrowser);
 
   if (wantsHtml) {
     try {

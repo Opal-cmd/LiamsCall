@@ -1,126 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
-  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+<xsl:stylesheet
+  version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+  exclude-result-prefixes="sitemap image">
+
   <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
+
   <xsl:template match="/">
-    <html>
+    <html lang="en">
       <head>
-        <title>XML Sitemap — Liam's Call</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta charset="UTF-8"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta name="robots" content="noindex,follow"/>
+        <title>XML Sitemap</title>
         <style type="text/css">
+          * { box-sizing: border-box; }
           body {
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: 13px;
-            color: #545353;
             margin: 0;
             padding: 0;
-            background: #fff;
+            background: #ffffff;
+            color: #545353;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 13px;
+            line-height: 1.45;
           }
           #content {
+            width: 100%;
+            max-width: 1000px;
             margin: 0 auto;
-            width: 1000px;
-            max-width: 100%;
             padding: 24px 16px 48px;
-            box-sizing: border-box;
           }
           h1 {
+            margin: 0 0 8px;
+            color: #333333;
             font-size: 24px;
             font-weight: 700;
-            color: #333;
-            margin: 0 0 8px;
           }
           .expl {
             margin: 18px 3px;
             line-height: 1.45em;
           }
-          a {
-            color: #1a73e8;
-            text-decoration: none;
-          }
-          a:visited { color: #551a8b; }
-          a:hover { text-decoration: underline; }
-          table {
+          .table-wrap {
             width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+          table#sitemap {
+            width: 100%;
+            min-width: 520px;
             border: none;
             border-collapse: collapse;
           }
-          #sitemap tr:nth-child(odd) td {
-            background-color: #eee !important;
-          }
-          #sitemap tbody tr:hover td {
-            background-color: #ccc !important;
-          }
-          #sitemap tbody tr:hover td,
-          #sitemap tbody tr:hover td a {
-            color: #000;
-          }
-          th {
+          #sitemap thead th {
             text-align: left;
-            padding: 8px 30px 8px 3px;
+            color: #333333;
             font-size: 11px;
             font-weight: 700;
-            color: #333;
+            padding: 8px 30px 8px 3px;
+            border-bottom: 1px solid #000000;
+            white-space: nowrap;
           }
-          thead th { border-bottom: 1px solid #000; }
-          td {
+          #sitemap tbody td {
             font-size: 11px;
             padding: 7px 30px 7px 3px;
             vertical-align: top;
+          }
+          #sitemap tr:nth-child(odd) td {
+            background-color: #eeeeee;
+          }
+          #sitemap tbody tr:hover td {
+            background-color: #cccccc;
+            color: #000000;
+          }
+          #sitemap tbody tr:hover td a {
+            color: #000000;
+          }
+          #sitemap a {
+            color: #1a73e8;
+            text-decoration: none;
+            word-break: break-all;
+          }
+          #sitemap a:visited { color: #551a8b; }
+          #sitemap a:hover { text-decoration: underline; }
+          #sitemap td.images,
+          #sitemap td.lastmod {
+            white-space: nowrap;
+          }
+          @media (max-width: 640px) {
+            #content { padding: 16px 12px 32px; }
+            h1 { font-size: 20px; }
+            #sitemap thead th,
+            #sitemap tbody td {
+              padding-right: 16px;
+            }
           }
         </style>
       </head>
       <body>
         <div id="content">
           <h1>XML Sitemap</h1>
-          <xsl:if test="count(sitemap:urlset/sitemap:url) &gt; 0">
-            <p class="expl">
-              This XML Sitemap contains
-              <xsl:value-of select="count(sitemap:urlset/sitemap:url)"/>
-              URLs.
-            </p>
+          <p class="expl">
+            This XML Sitemap contains
+            <xsl:value-of select="count(sitemap:urlset/sitemap:url)"/>
+            URLs.
+          </p>
+          <div class="table-wrap">
             <table id="sitemap" cellpadding="3">
               <thead>
                 <tr>
-                  <th width="28%">Title</th>
-                  <th width="42%">URL</th>
-                  <th width="10%">Images</th>
-                  <th width="20%">Last Modified</th>
+                  <th>Title</th>
+                  <th>URL</th>
+                  <th>Images</th>
+                  <th>Last Modified</th>
                 </tr>
               </thead>
               <tbody>
                 <xsl:for-each select="sitemap:urlset/sitemap:url">
                   <tr>
                     <td>
-                      <xsl:variable name="c" select="comment()"/>
+                      <xsl:variable name="c" select="comment()[1]"/>
                       <xsl:choose>
-                        <xsl:when test="starts-with(normalize-space($c), 'title:')">
+                        <xsl:when test="contains($c, 'title:')">
                           <xsl:value-of select="normalize-space(substring-after($c, 'title:'))"/>
                         </xsl:when>
                         <xsl:otherwise>—</xsl:otherwise>
                       </xsl:choose>
                     </td>
                     <td>
-                      <xsl:variable name="itemURL">
-                        <xsl:value-of select="sitemap:loc"/>
-                      </xsl:variable>
-                      <a href="{$itemURL}">
+                      <a href="{sitemap:loc}">
                         <xsl:value-of select="sitemap:loc"/>
                       </a>
                     </td>
-                    <td>
+                    <td class="images">
                       <xsl:value-of select="count(image:image)"/>
                     </td>
-                    <td>
+                    <td class="lastmod">
                       <xsl:value-of select="sitemap:lastmod"/>
                     </td>
                   </tr>
                 </xsl:for-each>
               </tbody>
             </table>
-          </xsl:if>
+          </div>
         </div>
       </body>
     </html>
