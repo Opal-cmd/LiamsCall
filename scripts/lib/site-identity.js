@@ -236,8 +236,8 @@ const ABOUT_FAQS = [
 function sitemapXmlComment() {
   return [
     '<!--',
-    `  ${SITE_IDENTITY.siteName} — ${SITE_IDENTITY.domain}`,
-    `  ${SITE_IDENTITY.category} · ${SITE_IDENTITY.subCategory}`,
+    `  ${SITE_IDENTITY.siteName} | ${SITE_IDENTITY.domain}`,
+    `  ${SITE_IDENTITY.category} / ${SITE_IDENTITY.subCategory}`,
     '  Machine-readable sitemap for search engines (see robots.txt).',
     '  Human-readable map: https://liamscall.com/sitemap',
     '-->',

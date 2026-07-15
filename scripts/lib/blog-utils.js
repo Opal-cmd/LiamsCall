@@ -826,7 +826,8 @@ function bestLastmod(...candidates) {
     })
     .filter(Boolean);
   if (!times.length) return '';
-  return new Date(Math.max(...times)).toISOString();
+  // Date-only (YYYY-MM-DD) — cleaner XML and preferred by Google for sitemaps.
+  return new Date(Math.max(...times)).toISOString().slice(0, 10);
 }
 
 function absoluteAssetUrl(src) {
@@ -856,9 +857,7 @@ function defaultBrandImage() {
   return {
     loc: `${SITE}/assets/logo-icon.svg`,
     title: SITE_IDENTITY.siteName,
-    caption: `${SITE_IDENTITY.siteName} — ${SITE_IDENTITY.subCategory}`,
-    geoLocation: 'Ontario, Canada',
-    license: `${SITE}/terms`,
+    caption: `${SITE_IDENTITY.siteName} - ${SITE_IDENTITY.subCategory}`,
   };
 }
 
@@ -881,19 +880,20 @@ function xmlEscape(str) {
 
 function renderImageBlock(img) {
   if (!img?.loc) return '';
+  // Keep image blocks lean: loc + title (+ caption when it differs).
   const lines = ['    <image:image>', `      <image:loc>${xmlEscape(img.loc)}</image:loc>`];
   if (img.title) lines.push(`      <image:title>${xmlEscape(img.title)}</image:title>`);
-  if (img.caption) lines.push(`      <image:caption>${xmlEscape(img.caption)}</image:caption>`);
-  if (img.geoLocation) {
-    lines.push(`      <image:geo_location>${xmlEscape(img.geoLocation)}</image:geo_location>`);
+  if (img.caption && img.caption !== img.title) {
+    lines.push(`      <image:caption>${xmlEscape(img.caption)}</image:caption>`);
   }
-  if (img.license) lines.push(`      <image:license>${xmlEscape(img.license)}</image:license>`);
   lines.push('    </image:image>');
   return lines.join('\n');
 }
 
 function renderUrlEntry(entry) {
-  const lines = ['  <url>', `    <loc>${xmlEscape(entry.loc)}</loc>`];
+  const lines = [];
+  if (entry.label) lines.push(`  <!-- ${entry.label} -->`);
+  lines.push('  <url>', `    <loc>${xmlEscape(entry.loc)}</loc>`);
   if (entry.lastmod) lines.push(`    <lastmod>${xmlEscape(entry.lastmod)}</lastmod>`);
   if (entry.changefreq) lines.push(`    <changefreq>${xmlEscape(entry.changefreq)}</changefreq>`);
   if (entry.priority) lines.push(`    <priority>${xmlEscape(entry.priority)}</priority>`);
@@ -1048,11 +1048,13 @@ function writeSitemap(posts) {
   // Human-readable HTML sitemap first so it exists for the XML entry below.
   writeHtmlSitemap(posts);
 
-  // Standalone content pages (generated HTML in public/) — keep in sync with server routes.
+  // Standalone content pages — keep in sync with server routes.
+  // Brand images only on home; other URLs stay lean so the XML stays readable.
   const contentPages = [
     {
       route: '/',
       file: 'index.html',
+      label: 'Home / Chat',
       priority: '1.0',
       changefreq: 'daily',
       images: [
@@ -1061,52 +1063,50 @@ function writeSitemap(posts) {
           loc: `${SITE}/assets/logo-horizontal.svg`,
           title: `${SITE_IDENTITY.siteName} wordmark`,
           caption: 'Primary horizontal logo for Liam\'s Call',
-          geoLocation: 'Ontario, Canada',
-          license: `${SITE}/terms`,
         },
       ],
     },
     {
       route: '/blog',
       file: path.join('blog', 'index.html'),
+      label: 'Blog index',
       priority: '0.9',
       changefreq: 'daily',
-      images: [brandImage],
     },
     {
       route: '/resources',
       file: 'resources.html',
+      label: 'Crisis & Support Resources',
       priority: '0.8',
       changefreq: 'weekly',
-      images: [brandImage],
     },
     {
       route: '/about',
       file: 'about.html',
+      label: 'About Us',
       priority: '0.7',
       changefreq: 'monthly',
-      images: [brandImage],
     },
     {
       route: '/sitemap',
       file: 'sitemap.html',
+      label: 'HTML sitemap (human-readable)',
       priority: '0.4',
       changefreq: 'weekly',
-      images: [brandImage],
     },
     {
       route: '/privacy',
       file: 'privacy.html',
+      label: 'Privacy Policy',
       priority: '0.5',
       changefreq: 'yearly',
-      images: [brandImage],
     },
     {
       route: '/terms',
       file: 'terms.html',
+      label: 'Terms of Use',
       priority: '0.5',
       changefreq: 'yearly',
-      images: [brandImage],
     },
   ];
 
@@ -1115,12 +1115,13 @@ function writeSitemap(posts) {
     .map((p) => {
       const loc = `${SITE}${p.route}`;
       return {
+        label: p.label,
         loc,
         priority: p.priority,
         changefreq: p.changefreq,
         lastmod: bestLastmod(fileLastmod(path.join(publicDir, p.file))),
         hreflang: hreflangLinks(loc),
-        images: p.images || [brandImage],
+        images: p.images || [],
       };
     });
 
@@ -1128,19 +1129,18 @@ function writeSitemap(posts) {
     const loc = `${SITE}/blog/${p.slug}`;
     const htmlPath = path.join(PUBLIC_BLOG_DIR, p.slug, 'index.html');
     const mdPath = p.filePath || path.join(CONTENT_DIR, `${p.slug}.md`);
-    const images = [brandImage];
+    const images = [];
     if (p.image) {
       images.push({
         loc: absoluteAssetUrl(p.image),
         title: p.title,
         caption: p.description || p.title,
-        geoLocation: p.region || 'Canada',
-        license: `${SITE}/terms`,
       });
     }
     images.push(...extractBodyImages(p.body));
 
     return {
+      label: p.title,
       loc,
       priority: '0.75',
       changefreq: 'weekly',
@@ -1150,15 +1150,21 @@ function writeSitemap(posts) {
     };
   });
 
-  const entries = [...staticUrls, ...postUrls];
-  const body = entries.map(renderUrlEntry).join('\n');
+  const coreBlock = staticUrls.map(renderUrlEntry).join('\n\n');
+  const blogBlock = postUrls.map(renderUrlEntry).join('\n\n');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 ${sitemapXmlComment()}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${body}
+
+  <!-- ========== Core pages ========== -->
+${coreBlock}
+
+  <!-- ========== Blog articles ========== -->
+${blogBlock}
+
 </urlset>
 `;
   fs.writeFileSync(SITEMAP_PATH, xml);
