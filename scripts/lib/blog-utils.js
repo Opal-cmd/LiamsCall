@@ -8,12 +8,14 @@ const CONTENT_DIR = path.join(ROOT, 'content', 'blog');
 const DRAFTS_DIR = path.join(CONTENT_DIR, 'drafts');
 const PUBLIC_BLOG_DIR = path.join(ROOT, 'public', 'blog');
 const SITEMAP_PATH = path.join(ROOT, 'public', 'sitemap.xml');
+const HTML_SITEMAP_PATH = path.join(ROOT, 'public', 'sitemap.html');
 const TOPICS_PATH = path.join(CONTENT_DIR, 'topics.yaml');
 const SITE = 'https://liamscall.com';
 const {
   SITE_IDENTITY,
   sitemapXmlComment,
   organizationSchema,
+  speakableSpec,
 } = require('./site-identity');
 
 /** Verified numbers that may appear in posts (digits only, with and without country code). */
@@ -740,6 +742,8 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
           ${navLink('privacy', '/privacy', 'Privacy')}
           <span>&middot;</span>
           ${navLink('terms', '/terms', 'Terms')}
+          <span>&middot;</span>
+          ${navLink('sitemap', '/sitemap', 'Sitemap')}
         </div>
       </div>
     </aside>
@@ -908,9 +912,141 @@ function renderUrlEntry(entry) {
   return lines.join('\n');
 }
 
+function writeHtmlSitemap(posts) {
+  const corePages = [
+    {
+      href: '/',
+      title: 'Home / Chat',
+      blurb: 'Free AI chat for caregivers and families — mental health, addiction, and housing support. No account required.',
+    },
+    {
+      href: '/blog',
+      title: 'Blog',
+      blurb: 'Practical articles on caregiver wellbeing, communication, grief, and next steps.',
+    },
+    {
+      href: '/resources',
+      title: 'Crisis & Support Resources',
+      blurb: 'Verified crisis lines and Ontario local directories — Toronto shelter Central Intake, ConnexOntario detox referrals, 988, 211.',
+    },
+    {
+      href: '/about',
+      title: 'About Us',
+      blurb: 'Who Liam\'s Call is, what we offer, and how the AI chat works.',
+    },
+    {
+      href: '/privacy',
+      title: 'Privacy Policy',
+      blurb: 'How we handle chat data, approximate location, and third-party providers.',
+    },
+    {
+      href: '/terms',
+      title: 'Terms of Use',
+      blurb: 'Rules for using Liam\'s Call AI support chat.',
+    },
+  ];
+
+  const coreList = corePages
+    .map(
+      (p) => `
+        <li class="sitemap-item">
+          <a href="${escapeHtml(p.href)}"><strong>${escapeHtml(p.title)}</strong></a>
+          <p>${escapeHtml(p.blurb)}</p>
+        </li>`,
+    )
+    .join('\n');
+
+  const postList = (posts || [])
+    .map(
+      (p) => `
+        <li class="sitemap-item">
+          <a href="/blog/${escapeHtml(p.slug)}"><strong>${escapeHtml(p.title)}</strong></a>
+          <p>${escapeHtml(p.description || '')}${p.category ? ` · ${escapeHtml(p.category)}` : ''}${p.region ? ` · ${escapeHtml(p.region)}` : ''}</p>
+        </li>`,
+    )
+    .join('\n');
+
+  const bodyHtml = `
+    <style>
+      .sitemap-lead { margin: 0 0 1.5rem; color: #6b7280; font-size: 0.95rem; line-height: 1.6; }
+      .sitemap-section { margin: 0 0 1.75rem; }
+      .sitemap-section h2 {
+        margin: 0 0 0.75rem; font-size: 1.05rem; color: var(--green-dark); letter-spacing: -0.02em;
+      }
+      .sitemap-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+      .sitemap-item {
+        background: #fff; border: 1px solid #e5e7eb; border-radius: 0.85rem; padding: 0.9rem 1rem;
+      }
+      .sitemap-item a { text-decoration: none; color: var(--green-dark); }
+      .sitemap-item a:hover { text-decoration: underline; text-underline-offset: 3px; }
+      .sitemap-item p { margin: 0.35rem 0 0; color: #6b7280; font-size: 0.85rem; line-height: 1.5; }
+      .sitemap-note {
+        margin-top: 1.5rem; padding: 0.9rem 1rem; border-radius: 0.85rem;
+        background: #fff; border: 1px dashed rgba(15,74,58,0.25); color: #6b7280; font-size: 0.82rem; line-height: 1.5;
+      }
+    </style>
+    <h1>Sitemap</h1>
+    <p class="sitemap-lead speakable-summary">
+      ${escapeHtml(SITE_IDENTITY.shortDescription)}
+    </p>
+    <p class="sitemap-lead">
+      Category: <strong>${escapeHtml(SITE_IDENTITY.category)}</strong>
+      · Sub-category: <strong>${escapeHtml(SITE_IDENTITY.subCategory)}</strong>
+      · Focus: Canada &amp; U.S., with Ontario local directories.
+    </p>
+
+    <section class="sitemap-section" aria-labelledby="sitemap-core">
+      <h2 id="sitemap-core">Main pages</h2>
+      <ul class="sitemap-list">${coreList}</ul>
+    </section>
+
+    <section class="sitemap-section" aria-labelledby="sitemap-blog">
+      <h2 id="sitemap-blog">Blog articles</h2>
+      <ul class="sitemap-list">${postList || '<li class="sitemap-item"><p>No posts published yet.</p></li>'}</ul>
+    </section>
+
+    <p class="sitemap-note">
+      Looking for the machine-readable crawl file? Use
+      <a href="/sitemap.xml">sitemap.xml</a> (for search engines).
+      This page is the human-readable map of Liam's Call.
+    </p>
+  `;
+
+  const html = blogShell({
+    title: "Sitemap — Liam's Call",
+    description:
+      "Human-readable sitemap for Liam's Call — main pages, crisis resources, and blog articles for mental health, addiction, and housing support.",
+    canonical: `${SITE}/sitemap`,
+    active: 'sitemap',
+    breadcrumb: '<span>Sitemap</span>',
+    schema: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        organizationSchema(),
+        {
+          '@type': 'WebPage',
+          '@id': `${SITE}/sitemap#page`,
+          name: "Sitemap — Liam's Call",
+          url: `${SITE}/sitemap`,
+          description:
+            "Human-readable site map of Liam's Call pages and blog articles.",
+          isPartOf: { '@id': `${SITE}/#website` },
+          speakable: speakableSpec(['h1', '.speakable-summary']),
+        },
+      ],
+    },
+    bodyHtml,
+  });
+
+  fs.writeFileSync(HTML_SITEMAP_PATH, html);
+}
+
 function writeSitemap(posts) {
   const publicDir = path.join(ROOT, 'public');
   const brandImage = defaultBrandImage();
+
+  // Human-readable HTML sitemap first so it exists for the XML entry below.
+  writeHtmlSitemap(posts);
 
   // Standalone content pages (generated HTML in public/) — keep in sync with server routes.
   const contentPages = [
@@ -949,6 +1085,13 @@ function writeSitemap(posts) {
       file: 'about.html',
       priority: '0.7',
       changefreq: 'monthly',
+      images: [brandImage],
+    },
+    {
+      route: '/sitemap',
+      file: 'sitemap.html',
+      priority: '0.4',
+      changefreq: 'weekly',
       images: [brandImage],
     },
     {
@@ -1037,9 +1180,10 @@ ${body}
         organization: organizationSchema(),
         sitemap: {
           url: `${SITE}/sitemap.xml`,
+          html: `${SITE}/sitemap`,
           extensions: ['xhtml/hreflang', 'image'],
           notes:
-            'Video and Google News sitemap extensions are omitted until video/news publishing is live.',
+            'XML sitemap is for crawlers. /sitemap is the human-readable HTML map. Video and Google News extensions omitted until live.',
         },
       },
       null,

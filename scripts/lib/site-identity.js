@@ -236,15 +236,10 @@ const ABOUT_FAQS = [
 function sitemapXmlComment() {
   return [
     '<!--',
-    `  Site Name: ${SITE_IDENTITY.siteName}`,
-    `  Domain: ${SITE_IDENTITY.domain}`,
-    `  Category: ${SITE_IDENTITY.category}`,
-    `  Sub-Category: ${SITE_IDENTITY.subCategory}`,
-    `  Short Description: ${SITE_IDENTITY.shortDescription}`,
-    '  Extensions: lastmod (W3C datetime), changefreq, priority, xhtml hreflang (en-CA/en/x-default), image.',
-    '  Omitted until content exists: video sitemap, Google News sitemap.',
-    '  This file is for search-engine crawlers (referenced from /robots.txt).',
-    '  It is not linked in the public navigation.',
+    `  ${SITE_IDENTITY.siteName} — ${SITE_IDENTITY.domain}`,
+    `  ${SITE_IDENTITY.category} · ${SITE_IDENTITY.subCategory}`,
+    '  Machine-readable sitemap for search engines (see robots.txt).',
+    '  Human-readable map: https://liamscall.com/sitemap',
     '-->',
   ].join('\n');
 }

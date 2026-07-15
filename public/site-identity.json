@@ -65,10 +65,11 @@
   },
   "sitemap": {
     "url": "https://liamscall.com/sitemap.xml",
+    "html": "https://liamscall.com/sitemap",
     "extensions": [
       "xhtml/hreflang",
       "image"
     ],
-    "notes": "Video and Google News sitemap extensions are omitted until video/news publishing is live."
+    "notes": "XML sitemap is for crawlers. /sitemap is the human-readable HTML map. Video and Google News extensions omitted until live."
   }
 }

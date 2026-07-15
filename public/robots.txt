@@ -2,7 +2,8 @@
 # Site category: Health Sciences, Social/Civic Services
 # Sub-category: Mental Health, Addiction, Homelessness
 #
-# Sitemap is for crawlers only — it is not linked in site navigation.
+# sitemap.xml = machine-readable (crawlers)
+# /sitemap     = human-readable HTML map of main pages + blog
 # Do not index /admin.
 
 User-agent: *

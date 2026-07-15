@@ -243,6 +243,8 @@ function shell(title, description, active, body, extras = {}) {
           ${navLink('privacy', '/privacy', 'Privacy')}
           <span>·</span>
           ${navLink('terms', '/terms', 'Terms')}
+          <span>·</span>
+          ${navLink('sitemap', '/sitemap', 'Sitemap')}
         </div>
       </div>
     </aside>

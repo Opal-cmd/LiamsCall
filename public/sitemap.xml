@@ -15,7 +15,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://liamscall.com/</loc>
-    <lastmod>2026-07-15T19:00:01.995Z</lastmod>
+    <lastmod>2026-07-15T19:03:42.137Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/"/>
@@ -38,7 +38,7 @@
   </url>
   <url>
     <loc>https://liamscall.com/blog</loc>
-    <lastmod>2026-07-15T19:00:33.303Z</lastmod>
+    <lastmod>2026-07-15T19:03:43.417Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/blog"/>
@@ -85,6 +85,22 @@
     </image:image>
   </url>
   <url>
+    <loc>https://liamscall.com/sitemap</loc>
+    <lastmod>2026-07-15T19:03:43.443Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/sitemap"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liamscall.com/sitemap"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liamscall.com/sitemap"/>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/logo-icon.svg</image:loc>
+      <image:title>Liam's Call</image:title>
+      <image:caption>Liam's Call — Mental Health, Addiction, Homelessness</image:caption>
+      <image:geo_location>Ontario, Canada</image:geo_location>
+      <image:license>https://liamscall.com/terms</image:license>
+    </image:image>
+  </url>
+  <url>
     <loc>https://liamscall.com/privacy</loc>
     <lastmod>2026-07-15T19:00:32.486Z</lastmod>
     <changefreq>yearly</changefreq>
@@ -118,7 +134,7 @@
   </url>
   <url>
     <loc>https://liamscall.com/blog/finding-toronto-shelter-help</loc>
-    <lastmod>2026-07-15T19:00:33.308Z</lastmod>
+    <lastmod>2026-07-15T19:03:43.423Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/blog/finding-toronto-shelter-help"/>
@@ -134,7 +150,7 @@
   </url>
   <url>
     <loc>https://liamscall.com/blog/ontario-detox-near-me</loc>
-    <lastmod>2026-07-15T19:00:33.310Z</lastmod>
+    <lastmod>2026-07-15T19:03:43.428Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/blog/ontario-detox-near-me"/>
@@ -150,7 +166,7 @@
   </url>
   <url>
     <loc>https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you</loc>
-    <lastmod>2026-07-15T19:00:33.312Z</lastmod>
+    <lastmod>2026-07-15T19:03:43.430Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you"/>
@@ -166,7 +182,7 @@
   </url>
   <url>
     <loc>https://liamscall.com/blog/grief-while-theyre-still-here</loc>
-    <lastmod>2026-07-15T19:00:33.315Z</lastmod>
+    <lastmod>2026-07-15T19:03:43.433Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/blog/grief-while-theyre-still-here"/>
@@ -182,7 +198,7 @@
   </url>
   <url>
     <loc>https://liamscall.com/blog/how-to-ask-for-help-without-feeling-guilty</loc>
-    <lastmod>2026-07-15T19:00:33.316Z</lastmod>
+    <lastmod>2026-07-15T19:03:43.435Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/blog/how-to-ask-for-help-without-feeling-guilty"/>
@@ -198,7 +214,7 @@
   </url>
   <url>
     <loc>https://liamscall.com/blog/the-5-minute-reset</loc>
-    <lastmod>2026-07-15T19:00:33.318Z</lastmod>
+    <lastmod>2026-07-15T19:03:43.438Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/blog/the-5-minute-reset"/>
@@ -214,7 +230,7 @@
   </url>
   <url>
     <loc>https://liamscall.com/blog/you-cant-pour-from-an-empty-cup</loc>
-    <lastmod>2026-07-15T19:00:33.320Z</lastmod>
+    <lastmod>2026-07-15T19:03:43.440Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://liamscall.com/blog/you-cant-pour-from-an-empty-cup"/>

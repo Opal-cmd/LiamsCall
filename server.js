@@ -401,6 +401,11 @@ app.get('/sitemap.xml', (_req, res) => {
   return res.sendFile(file);
 });
 
+// Human-readable HTML sitemap (for people). XML above stays for crawlers.
+app.get(['/sitemap', '/sitemap.html'], (_req, res) => {
+  sendPublicHtml(res, 'sitemap.html');
+});
+
 app.get('/site-identity.json', (_req, res) => {
   const file = path.join(PUBLIC_DIR, 'site-identity.json');
   if (!fs.existsSync(file)) {
