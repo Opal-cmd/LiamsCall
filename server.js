@@ -421,7 +421,7 @@ app.get('/sitemap.xml', (req, res) => {
       const { buildBrowserHtml } = require('./scripts/lib/sitemap-browser-view');
       const xml = fs.readFileSync(file, 'utf8');
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.send(buildBrowserHtml(xml));
+      return res.send(buildBrowserHtml(xml, PUBLIC_DIR));
     } catch (err) {
       console.warn('sitemap browser view failed, serving XML:', err.message);
     }

@@ -14,6 +14,7 @@ const {
   speakableSpec,
 } = require('./lib/site-identity');
 const { shell } = require('./generate-legal-pages');
+const { extractH1 } = require('./lib/sitemap-browser-view');
 
 const ROOT = path.join(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
@@ -60,7 +61,12 @@ function renderImage(img) {
 }
 
 function renderUrl(entry) {
-  const lines = ['  <url>', `    <loc>${xmlEscape(entry.loc)}</loc>`];
+  const lines = ['  <url>'];
+  if (entry.title) {
+    // Browser sitemap view + humans; ignored by crawlers.
+    lines.push(`    <!-- title: ${entry.title.replace(/--/g, '—')} -->`);
+  }
+  lines.push(`    <loc>${xmlEscape(entry.loc)}</loc>`);
   if (entry.lastmod) lines.push(`    <lastmod>${xmlEscape(entry.lastmod)}</lastmod>`);
   if (entry.changefreq) lines.push(`    <changefreq>${xmlEscape(entry.changefreq)}</changefreq>`);
   if (entry.priority) lines.push(`    <priority>${xmlEscape(entry.priority)}</priority>`);
@@ -199,8 +205,15 @@ function main() {
     .map((p) => {
       const loc = `${SITE}${p.route}`;
       const filePath = path.join(PUBLIC_DIR, p.file);
+      let title = p.label || '';
+      try {
+        title = extractH1(fs.readFileSync(filePath, 'utf8')) || title;
+      } catch {
+        /* keep label */
+      }
       return {
         loc,
+        title,
         lastmod: fileLastmod(filePath) || new Date().toISOString().slice(0, 10),
         changefreq: p.changefreq,
         priority: p.priority,

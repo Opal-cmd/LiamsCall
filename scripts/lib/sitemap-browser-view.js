@@ -5,6 +5,18 @@
  * Visual style matches the classic WordPress / Yoast "XML Sitemap" table.
  */
 
+const fs = require('fs');
+const path = require('path');
+
+const ROUTE_TO_FILE = {
+  '/': 'index.html',
+  '/resources': 'resources.html',
+  '/about': 'about.html',
+  '/sitemap': 'sitemap.html',
+  '/privacy': 'privacy.html',
+  '/terms': 'terms.html',
+};
+
 function escapeHtml(str) {
   return String(str || '')
     .replace(/&/g, '&amp;')
@@ -13,7 +25,57 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-function parseUrlEntries(xml) {
+function decodeEntities(str) {
+  return String(str || '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
+
+function stripTags(str) {
+  return String(str || '').replace(/<[^>]+>/g, '');
+}
+
+function extractH1(html) {
+  const matches = [...String(html || '').matchAll(/<h1\b([^>]*)>([\s\S]*?)<\/h1>/gi)];
+  if (!matches.length) return '';
+
+  // Prefer the main page title over chrome/brand duplicates on the homepage.
+  const preferred =
+    matches.find((m) => {
+      const attrs = m[1] || '';
+      return !/\bstyle\s*=/.test(attrs) && !/font-serif-brand/.test(attrs);
+    }) || matches[0];
+
+  return decodeEntities(stripTags(preferred[2])).replace(/\s+/g, ' ').trim();
+}
+
+function fileForLoc(loc) {
+  try {
+    const pathname = new URL(loc).pathname.replace(/\/+$/, '') || '/';
+    return ROUTE_TO_FILE[pathname] || null;
+  } catch {
+    return null;
+  }
+}
+
+function h1ForLoc(loc, publicDir) {
+  if (!publicDir) return '';
+  const file = fileForLoc(loc);
+  if (!file) return '';
+  const abs = path.join(publicDir, file);
+  try {
+    return extractH1(fs.readFileSync(abs, 'utf8'));
+  } catch {
+    return '';
+  }
+}
+
+function parseUrlEntries(xml, publicDir) {
   const urls = [];
   const blocks = String(xml || '').match(/<url>([\s\S]*?)<\/url>/g) || [];
   for (const block of blocks) {
@@ -21,7 +83,10 @@ function parseUrlEntries(xml) {
     if (!loc) continue;
     const lastmod = (block.match(/<lastmod>([^<]*)<\/lastmod>/) || [])[1] || '';
     const images = (block.match(/<image:image\b/g) || []).length;
-    urls.push({ loc, lastmod, images });
+    const title =
+      ((block.match(/<!--\s*title:\s*([\s\S]*?)\s*-->/i) || [])[1] || '').trim() ||
+      h1ForLoc(loc, publicDir);
+    urls.push({ loc, lastmod, images, title });
   }
   return urls;
 }
@@ -29,19 +94,18 @@ function parseUrlEntries(xml) {
 function formatLastmod(value) {
   const v = String(value || '').trim();
   if (!v) return '';
-  // Date-only (YYYY-MM-DD) — show as midnight UTC, matching common sitemap UIs.
   if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return `${v} 00:00 +00:00`;
-  // Full ISO — trim to "YYYY-MM-DD HH:MM +00:00" when possible.
   const m = v.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/);
   if (m) return `${m[1]} ${m[2]} +00:00`;
   return v;
 }
 
-function buildBrowserHtml(xml) {
-  const urls = parseUrlEntries(xml);
+function buildBrowserHtml(xml, publicDir) {
+  const urls = parseUrlEntries(xml, publicDir);
   const rows = urls
     .map(
       (u) => `				<tr>
+					<td>${escapeHtml(u.title || '—')}</td>
 					<td class="loc">
 						<a href="${escapeHtml(u.loc)}">${escapeHtml(u.loc)}</a>
 					</td>
@@ -83,11 +147,6 @@ function buildBrowserHtml(xml) {
 			margin: 18px 3px;
 			line-height: 1.45em;
 		}
-		.expl a {
-			color: #0f4a3a;
-			font-weight: 600;
-		}
-		.expl a:visited { color: #0f4a3a; }
 		a {
 			color: #1a73e8;
 			text-decoration: none;
@@ -132,9 +191,10 @@ function buildBrowserHtml(xml) {
 		<table id="sitemap" cellpadding="3">
 			<thead>
 				<tr>
-					<th width="65%">URL</th>
+					<th width="28%">Title</th>
+					<th width="42%">URL</th>
 					<th width="10%">Images</th>
-					<th width="25%">Last Modified</th>
+					<th width="20%">Last Modified</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -147,4 +207,10 @@ ${rows}
 `;
 }
 
-module.exports = { buildBrowserHtml, parseUrlEntries, formatLastmod };
+module.exports = {
+  buildBrowserHtml,
+  parseUrlEntries,
+  formatLastmod,
+  extractH1,
+  h1ForLoc,
+};

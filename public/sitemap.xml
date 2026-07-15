@@ -3,6 +3,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
+    <!-- title: Liam's Call — Mental Health, Addiction & Housing Support -->
     <loc>https://liamscall.com/</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>daily</changefreq>
@@ -19,30 +20,35 @@
     </image:image>
   </url>
   <url>
+    <!-- title: Crisis & Support Resources -->
     <loc>https://liamscall.com/resources</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <!-- title: About Us -->
     <loc>https://liamscall.com/about</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
+    <!-- title: Sitemap -->
     <loc>https://liamscall.com/sitemap</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
+    <!-- title: Privacy Policy -->
     <loc>https://liamscall.com/privacy</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
+    <!-- title: Terms of Use — LiamsCall.com -->
     <loc>https://liamscall.com/terms</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>

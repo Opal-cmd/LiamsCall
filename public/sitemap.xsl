@@ -36,11 +36,6 @@
             margin: 18px 3px;
             line-height: 1.45em;
           }
-          .expl a {
-            color: #0f4a3a;
-            font-weight: 600;
-          }
-          .expl a:visited { color: #0f4a3a; }
           a {
             color: #1a73e8;
             text-decoration: none;
@@ -89,14 +84,24 @@
             <table id="sitemap" cellpadding="3">
               <thead>
                 <tr>
-                  <th width="65%">URL</th>
+                  <th width="28%">Title</th>
+                  <th width="42%">URL</th>
                   <th width="10%">Images</th>
-                  <th width="25%">Last Modified</th>
+                  <th width="20%">Last Modified</th>
                 </tr>
               </thead>
               <tbody>
                 <xsl:for-each select="sitemap:urlset/sitemap:url">
                   <tr>
+                    <td>
+                      <xsl:variable name="c" select="comment()"/>
+                      <xsl:choose>
+                        <xsl:when test="starts-with(normalize-space($c), 'title:')">
+                          <xsl:value-of select="normalize-space(substring-after($c, 'title:'))"/>
+                        </xsl:when>
+                        <xsl:otherwise>—</xsl:otherwise>
+                      </xsl:choose>
+                    </td>
                     <td>
                       <xsl:variable name="itemURL">
                         <xsl:value-of select="sitemap:loc"/>
