@@ -104,6 +104,19 @@
     }
     .sidebar-legal span { font-size: 10px; color: #e5e7eb; line-height: 1; }
 
+    .blog-crumb {
+      margin: 0 0 0.85rem;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      color: #9ca3af;
+    }
+    .blog-crumb a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+    .blog-crumb a:hover { text-decoration: underline; text-underline-offset: 2px; }
+    .blog-crumb span[aria-hidden="true"] { margin: 0 0.35rem; color: #d1d5db; }
+
     /* Mobile top bar + drawer */
     .mobile-topbar { display: none; }
     #sidebar-overlay { display: none; }
@@ -223,6 +236,11 @@
         </a>
       </div>
       <main>
+        <nav class="blog-crumb" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <span aria-hidden="true">/</span>
+          <span>Terms</span>
+        </nav>
         <h1>Terms of Use — LiamsCall.com</h1>
         <p class="text-xs text-gray-400 text-center mb-6">Effective date: July 8th, 2026 &nbsp;·&nbsp; Last updated: July 8th, 2026</p>
 

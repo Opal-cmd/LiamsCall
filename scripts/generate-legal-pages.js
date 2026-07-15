@@ -34,6 +34,7 @@ function shell(title, description, active, body, extras = {}) {
     `<a class="side-link${active === key ? ' active' : ''}" href="${href}">${label}</a>`;
   const canonical = extras.canonical || `https://liamscall.com/${active === 'home' ? '' : active}`;
   const ogTitle = extras.ogTitle || `${title} — Liam's Call`;
+  const crumbLabel = extras.crumb || title;
   const schema = extras.schema
     ? `\n  <script type="application/ld+json">\n${JSON.stringify(extras.schema, null, 4)}\n  </script>`
     : '';
@@ -143,6 +144,19 @@ function shell(title, description, active, body, extras = {}) {
       text-underline-offset: 2px;
     }
     .sidebar-legal span { font-size: 10px; color: #e5e7eb; line-height: 1; }
+
+    .blog-crumb {
+      margin: 0 0 0.85rem;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      color: #9ca3af;
+    }
+    .blog-crumb a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+    .blog-crumb a:hover { text-decoration: underline; text-underline-offset: 2px; }
+    .blog-crumb span[aria-hidden="true"] { margin: 0 0.35rem; color: #d1d5db; }
 
     /* Mobile top bar + drawer */
     .mobile-topbar { display: none; }
@@ -263,6 +277,11 @@ function shell(title, description, active, body, extras = {}) {
         </a>
       </div>
       <main>
+        <nav class="blog-crumb" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <span aria-hidden="true">/</span>
+          <span>${crumbLabel}</span>
+        </nav>
         <h1>${title}</h1>
         ${body}
       </main>
@@ -361,22 +380,43 @@ const pages = [
   },
 ];
 
-for (const p of pages) {
-  let { title, body } = extractPage(p.key);
-  body = body
-    .replace(
-      /<button type="button" class="underline text-\[var\(--green-dark\)\] font-medium" data-nav="resources">Resources page<\/button>/g,
-      '<a href="/resources" class="underline text-[var(--green-dark)] font-medium">Resources page</a>',
-    )
-    .replace(
-      /\(see Privacy Policy\)/g,
-      '(see <a href="/privacy" class="underline text-[var(--green-dark)]">Privacy Policy</a>)',
-    )
-    .replace(
-      /See our Privacy Policy for more detail\./g,
-      'See our <a href="/privacy" class="underline text-[var(--green-dark)]">Privacy Policy</a> for more detail.',
+function writeLegalPages() {
+  for (const p of pages) {
+    let { title, body } = extractPage(p.key);
+    body = body
+      .replace(
+        /<button type="button" class="underline text-\[var\(--green-dark\)\] font-medium" data-nav="resources">Resources page<\/button>/g,
+        '<a href="/resources" class="underline text-[var(--green-dark)] font-medium">Resources page</a>',
+      )
+      .replace(
+        /\(see Privacy Policy\)/g,
+        '(see <a href="/privacy" class="underline text-[var(--green-dark)]">Privacy Policy</a>)',
+      )
+      .replace(
+        /See our Privacy Policy for more detail\./g,
+        'See our <a href="/privacy" class="underline text-[var(--green-dark)]">Privacy Policy</a> for more detail.',
+      );
+    const crumbByKey = {
+      about: 'About',
+      resources: 'Resources',
+      privacy: 'Privacy',
+      terms: 'Terms',
+      sitemap: 'Sitemap',
+    };
+    const out = path.join(root, p.file);
+    fs.writeFileSync(
+      out,
+      shell(title, p.description, p.key, body, {
+        schema: p.schema,
+        crumb: p.crumb || crumbByKey[p.key] || title,
+      }),
     );
-  const out = path.join(root, p.file);
-  fs.writeFileSync(out, shell(title, p.description, p.key, body, { schema: p.schema }));
-  console.log('wrote', p.file, fs.statSync(out).size);
+    console.log('wrote', p.file, fs.statSync(out).size);
+  }
+}
+
+module.exports = { shell, writeLegalPages };
+
+if (require.main === module) {
+  writeLegalPages();
 }

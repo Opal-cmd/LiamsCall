@@ -26,7 +26,7 @@
     },
     "email": "hello@liamscall.ca",
     "description": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
-    "disambiguatingDescription": "Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.",
+    "disambiguatingDescription": "Liam's Call (liamscall.com) is a free Canadian AI web chat for caregivers and families facing mental health, addiction, and housing challenges — not LimeCall, not a click-to-call widget company, and not an AI phone receptionist or marketing platform.",
     "areaServed": [
       "CA",
       "US"
@@ -59,15 +59,16 @@
       }
     ],
     "additionalType": [
-      "https://schema.org/HealthAndBeautyBusiness",
       "https://schema.org/CivicStructure"
+    ],
+    "sameAs": [
+      "https://github.com/Opal-cmd/LiamsCall"
     ]
   },
   "sitemap": {
     "url": "https://liamscall.com/sitemap.xml",
     "html": "https://liamscall.com/sitemap",
     "extensions": [
-      "xhtml/hreflang",
       "image"
     ],
     "notes": "Production sitemap lists core site pages only. Blog remains on the staging branch."

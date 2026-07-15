@@ -9,9 +9,19 @@ const SITE_IDENTITY = {
   subCategory: 'Mental Health, Addiction, Homelessness',
   shortDescription:
     "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+  /** One-line disambiguation for Google/AI Overview (not LimeCall / phone widgets). */
+  disambiguatingDescription:
+    "Liam's Call (liamscall.com) is a free Canadian AI web chat for caregivers and families facing mental health, addiction, and housing challenges — not LimeCall, not a click-to-call widget company, and not an AI phone receptionist or marketing platform.",
   fullDescription:
     "Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.\n\n" +
     "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+  /**
+   * Official profiles Google can treat as the same entity (schema.org sameAs).
+   * Only real public URLs — add LinkedIn / Instagram / X when they exist.
+   */
+  sameAs: [
+    'https://github.com/Opal-cmd/LiamsCall',
+  ],
   keywords: [
     "Liam's Call",
     'liamscall',
@@ -51,7 +61,7 @@ function metaDescription() {
 }
 
 function organizationSchema() {
-  return {
+  const org = {
     '@type': 'Organization',
     '@id': `${SITE_IDENTITY.url}/#organization`,
     name: SITE_IDENTITY.siteName,
@@ -63,7 +73,7 @@ function organizationSchema() {
     },
     email: 'hello@liamscall.ca',
     description: SITE_IDENTITY.shortDescription,
-    disambiguatingDescription: SITE_IDENTITY.fullDescription.split('\n\n')[0],
+    disambiguatingDescription: SITE_IDENTITY.disambiguatingDescription,
     areaServed: ['CA', 'US'],
     knowsAbout: SITE_IDENTITY.knowsAbout,
     category: SITE_IDENTITY.category,
@@ -75,11 +85,12 @@ function organizationSchema() {
         availableLanguage: ['en', 'en-CA'],
       },
     ],
-    additionalType: [
-      'https://schema.org/HealthAndBeautyBusiness',
-      'https://schema.org/CivicStructure',
-    ],
+    additionalType: ['https://schema.org/CivicStructure'],
   };
+  if (SITE_IDENTITY.sameAs && SITE_IDENTITY.sameAs.length) {
+    org.sameAs = SITE_IDENTITY.sameAs;
+  }
+  return org;
 }
 
 function websiteSchema() {
@@ -220,7 +231,7 @@ const ABOUT_FAQS = [
   {
     question: "What is Liam's Call?",
     answer:
-      "Liam's Call is a Canadian mental health technology project offering free AI chat support for caregivers and families facing mental health, addiction, and housing challenges.",
+      "Liam's Call (liamscall.com) is a free Canadian AI web chat for caregivers and families facing mental health, addiction, and housing challenges. It is not a click-to-call product, phone receptionist service, or marketing platform.",
   },
   {
     question: "Who is Liam's Call for?",
