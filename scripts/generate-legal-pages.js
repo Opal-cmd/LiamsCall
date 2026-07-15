@@ -359,7 +359,7 @@ const pages = [
     key: 'resources',
     file: 'public/resources.html',
     description:
-      "Crisis and local Ontario resources from Liam's Call — Toronto shelter Central Intake, Ontario detox via ConnexOntario, 988, 211, Kids Help Phone, and caregiver supports.",
+      "Crisis and support resources from Liam's Call for Canada and the United States — 988, 911, 211, SAMHSA, ConnexOntario, FindTreatment.gov, Kids Help Phone, and caregiver supports.",
     schema: {
       '@context': 'https://schema.org',
       '@graph': [
@@ -370,7 +370,7 @@ const pages = [
           name: "Crisis & Support Resources — Liam's Call",
           url: 'https://liamscall.com/resources',
           description:
-            'Verified crisis lines and local Ontario directories for Toronto shelters, detox and addiction treatment, mental health, and caregiver support.',
+            'Verified crisis lines and directories for Canada and the United States — mental health, addiction, housing, and caregiver support.',
           isPartOf: { '@id': 'https://liamscall.com/#website' },
           speakable: speakableSpec(['h1', '#faq h4', '#faq p']),
         },

@@ -98,8 +98,10 @@ function writeHtmlSitemap(pages) {
 </style>
 <p class="sitemap-lead speakable-summary">${escapeHtml(SITE_IDENTITY.shortDescription)}</p>
 <p class="sitemap-lead">
-  Category: <strong>${escapeHtml(SITE_IDENTITY.category)}</strong>
-  / Sub-category: <strong>${escapeHtml(SITE_IDENTITY.subCategory)}</strong>
+  Free support for caregivers and families across <strong>Canada</strong> and the <strong>United States</strong>
+  — mental health, addiction, and housing. Category:
+  <strong>${escapeHtml(SITE_IDENTITY.category)}</strong>
+  / <strong>${escapeHtml(SITE_IDENTITY.subCategory)}</strong>.
 </p>
 <ul class="sitemap-list">${items}</ul>
 <p class="sitemap-note">
@@ -110,7 +112,7 @@ function writeHtmlSitemap(pages) {
 
   const html = shell(
     'Sitemap',
-    "Human-readable sitemap for Liam's Call — main pages for mental health, addiction, and housing support.",
+    "Human-readable sitemap for Liam's Call — main pages for mental health, addiction, and housing support in Canada and the United States.",
     'sitemap',
     body,
     {
@@ -125,7 +127,8 @@ function writeHtmlSitemap(pages) {
             '@id': `${SITE}/sitemap#page`,
             name: "Sitemap — Liam's Call",
             url: `${SITE}/sitemap`,
-            description: "Human-readable site map of Liam's Call pages.",
+            description:
+              "Human-readable site map of Liam's Call pages for caregivers and families in Canada and the United States.",
             isPartOf: { '@id': `${SITE}/#website` },
             speakable: speakableSpec(['h1', '.speakable-summary']),
           },
@@ -143,7 +146,8 @@ function main() {
       route: '/',
       file: 'index.html',
       label: 'Home / Chat',
-      blurb: 'Free AI chat for caregivers and families — mental health, addiction, and housing support. No account required.',
+      blurb:
+        'Free AI chat for caregivers and families in Canada and the United States — mental health, addiction, and housing support. No account required.',
       priority: '1.0',
       changefreq: 'daily',
       images: [
@@ -159,7 +163,8 @@ function main() {
       route: '/resources',
       file: 'resources.html',
       label: 'Crisis & Support Resources',
-      blurb: 'Verified crisis lines and Ontario local directories — Toronto shelter Central Intake, ConnexOntario, 988, 211.',
+      blurb:
+        'Verified Canada and United States crisis lines and directories — 988, 911, 211, SAMHSA, ConnexOntario, and more.',
       priority: '0.8',
       changefreq: 'weekly',
     },
@@ -167,7 +172,7 @@ function main() {
       route: '/about',
       file: 'about.html',
       label: 'About Us',
-      blurb: "Who Liam's Call is, what we offer, and how the AI chat works.",
+      blurb: "Who Liam's Call is, what we offer, and how the AI chat works for caregivers in Canada and the U.S.",
       priority: '0.7',
       changefreq: 'monthly',
     },
@@ -175,7 +180,7 @@ function main() {
       route: '/sitemap',
       file: 'sitemap.html',
       label: 'Sitemap',
-      blurb: 'Human-readable map of the live site pages.',
+      blurb: 'Human-readable map of Liam\'s Call pages for Canada and the United States.',
       priority: '0.4',
       changefreq: 'weekly',
     },

@@ -217,9 +217,14 @@ const RESOURCES_FAQS = [
       'Call ConnexOntario at 1-866-531-2600 or visit connexontario.ca. They match people to current withdrawal management and addiction treatment openings across Ontario.',
   },
   {
+    question: 'How do I find mental health or addiction treatment in the United States?',
+    answer:
+      'Call the SAMHSA National Helpline at 1-800-662-HELP or use the official locator at findtreatment.gov. For local shelters and community services, dial 211 or visit 211.org.',
+  },
+  {
     question: "Is Liam's Call a crisis line or medical service?",
     answer:
-      "No. Liam's Call is a free informational AI chat for caregivers and families. It is not a medical professional, therapist, or emergency service. In a crisis, call or text 9-8-8, or call 9-1-1 for emergencies.",
+      "No. Liam's Call is a free informational AI chat for caregivers and families. It is not a medical professional, therapist, or emergency service. In a crisis, call or text 9-8-8 (Canada or the U.S.), or call 9-1-1 for emergencies.",
   },
   {
     question: "Do I need an account to use Liam's Call?",
