@@ -55,10 +55,17 @@
   color: var(--green-dark);
 }
 
-.pill-dark {
+.pill-dark,
+.page-shell-root a.pill-dark {
   background: var(--green-dark);
   color: #fff;
   border-radius: 9999px;
+  text-decoration: none;
+}
+
+.page-shell-root a.pill-dark:hover {
+  color: #fff;
+  opacity: 0.92;
 }
 
 .page-shell {
