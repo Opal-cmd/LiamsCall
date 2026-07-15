@@ -20,28 +20,135 @@
   <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": "Finding Toronto Shelter Help Without Guessing Phone Numbers",
-    "description": "Searching for a Toronto shelter? Use Central Intake, 311, and 211 Ontario instead of outdated clinic lists — verified numbers for caregivers and people in crisis.",
-    "datePublished": "2026-07-15",
-    "dateModified": "2026-07-15",
-    "author": {
-        "@type": "Organization",
-        "name": "Liam's Call",
-        "url": "https://liamscall.com"
-    },
-    "publisher": {
-        "@type": "Organization",
-        "name": "Liam's Call",
-        "url": "https://liamscall.com",
-        "logo": {
-            "@type": "ImageObject",
-            "url": "https://liamscall.com/assets/logo-icon.svg"
+    "@graph": [
+        {
+            "@type": "Organization",
+            "@id": "https://liamscall.com/#organization",
+            "name": "Liam's Call",
+            "alternateName": [
+                "Liams Call",
+                "liamscall.com",
+                "LiamsCall"
+            ],
+            "url": "https://liamscall.com/",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://liamscall.com/assets/logo-icon.svg"
+            },
+            "email": "hello@liamscall.ca",
+            "description": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+            "disambiguatingDescription": "Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.",
+            "areaServed": [
+                "CA",
+                "US"
+            ],
+            "knowsAbout": [
+                "mental health",
+                "addiction",
+                "homelessness",
+                "housing instability",
+                "caregiving",
+                "family support",
+                "crisis resources",
+                "Health Sciences",
+                "Social/Civic Services",
+                "Toronto shelter",
+                "Ontario detox",
+                "ConnexOntario",
+                "211 Ontario"
+            ],
+            "category": "Health Sciences, Social/Civic Services",
+            "contactPoint": [
+                {
+                    "@type": "ContactPoint",
+                    "contactType": "customer support",
+                    "email": "hello@liamscall.ca",
+                    "availableLanguage": [
+                        "en",
+                        "en-CA"
+                    ]
+                }
+            ],
+            "additionalType": [
+                "https://schema.org/HealthAndBeautyBusiness",
+                "https://schema.org/CivicStructure"
+            ]
+        },
+        {
+            "@type": "BlogPosting",
+            "@id": "https://liamscall.com/blog/finding-toronto-shelter-help#article",
+            "headline": "Finding Toronto Shelter Help Without Guessing Phone Numbers",
+            "description": "Searching for a Toronto shelter? Use Central Intake, 311, and 211 Ontario instead of outdated clinic lists — verified numbers for caregivers and people in crisis.",
+            "datePublished": "2026-07-15",
+            "dateModified": "2026-07-15",
+            "inLanguage": "en-CA",
+            "isAccessibleForFree": true,
+            "author": {
+                "@type": "Organization",
+                "@id": "https://liamscall.com/#organization",
+                "name": "Liam's Call",
+                "url": "https://liamscall.com/"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "@id": "https://liamscall.com/#organization",
+                "name": "Liam's Call",
+                "url": "https://liamscall.com/",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://liamscall.com/assets/logo-icon.svg"
+                }
+            },
+            "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://liamscall.com/blog/finding-toronto-shelter-help"
+            },
+            "articleSection": "Housing",
+            "contentLocation": "Ontario",
+            "speakable": {
+                "@type": "SpeakableSpecification",
+                "cssSelector": [
+                    "h1",
+                    "article.blog-body > p:first-of-type",
+                    ".speakable-summary"
+                ]
+            },
+            "image": "https://liamscall.com/assets/logo-icon.svg"
+        },
+        {
+            "@type": "HowTo",
+            "@id": "https://liamscall.com/blog/finding-toronto-shelter-help#howto",
+            "name": "Find Toronto shelter help without guessing phone numbers",
+            "description": "Searching for a Toronto shelter? Use Central Intake, 311, and 211 Ontario instead of outdated clinic lists — verified numbers for caregivers and people in crisis.",
+            "inLanguage": "en-CA",
+            "step": [
+                {
+                    "@type": "HowToStep",
+                    "position": 1,
+                    "name": "Call Toronto Shelter Central Intake",
+                    "text": "Call 416-338-4766 or toll-free 1-877-338-4766 for shelter system access."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 2,
+                    "name": "Use Toronto 311 if you are in the city",
+                    "text": "Dial 311 for City of Toronto shelter and housing information."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 3,
+                    "name": "Try 211 Ontario for local services",
+                    "text": "Dial 2-1-1 or visit 211ontario.ca for housing and social supports."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 4,
+                    "name": "Use emergency lines when needed",
+                    "text": "Call 911 for immediate danger, or call or text 988 for suicidal crisis or severe distress."
+                }
+            ]
         }
-    },
-    "mainEntityOfPage": "https://liamscall.com/blog/finding-toronto-shelter-help",
-    "articleSection": "Housing",
-    "contentLocation": "Ontario"
+    ]
 }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -92,6 +199,11 @@
     .ad-slot-article { margin: 1.5rem 0; }
     .blog-figure { margin: 0 0 1.25rem; }
     .blog-img { display: block; max-width: 100%; height: auto; border-radius: 0.75rem; }
+    .speakable-summary { margin: 0 0 1.1rem; color: #6b7280; font-size: 0.95rem; line-height: 1.55; }
+    .howto-block { margin: 1.5rem 0; padding: 1rem 1.1rem; border-radius: 0.85rem; background: #fff; border: 1px solid #e5e7eb; }
+    .howto-block h2 { margin: 0 0 0.65rem; font-size: 1rem; color: var(--green-dark); }
+    .howto-steps { margin: 0; padding-left: 1.2rem; color: #4b5563; font-size: 0.9rem; line-height: 1.55; }
+    .howto-steps li { margin: 0 0 0.45rem; }
     .blog-filters { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0 0 1.25rem; }
     .blog-filter {
       appearance: none; border: 1px solid #e5e7eb; background: #fff; color: #374151;
@@ -226,6 +338,7 @@
     <a class="blog-back" href="/blog">&larr; Back to blog</a>
     <p class="blog-meta"><span>Housing</span> · <span>Ontario</span> · <time datetime="2026-07-15">July 15, 2026</time></p>
     <h1>Finding Toronto Shelter Help Without Guessing Phone Numbers</h1>
+    <p class="speakable-summary">Searching for a Toronto shelter? Use Central Intake, 311, and 211 Ontario instead of outdated clinic lists — verified numbers for caregivers and people in crisis.</p>
     
     <article class="blog-body">
       <p>If you typed “Toronto shelter” into a search engine, you are probably looking for something urgent: a bed tonight, a place for someone you love, or a next step when housing feels impossible. Random clinic pages and old phone numbers make that harder, not easier. Shelter vacancies change by the hour. A number that looked right last year can put you through to a closed program.</p>
@@ -236,6 +349,16 @@
 <p>Caregivers often end up doing this search for a sibling, adult child, or parent. It is okay to make the call on their behalf when they will not or cannot. Keep notes: date, who you spoke with, and what they asked you to do next. That one call to Central Intake is usually more useful than five unverified numbers from a blog list.</p>
 <p>Liam’s Call cannot book a bed or confirm vacancies. We can help you think through what to say on the call, and point you back to [verified crisis and local resources](/resources). When housing is the urgent issue, get that intake call started before opening ten more tabs.</p>
     </article>
+    
+    <section class="howto-block" aria-label="Step-by-step guide">
+      <h2>Quick steps</h2>
+      <ol class="howto-steps">
+        <li><strong>Call Toronto Shelter Central Intake</strong> — Call 416-338-4766 or toll-free 1-877-338-4766 for shelter system access.</li>
+<li><strong>Use Toronto 311 if you are in the city</strong> — Dial 311 for City of Toronto shelter and housing information.</li>
+<li><strong>Try 211 Ontario for local services</strong> — Dial 2-1-1 or visit 211ontario.ca for housing and social supports.</li>
+<li><strong>Use emergency lines when needed</strong> — Call 911 for immediate danger, or call or text 988 for suicidal crisis or severe distress.</li>
+      </ol>
+    </section>
     <div class="ad-slot-article">
       
         <div class="ad-slot ad-slot--placeholder" data-ad-slot="article" aria-label="In-article ad">

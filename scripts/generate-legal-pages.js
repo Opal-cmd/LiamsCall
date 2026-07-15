@@ -1,5 +1,12 @@
 const fs = require('fs');
 const path = require('path');
+const {
+  organizationSchema,
+  faqPageSchema,
+  speakableSpec,
+  RESOURCES_FAQS,
+  ABOUT_FAQS,
+} = require('./lib/site-identity');
 
 const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'public', 'index.html'), 'utf8');
@@ -301,13 +308,21 @@ const pages = [
       "About Liam's Call (liamscall.com): a Canadian mental health technology project for caregivers and families — Mental Health, Addiction, Homelessness support without a waitlist or co-pay.",
     schema: {
       '@context': 'https://schema.org',
-      '@type': 'AboutPage',
-      name: "About Liam's Call",
-      url: 'https://liamscall.com/about',
-      description:
-        "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone.",
-      isPartOf: { '@id': 'https://liamscall.com/#website' },
-      about: { '@id': 'https://liamscall.com/#organization' },
+      '@graph': [
+        organizationSchema(),
+        {
+          '@type': 'AboutPage',
+          '@id': 'https://liamscall.com/about#page',
+          name: "About Liam's Call",
+          url: 'https://liamscall.com/about',
+          description:
+            "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone.",
+          isPartOf: { '@id': 'https://liamscall.com/#website' },
+          about: { '@id': 'https://liamscall.com/#organization' },
+          speakable: speakableSpec(['h1', '#faq h4', '#faq p']),
+        },
+        faqPageSchema(ABOUT_FAQS, 'https://liamscall.com/about'),
+      ],
     },
   },
   {
@@ -327,12 +342,20 @@ const pages = [
       "Crisis and local Ontario resources from Liam's Call — Toronto shelter Central Intake, Ontario detox via ConnexOntario, 988, 211, Kids Help Phone, and caregiver supports.",
     schema: {
       '@context': 'https://schema.org',
-      '@type': 'WebPage',
-      name: 'Crisis & Support Resources — Liam\'s Call',
-      url: 'https://liamscall.com/resources',
-      description:
-        'Verified crisis lines and local Ontario directories for Toronto shelters, detox and addiction treatment, mental health, and caregiver support.',
-      isPartOf: { '@id': 'https://liamscall.com/#website' },
+      '@graph': [
+        organizationSchema(),
+        {
+          '@type': 'WebPage',
+          '@id': 'https://liamscall.com/resources#page',
+          name: "Crisis & Support Resources — Liam's Call",
+          url: 'https://liamscall.com/resources',
+          description:
+            'Verified crisis lines and local Ontario directories for Toronto shelters, detox and addiction treatment, mental health, and caregiver support.',
+          isPartOf: { '@id': 'https://liamscall.com/#website' },
+          speakable: speakableSpec(['h1', '#faq h4', '#faq p']),
+        },
+        faqPageSchema(RESOURCES_FAQS, 'https://liamscall.com/resources'),
+      ],
     },
   },
 ];

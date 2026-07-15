@@ -572,7 +572,14 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
   <meta name="description" content="${escapeHtml(description)}">
   <meta name="theme-color" content="#0f4a3a">
   <link rel="canonical" href="${canonical}">
-  <meta property="og:type" content="${schema?.['@type'] === 'Article' ? 'article' : 'website'}">
+  <meta property="og:type" content="${
+    schema?.['@type'] === 'Article' ||
+    schema?.['@type'] === 'BlogPosting' ||
+    (Array.isArray(schema?.['@graph']) &&
+      schema['@graph'].some((n) => n?.['@type'] === 'BlogPosting' || n?.['@type'] === 'Article'))
+      ? 'article'
+      : 'website'
+  }">
   <meta property="og:site_name" content="Liam's Call">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
@@ -631,6 +638,11 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
     .ad-slot-article { margin: 1.5rem 0; }
     .blog-figure { margin: 0 0 1.25rem; }
     .blog-img { display: block; max-width: 100%; height: auto; border-radius: 0.75rem; }
+    .speakable-summary { margin: 0 0 1.1rem; color: #6b7280; font-size: 0.95rem; line-height: 1.55; }
+    .howto-block { margin: 1.5rem 0; padding: 1rem 1.1rem; border-radius: 0.85rem; background: #fff; border: 1px solid #e5e7eb; }
+    .howto-block h2 { margin: 0 0 0.65rem; font-size: 1rem; color: var(--green-dark); }
+    .howto-steps { margin: 0; padding-left: 1.2rem; color: #4b5563; font-size: 0.9rem; line-height: 1.55; }
+    .howto-steps li { margin: 0 0 0.45rem; }
     .blog-filters { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0 0 1.25rem; }
     .blog-filter {
       appearance: none; border: 1px solid #e5e7eb; background: #fff; color: #374151;

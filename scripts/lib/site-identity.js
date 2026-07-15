@@ -36,6 +36,10 @@ const SITE_IDENTITY = {
     'crisis resources',
     'Health Sciences',
     'Social/Civic Services',
+    'Toronto shelter',
+    'Ontario detox',
+    'ConnexOntario',
+    '211 Ontario',
   ],
 };
 
@@ -63,6 +67,14 @@ function organizationSchema() {
     areaServed: ['CA', 'US'],
     knowsAbout: SITE_IDENTITY.knowsAbout,
     category: SITE_IDENTITY.category,
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: 'hello@liamscall.ca',
+        availableLanguage: ['en', 'en-CA'],
+      },
+    ],
     additionalType: [
       'https://schema.org/HealthAndBeautyBusiness',
       'https://schema.org/CivicStructure',
@@ -82,6 +94,144 @@ function websiteSchema() {
     about: SITE_IDENTITY.subCategory.split(',').map((s) => s.trim()),
   };
 }
+
+/** Google/AI preferred voice & TTS cue (cssSelector must match crawlable nodes). */
+function speakableSpec(cssSelectors = ['h1', '.speakable-summary']) {
+  return {
+    '@type': 'SpeakableSpecification',
+    cssSelector: cssSelectors,
+  };
+}
+
+/**
+ * FAQPage JSON-LD. Each item: { question, answer } — answers must match visible FAQ copy.
+ */
+function faqPageSchema(faqs, pageUrl) {
+  return {
+    '@type': 'FAQPage',
+    '@id': `${pageUrl}#faq`,
+    mainEntity: (faqs || []).map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+}
+
+function blogPostingSchema({
+  title,
+  description,
+  datePublished,
+  dateModified,
+  url,
+  category,
+  region,
+  image,
+}) {
+  const schema = {
+    '@type': 'BlogPosting',
+    '@id': `${url}#article`,
+    headline: title,
+    description,
+    datePublished,
+    dateModified: dateModified || datePublished,
+    inLanguage: 'en-CA',
+    isAccessibleForFree: true,
+    author: {
+      '@type': 'Organization',
+      '@id': `${SITE_IDENTITY.url}/#organization`,
+      name: SITE_IDENTITY.siteName,
+      url: `${SITE_IDENTITY.url}/`,
+    },
+    publisher: {
+      '@type': 'Organization',
+      '@id': `${SITE_IDENTITY.url}/#organization`,
+      name: SITE_IDENTITY.siteName,
+      url: `${SITE_IDENTITY.url}/`,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE_IDENTITY.url}/assets/logo-icon.svg`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+    articleSection: category,
+    contentLocation: region || 'Canada',
+    speakable: speakableSpec(['h1', 'article.blog-body > p:first-of-type', '.speakable-summary']),
+  };
+  if (image) {
+    schema.image = image.startsWith('http')
+      ? image
+      : `${SITE_IDENTITY.url}${image.startsWith('/') ? image : `/${image}`}`;
+  } else {
+    schema.image = `${SITE_IDENTITY.url}/assets/logo-icon.svg`;
+  }
+  return schema;
+}
+
+/**
+ * HowTo JSON-LD. steps: [{ name, text }] — must match visible ordered steps on the page.
+ */
+function howToSchema({ name, description, steps, url }) {
+  return {
+    '@type': 'HowTo',
+    '@id': `${url}#howto`,
+    name,
+    description,
+    inLanguage: 'en-CA',
+    step: (steps || []).map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: step.name,
+      text: step.text,
+    })),
+  };
+}
+
+/** Shared FAQs for /resources (answers must stay in sync with page HTML). */
+const RESOURCES_FAQS = [
+  {
+    question: 'How do I find a Toronto shelter tonight?',
+    answer:
+      "Call Toronto Shelter Central Intake at 416-338-4766 or 1-877-338-4766, or dial 311 in Toronto. You can also use 211 Ontario (211ontario.ca). Liam's Call does not list individual shelter phones because vacancies change constantly.",
+  },
+  {
+    question: 'How do I find Ontario detox or addiction treatment near me?',
+    answer:
+      'Call ConnexOntario at 1-866-531-2600 or visit connexontario.ca. They match people to current withdrawal management and addiction treatment openings across Ontario.',
+  },
+  {
+    question: "Is Liam's Call a crisis line or medical service?",
+    answer:
+      "No. Liam's Call is a free informational AI chat for caregivers and families. It is not a medical professional, therapist, or emergency service. In a crisis, call or text 9-8-8, or call 9-1-1 for emergencies.",
+  },
+  {
+    question: "Do I need an account to use Liam's Call?",
+    answer: "No. Liam's Call is free and does not require an account or login.",
+  },
+];
+
+const ABOUT_FAQS = [
+  {
+    question: "What is Liam's Call?",
+    answer:
+      "Liam's Call is a Canadian mental health technology project offering free AI chat support for caregivers and families facing mental health, addiction, and housing challenges.",
+  },
+  {
+    question: "Who is Liam's Call for?",
+    answer:
+      'Caregivers, family members, and anyone seeking next steps around mental health, addiction, or housing support in Canada and the U.S.',
+  },
+  {
+    question: "Is Liam's Call free?",
+    answer: 'Yes. The chat is free to use with no account, waitlist, or co-pay.',
+  },
+];
 
 function sitemapXmlComment() {
   return [
@@ -104,5 +254,11 @@ module.exports = {
   metaDescription,
   organizationSchema,
   websiteSchema,
+  speakableSpec,
+  faqPageSchema,
+  blogPostingSchema,
+  howToSchema,
+  RESOURCES_FAQS,
+  ABOUT_FAQS,
   sitemapXmlComment,
 };

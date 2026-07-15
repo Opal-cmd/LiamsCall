@@ -20,13 +20,117 @@
   <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "Crisis & Support Resources — Liam's Call",
-    "url": "https://liamscall.com/resources",
-    "description": "Verified crisis lines and local Ontario directories for Toronto shelters, detox and addiction treatment, mental health, and caregiver support.",
-    "isPartOf": {
-        "@id": "https://liamscall.com/#website"
-    }
+    "@graph": [
+        {
+            "@type": "Organization",
+            "@id": "https://liamscall.com/#organization",
+            "name": "Liam's Call",
+            "alternateName": [
+                "Liams Call",
+                "liamscall.com",
+                "LiamsCall"
+            ],
+            "url": "https://liamscall.com/",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://liamscall.com/assets/logo-icon.svg"
+            },
+            "email": "hello@liamscall.ca",
+            "description": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+            "disambiguatingDescription": "Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.",
+            "areaServed": [
+                "CA",
+                "US"
+            ],
+            "knowsAbout": [
+                "mental health",
+                "addiction",
+                "homelessness",
+                "housing instability",
+                "caregiving",
+                "family support",
+                "crisis resources",
+                "Health Sciences",
+                "Social/Civic Services",
+                "Toronto shelter",
+                "Ontario detox",
+                "ConnexOntario",
+                "211 Ontario"
+            ],
+            "category": "Health Sciences, Social/Civic Services",
+            "contactPoint": [
+                {
+                    "@type": "ContactPoint",
+                    "contactType": "customer support",
+                    "email": "hello@liamscall.ca",
+                    "availableLanguage": [
+                        "en",
+                        "en-CA"
+                    ]
+                }
+            ],
+            "additionalType": [
+                "https://schema.org/HealthAndBeautyBusiness",
+                "https://schema.org/CivicStructure"
+            ]
+        },
+        {
+            "@type": "WebPage",
+            "@id": "https://liamscall.com/resources#page",
+            "name": "Crisis & Support Resources — Liam's Call",
+            "url": "https://liamscall.com/resources",
+            "description": "Verified crisis lines and local Ontario directories for Toronto shelters, detox and addiction treatment, mental health, and caregiver support.",
+            "isPartOf": {
+                "@id": "https://liamscall.com/#website"
+            },
+            "speakable": {
+                "@type": "SpeakableSpecification",
+                "cssSelector": [
+                    "h1",
+                    "#faq h4",
+                    "#faq p"
+                ]
+            }
+        },
+        {
+            "@type": "FAQPage",
+            "@id": "https://liamscall.com/resources#faq",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "How do I find a Toronto shelter tonight?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Call Toronto Shelter Central Intake at 416-338-4766 or 1-877-338-4766, or dial 311 in Toronto. You can also use 211 Ontario (211ontario.ca). Liam's Call does not list individual shelter phones because vacancies change constantly."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How do I find Ontario detox or addiction treatment near me?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Call ConnexOntario at 1-866-531-2600 or visit connexontario.ca. They match people to current withdrawal management and addiction treatment openings across Ontario."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is Liam's Call a crisis line or medical service?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Liam's Call is a free informational AI chat for caregivers and families. It is not a medical professional, therapist, or emergency service. In a crisis, call or text 9-8-8, or call 9-1-1 for emergencies."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Do I need an account to use Liam's Call?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Liam's Call is free and does not require an account or login."
+                    }
+                }
+            ]
+        }
+    ]
 }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -360,6 +464,26 @@
                         <p class="text-xs text-gray-500 mb-2">Dial 2-1-1 or visit online to find local social services, housing support, food banks, and community mental health programs near you.</p>
                         <a href="https://211ontario.ca" target="_blank" rel="noopener" class="inline-block pill-dark text-xs px-3 py-1 font-medium mr-2">211ontario.ca</a>
                         <span class="text-xs text-gray-500">or dial <strong>2-1-1</strong></span>
+                    </div>
+                </div>
+
+                <h3 class="font-semibold text-gray-700 text-sm mt-8 mb-4">Frequently asked questions</h3>
+                <div class="space-y-3 text-left" id="faq">
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <h4 class="font-semibold text-[var(--green-dark)] text-sm mb-1">How do I find a Toronto shelter tonight?</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed">Call Toronto Shelter Central Intake at <a href="tel:4163384766" class="underline">416-338-4766</a> or <a href="tel:18773384766" class="underline">1-877-338-4766</a>, or dial 311 in Toronto. You can also use 211 Ontario (<a href="https://211ontario.ca" target="_blank" rel="noopener" class="underline">211ontario.ca</a>). Liam's Call does not list individual shelter phones because vacancies change constantly.</p>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <h4 class="font-semibold text-[var(--green-dark)] text-sm mb-1">How do I find Ontario detox or addiction treatment near me?</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed">Call ConnexOntario at <a href="tel:18665312600" class="underline">1-866-531-2600</a> or visit <a href="https://connexontario.ca" target="_blank" rel="noopener" class="underline">connexontario.ca</a>. They match people to current withdrawal management and addiction treatment openings across Ontario.</p>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <h4 class="font-semibold text-[var(--green-dark)] text-sm mb-1">Is Liam's Call a crisis line or medical service?</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed">No. Liam's Call is a free informational AI chat for caregivers and families. It is not a medical professional, therapist, or emergency service. In a crisis, call or text <a href="tel:988" class="underline">9-8-8</a>, or call <a href="tel:911" class="underline">9-1-1</a> for emergencies.</p>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <h4 class="font-semibold text-[var(--green-dark)] text-sm mb-1">Do I need an account to use Liam's Call?</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed">No. Liam's Call is free and does not require an account or login.</p>
                     </div>
                 </div>
       </main>

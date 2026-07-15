@@ -40,9 +40,24 @@
       "family support",
       "crisis resources",
       "Health Sciences",
-      "Social/Civic Services"
+      "Social/Civic Services",
+      "Toronto shelter",
+      "Ontario detox",
+      "ConnexOntario",
+      "211 Ontario"
     ],
     "category": "Health Sciences, Social/Civic Services",
+    "contactPoint": [
+      {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "hello@liamscall.ca",
+        "availableLanguage": [
+          "en",
+          "en-CA"
+        ]
+      }
+    ],
     "additionalType": [
       "https://schema.org/HealthAndBeautyBusiness",
       "https://schema.org/CivicStructure"

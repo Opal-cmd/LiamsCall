@@ -20,28 +20,102 @@
   <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": "Grief While They're Still Here: Understanding Anticipatory Loss",
-    "description": "Anticipatory grief has no public ritual. What it feels like for caregivers, why it's normal, and gentle ways to let it have somewhere to go.",
-    "datePublished": "2026-07-07",
-    "dateModified": "2026-07-07",
-    "author": {
-        "@type": "Organization",
-        "name": "Liam's Call",
-        "url": "https://liamscall.com"
-    },
-    "publisher": {
-        "@type": "Organization",
-        "name": "Liam's Call",
-        "url": "https://liamscall.com",
-        "logo": {
-            "@type": "ImageObject",
-            "url": "https://liamscall.com/assets/logo-icon.svg"
+    "@graph": [
+        {
+            "@type": "Organization",
+            "@id": "https://liamscall.com/#organization",
+            "name": "Liam's Call",
+            "alternateName": [
+                "Liams Call",
+                "liamscall.com",
+                "LiamsCall"
+            ],
+            "url": "https://liamscall.com/",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://liamscall.com/assets/logo-icon.svg"
+            },
+            "email": "hello@liamscall.ca",
+            "description": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+            "disambiguatingDescription": "Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.",
+            "areaServed": [
+                "CA",
+                "US"
+            ],
+            "knowsAbout": [
+                "mental health",
+                "addiction",
+                "homelessness",
+                "housing instability",
+                "caregiving",
+                "family support",
+                "crisis resources",
+                "Health Sciences",
+                "Social/Civic Services",
+                "Toronto shelter",
+                "Ontario detox",
+                "ConnexOntario",
+                "211 Ontario"
+            ],
+            "category": "Health Sciences, Social/Civic Services",
+            "contactPoint": [
+                {
+                    "@type": "ContactPoint",
+                    "contactType": "customer support",
+                    "email": "hello@liamscall.ca",
+                    "availableLanguage": [
+                        "en",
+                        "en-CA"
+                    ]
+                }
+            ],
+            "additionalType": [
+                "https://schema.org/HealthAndBeautyBusiness",
+                "https://schema.org/CivicStructure"
+            ]
+        },
+        {
+            "@type": "BlogPosting",
+            "@id": "https://liamscall.com/blog/grief-while-theyre-still-here#article",
+            "headline": "Grief While They're Still Here: Understanding Anticipatory Loss",
+            "description": "Anticipatory grief has no public ritual. What it feels like for caregivers, why it's normal, and gentle ways to let it have somewhere to go.",
+            "datePublished": "2026-07-07",
+            "dateModified": "2026-07-07",
+            "inLanguage": "en-CA",
+            "isAccessibleForFree": true,
+            "author": {
+                "@type": "Organization",
+                "@id": "https://liamscall.com/#organization",
+                "name": "Liam's Call",
+                "url": "https://liamscall.com/"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "@id": "https://liamscall.com/#organization",
+                "name": "Liam's Call",
+                "url": "https://liamscall.com/",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://liamscall.com/assets/logo-icon.svg"
+                }
+            },
+            "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://liamscall.com/blog/grief-while-theyre-still-here"
+            },
+            "articleSection": "Mental Health",
+            "contentLocation": "Canada",
+            "speakable": {
+                "@type": "SpeakableSpecification",
+                "cssSelector": [
+                    "h1",
+                    "article.blog-body > p:first-of-type",
+                    ".speakable-summary"
+                ]
+            },
+            "image": "https://liamscall.com/assets/logo-icon.svg"
         }
-    },
-    "mainEntityOfPage": "https://liamscall.com/blog/grief-while-theyre-still-here",
-    "articleSection": "Mental Health",
-    "contentLocation": "Canada"
+    ]
 }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -92,6 +166,11 @@
     .ad-slot-article { margin: 1.5rem 0; }
     .blog-figure { margin: 0 0 1.25rem; }
     .blog-img { display: block; max-width: 100%; height: auto; border-radius: 0.75rem; }
+    .speakable-summary { margin: 0 0 1.1rem; color: #6b7280; font-size: 0.95rem; line-height: 1.55; }
+    .howto-block { margin: 1.5rem 0; padding: 1rem 1.1rem; border-radius: 0.85rem; background: #fff; border: 1px solid #e5e7eb; }
+    .howto-block h2 { margin: 0 0 0.65rem; font-size: 1rem; color: var(--green-dark); }
+    .howto-steps { margin: 0; padding-left: 1.2rem; color: #4b5563; font-size: 0.9rem; line-height: 1.55; }
+    .howto-steps li { margin: 0 0 0.45rem; }
     .blog-filters { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0 0 1.25rem; }
     .blog-filter {
       appearance: none; border: 1px solid #e5e7eb; background: #fff; color: #374151;
@@ -226,6 +305,7 @@
     <a class="blog-back" href="/blog">&larr; Back to blog</a>
     <p class="blog-meta"><span>Mental Health</span> · <span>Canada</span> · <time datetime="2026-07-07">July 7, 2026</time></p>
     <h1>Grief While They're Still Here: Understanding Anticipatory Loss</h1>
+    <p class="speakable-summary">Anticipatory grief has no public ritual. What it feels like for caregivers, why it's normal, and gentle ways to let it have somewhere to go.</p>
     
     <article class="blog-body">
       <p>There is a form of grief that has no public ritual, no bereavement leave, no casseroles at the door. It is the grief of watching someone you love slowly become someone different — through dementia, a progressive illness, or the long decline of aging. They are still here, still present in some form. But the person you knew is changing, and you are losing them in pieces, over years.</p>
@@ -234,6 +314,7 @@
 <p>Giving yourself permission to grieve — without waiting for a conventional endpoint — is not morbid. It is honest. Grief is not a failure of loyalty or love. It is love responding to loss, and it needs somewhere to go.</p>
 <p>Some things that help: naming the grief out loud to at least one person, whether a friend, a therapist, or a support group; keeping a simple journal; finding a caregiver-specific grief group (<a href="https://connexontario.ca" target="_blank" rel="noopener noreferrer">ConnexOntario</a> can connect you to options in your area); or using a tool like Liam's Call to put words to what you are feeling in a low-stakes space. You do not have to be alone in this, even when it feels that way.</p>
     </article>
+    
     <div class="ad-slot-article">
       
         <div class="ad-slot ad-slot--placeholder" data-ad-slot="article" aria-label="In-article ad">

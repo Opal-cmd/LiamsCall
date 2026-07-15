@@ -15,6 +15,66 @@ const {
   escapeHtml,
   renderAdSlot,
 } = require('./lib/blog-utils');
+const {
+  blogPostingSchema,
+  howToSchema,
+  organizationSchema,
+} = require('./lib/site-identity');
+
+/** Procedural posts get HowTo schema + a matching visible ordered list. */
+const HOWTO_BY_SLUG = {
+  'the-5-minute-reset': {
+    name: 'Do a 5-minute caregiver reset',
+    steps: [
+      { name: 'Try 4-6 breathing', text: 'Breathe in for four counts and out for six, for about two minutes.' },
+      { name: 'Use sensory grounding', text: 'Name five things you can see, four you can touch, and three you can hear.' },
+      { name: 'Take a brief outdoor walk', text: 'Walk to the end of the driveway and back if you can — light and movement help.' },
+      { name: 'Hold one warm drink slowly', text: 'Use both hands and skip the screen for a few minutes.' },
+      { name: 'Release neck and shoulder tension', text: 'Gently stretch for about thirty seconds.' },
+    ],
+  },
+  'finding-toronto-shelter-help': {
+    name: 'Find Toronto shelter help without guessing phone numbers',
+    steps: [
+      { name: 'Call Toronto Shelter Central Intake', text: 'Call 416-338-4766 or toll-free 1-877-338-4766 for shelter system access.' },
+      { name: 'Use Toronto 311 if you are in the city', text: 'Dial 311 for City of Toronto shelter and housing information.' },
+      { name: 'Try 211 Ontario for local services', text: 'Dial 2-1-1 or visit 211ontario.ca for housing and social supports.' },
+      { name: 'Use emergency lines when needed', text: 'Call 911 for immediate danger, or call or text 988 for suicidal crisis or severe distress.' },
+    ],
+  },
+  'ontario-detox-near-me': {
+    name: 'Find Ontario detox or addiction treatment that is actually open',
+    steps: [
+      { name: 'Call ConnexOntario', text: 'Call 1-866-531-2600 or visit connexontario.ca for live addiction and detox referrals.' },
+      { name: 'Share practical details on the call', text: 'Note age, city or region, substances of concern, and whether housing is also unstable.' },
+      { name: 'Use Health 811 for non-emergency health questions', text: 'Dial 811 to speak with a registered nurse in Ontario.' },
+      { name: 'Escalate in a true emergency', text: 'Call 911 for immediate danger, or call or text 988 for crisis support.' },
+    ],
+  },
+  'how-to-ask-for-help-without-feeling-guilty': {
+    name: 'Ask for caregiver help without drowning in guilt',
+    steps: [
+      { name: 'Name the guilt loop', text: 'Notice when needing help turns into talking yourself out of asking.' },
+      { name: 'Reframe the ask around care quality', text: 'Remind yourself that rested caregivers are more patient and effective.' },
+      { name: 'Make the request specific and time-bounded', text: 'Ask for a concrete block of help instead of vague support.' },
+      { name: 'Look beyond family if needed', text: 'Contact the Ontario Caregiver Organization, your doctor, or local relief programs.' },
+    ],
+  },
+};
+
+function renderHowToBlock(howto) {
+  if (!howto || !howto.steps?.length) return '';
+  const items = howto.steps
+    .map((step) => `<li><strong>${escapeHtml(step.name)}</strong> — ${escapeHtml(step.text)}</li>`)
+    .join('\n');
+  return `
+    <section class="howto-block" aria-label="Step-by-step guide">
+      <h2>Quick steps</h2>
+      <ol class="howto-steps">
+        ${items}
+      </ol>
+    </section>`;
+}
 
 function uniqueSorted(values) {
   return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
@@ -145,14 +205,19 @@ function buildPost(post) {
     post.image && post.image.startsWith('/')
       ? `<figure class="blog-figure"><img class="blog-img" src="${escapeHtml(post.image)}" alt=""></figure>`
       : '';
+  const postUrl = `${SITE}/blog/${post.slug}`;
+  const howto = HOWTO_BY_SLUG[post.slug];
+  const howtoHtml = renderHowToBlock(howto);
   const bodyHtml = `
     <a class="blog-back" href="/blog">&larr; Back to blog</a>
     <p class="blog-meta"><span>${escapeHtml(post.category)}</span>${post.region ? ` · <span>${escapeHtml(post.region)}</span>` : ''} · <time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDateDisplay(post.date))}</time></p>
     <h1>${escapeHtml(post.title)}</h1>
+    <p class="speakable-summary">${escapeHtml(post.description)}</p>
     ${hero}
     <article class="blog-body">
       ${post.html}
     </article>
+    ${howtoHtml}
     <div class="ad-slot-article">
       ${renderAdSlot('article', { label: 'In-article ad' })}
     </div>
@@ -168,36 +233,39 @@ function buildPost(post) {
     </p>
   `;
 
+  const graph = [
+    organizationSchema(),
+    blogPostingSchema({
+      title: post.title,
+      description: post.description,
+      datePublished: post.date,
+      dateModified: post.date,
+      url: postUrl,
+      category: post.category,
+      region: post.region,
+      image: post.image,
+    }),
+  ];
+  if (howto) {
+    graph.push(
+      howToSchema({
+        name: howto.name,
+        description: post.description,
+        steps: howto.steps,
+        url: postUrl,
+      }),
+    );
+  }
+
   return blogShell({
     title: `${post.title} - Liam's Call`,
     description: post.description,
-    canonical: `${SITE}/blog/${post.slug}`,
+    canonical: postUrl,
     active: 'blog',
     breadcrumb: `<a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>${escapeHtml(post.title)}</span>`,
     schema: {
       '@context': 'https://schema.org',
-      '@type': 'Article',
-      headline: post.title,
-      description: post.description,
-      datePublished: post.date,
-      dateModified: post.date,
-      author: {
-        '@type': 'Organization',
-        name: "Liam's Call",
-        url: SITE,
-      },
-      publisher: {
-        '@type': 'Organization',
-        name: "Liam's Call",
-        url: SITE,
-        logo: {
-          '@type': 'ImageObject',
-          url: `${SITE}/assets/logo-icon.svg`,
-        },
-      },
-      mainEntityOfPage: `${SITE}/blog/${post.slug}`,
-      articleSection: post.category,
-      contentLocation: post.region || 'Canada',
+      '@graph': graph,
     },
     bodyHtml,
   });

@@ -20,28 +20,102 @@
   <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": "Building a Care Routine That Has Room for You",
-    "description": "A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.",
-    "datePublished": "2026-07-09",
-    "dateModified": "2026-07-09",
-    "author": {
-        "@type": "Organization",
-        "name": "Liam's Call",
-        "url": "https://liamscall.com"
-    },
-    "publisher": {
-        "@type": "Organization",
-        "name": "Liam's Call",
-        "url": "https://liamscall.com",
-        "logo": {
-            "@type": "ImageObject",
-            "url": "https://liamscall.com/assets/logo-icon.svg"
+    "@graph": [
+        {
+            "@type": "Organization",
+            "@id": "https://liamscall.com/#organization",
+            "name": "Liam's Call",
+            "alternateName": [
+                "Liams Call",
+                "liamscall.com",
+                "LiamsCall"
+            ],
+            "url": "https://liamscall.com/",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://liamscall.com/assets/logo-icon.svg"
+            },
+            "email": "hello@liamscall.ca",
+            "description": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+            "disambiguatingDescription": "Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.",
+            "areaServed": [
+                "CA",
+                "US"
+            ],
+            "knowsAbout": [
+                "mental health",
+                "addiction",
+                "homelessness",
+                "housing instability",
+                "caregiving",
+                "family support",
+                "crisis resources",
+                "Health Sciences",
+                "Social/Civic Services",
+                "Toronto shelter",
+                "Ontario detox",
+                "ConnexOntario",
+                "211 Ontario"
+            ],
+            "category": "Health Sciences, Social/Civic Services",
+            "contactPoint": [
+                {
+                    "@type": "ContactPoint",
+                    "contactType": "customer support",
+                    "email": "hello@liamscall.ca",
+                    "availableLanguage": [
+                        "en",
+                        "en-CA"
+                    ]
+                }
+            ],
+            "additionalType": [
+                "https://schema.org/HealthAndBeautyBusiness",
+                "https://schema.org/CivicStructure"
+            ]
+        },
+        {
+            "@type": "BlogPosting",
+            "@id": "https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you#article",
+            "headline": "Building a Care Routine That Has Room for You",
+            "description": "A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.",
+            "datePublished": "2026-07-09",
+            "dateModified": "2026-07-09",
+            "inLanguage": "en-CA",
+            "isAccessibleForFree": true,
+            "author": {
+                "@type": "Organization",
+                "@id": "https://liamscall.com/#organization",
+                "name": "Liam's Call",
+                "url": "https://liamscall.com/"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "@id": "https://liamscall.com/#organization",
+                "name": "Liam's Call",
+                "url": "https://liamscall.com/",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://liamscall.com/assets/logo-icon.svg"
+                }
+            },
+            "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you"
+            },
+            "articleSection": "Routines",
+            "contentLocation": "Ontario",
+            "speakable": {
+                "@type": "SpeakableSpecification",
+                "cssSelector": [
+                    "h1",
+                    "article.blog-body > p:first-of-type",
+                    ".speakable-summary"
+                ]
+            },
+            "image": "https://liamscall.com/assets/logo-icon.svg"
         }
-    },
-    "mainEntityOfPage": "https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you",
-    "articleSection": "Routines",
-    "contentLocation": "Ontario"
+    ]
 }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -92,6 +166,11 @@
     .ad-slot-article { margin: 1.5rem 0; }
     .blog-figure { margin: 0 0 1.25rem; }
     .blog-img { display: block; max-width: 100%; height: auto; border-radius: 0.75rem; }
+    .speakable-summary { margin: 0 0 1.1rem; color: #6b7280; font-size: 0.95rem; line-height: 1.55; }
+    .howto-block { margin: 1.5rem 0; padding: 1rem 1.1rem; border-radius: 0.85rem; background: #fff; border: 1px solid #e5e7eb; }
+    .howto-block h2 { margin: 0 0 0.65rem; font-size: 1rem; color: var(--green-dark); }
+    .howto-steps { margin: 0; padding-left: 1.2rem; color: #4b5563; font-size: 0.9rem; line-height: 1.55; }
+    .howto-steps li { margin: 0 0 0.45rem; }
     .blog-filters { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0 0 1.25rem; }
     .blog-filter {
       appearance: none; border: 1px solid #e5e7eb; background: #fff; color: #374151;
@@ -226,6 +305,7 @@
     <a class="blog-back" href="/blog">&larr; Back to blog</a>
     <p class="blog-meta"><span>Routines</span> · <span>Ontario</span> · <time datetime="2026-07-09">July 9, 2026</time></p>
     <h1>Building a Care Routine That Has Room for You</h1>
+    <p class="speakable-summary">A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</p>
     
     <article class="blog-body">
       <p>Routine often gets described as a burden — a rigid structure that boxes you in. But for caregivers, a well-built daily routine is less a cage and more a container. It absorbs the cognitive load of constant decision-making, creates predictability for the person you care for, and — when designed intentionally — carves out space that belongs to you.</p>
@@ -234,6 +314,7 @@
 <p>Build in contingency. Routines fail. Illness disrupts schedules. Unexpected appointments happen. A routine that assumes everything will go according to plan becomes a source of stress rather than relief when it does not. Build a 15-minute buffer between transitions, and have one fallback option for your own break time (a shorter version of it, rather than nothing).</p>
 <p>Review the routine every few weeks. The needs of the person you care for will change, and so will yours. A routine that worked in January may not work in June. Treating it as a living document — something you adjust rather than abandon when it stops fitting — keeps it functional over the long term.</p>
     </article>
+    
     <div class="ad-slot-article">
       
         <div class="ad-slot ad-slot--placeholder" data-ad-slot="article" aria-label="In-article ad">
