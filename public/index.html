@@ -1655,8 +1655,7 @@
         <p>
             Liam's Call is a Canadian mental health technology project focused on caregiver and
             family wellbeing (Health Sciences / Social &amp; Civic Services — Mental Health,
-            Addiction, Homelessness). Learn more on our <a href="/about">About</a> page, browse
-            the <a href="/blog">blog</a>, or open
+            Addiction, Homelessness). Learn more on our <a href="/about">About</a> page or open
             <a href="/resources">crisis and support resources</a>.
         </p>
     </section>
@@ -1678,7 +1677,6 @@
                     class="nav-logo-icon w-auto select-none object-contain shrink-0"
                 >
                 <button type="button" class="nav-link" data-nav="chat">New Chat</button>
-                <a class="nav-link" href="/blog">Blog</a>
                 <a class="nav-link" href="/resources">Resources</a>
                 <a class="nav-link" href="/about">About</a>
             </nav>
@@ -1707,7 +1705,6 @@
                 </button>
                 <div id="landing-mobile-menu" role="menu">
                     <button type="button" class="nav-link" role="menuitem" data-nav="chat">New Chat</button>
-                    <a class="nav-link" role="menuitem" href="/blog">Blog</a>
                     <a class="nav-link" role="menuitem" href="/resources">Resources</a>
                     <a class="nav-link" role="menuitem" href="/about">About</a>
                 </div>
@@ -1750,7 +1747,6 @@
             </div>
             <nav class="flex flex-col gap-5 text-sm text-gray-900 shrink-0">
                 <button type="button" class="nav-link text-left" data-nav="chat">New Chat</button>
-                <a class="nav-link text-left" href="/blog">Blog</a>
                 <a class="nav-link text-left" href="/resources">Resources</a>
                 <a class="nav-link text-left" href="/about">About Us</a>
             </nav>
@@ -1963,18 +1959,6 @@
         })();
 
         const CONTENT_PAGES = {
-            blog: { title: 'Blog', body: `
-                <p class="text-gray-500 text-sm text-center mb-6 leading-relaxed">
-                    Practical reads for caregivers and families now live on the full blog —
-                    better for sharing and for search engines.
-                </p>
-                <p class="text-center">
-                    <a href="/blog" class="inline-block pill-dark text-sm px-5 py-2.5 font-semibold text-white no-underline">Open the blog</a>
-                </p>
-                <p class="text-[11px] text-gray-400 text-center mt-4">
-                    Or browse <a href="/resources" class="underline text-[var(--green-dark)]">crisis resources</a>.
-                </p>
-            ` },
             resources: { title: 'Crisis &amp; Support Resources', body: `
                 <p class="text-gray-500 text-xs mb-5">Ontario &amp; Canada — all lines are free and confidential unless noted. Searching for a Toronto shelter or Ontario detox near you? Start with the verified local directories below — we do not list individual shelter or clinic phones that go out of date.</p>
                 <div class="space-y-4 text-left">
@@ -2601,12 +2585,7 @@
             }
         }
 
-        // Crawlable SEO blog lives at /blog (Markdown → static HTML).
         async function navigate(navKey) {
-            if (navKey === 'blog') {
-                window.location.href = '/blog';
-                return;
-            }
             if (navKey === 'chat') {
                 // Chat always does the full expand animation
                 if (!isExpanded) await expandShell();

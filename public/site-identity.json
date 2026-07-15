@@ -70,6 +70,6 @@
       "xhtml/hreflang",
       "image"
     ],
-    "notes": "XML sitemap is for crawlers. /sitemap is the human-readable HTML map. Video and Google News extensions omitted until live."
+    "notes": "Production sitemap lists core site pages only. Blog remains on the staging branch."
   }
 }
