@@ -9,19 +9,19 @@
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://liamscall.com/assets/logo.png</image:loc>
+      <image:loc>https://liamscall.com/assets/logo-icon.png</image:loc>
       <image:title>Liam's Call</image:title>
       <image:caption>Liam's Call - Mental Health, Addiction, Homelessness</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://liamscall.com/assets/logo-icon.svg</image:loc>
-      <image:title>Liam's Call icon</image:title>
-      <image:caption>Liam's Call crest logo</image:caption>
+      <image:loc>https://liamscall.com/assets/favicon.png</image:loc>
+      <image:title>Liam's Call favicon</image:title>
+      <image:caption>Liam's Call site icon</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://liamscall.com/assets/logo-horizontal.svg</image:loc>
-      <image:title>Liam's Call wordmark</image:title>
-      <image:caption>Primary horizontal logo for Liam's Call</image:caption>
+      <image:loc>https://liamscall.com/assets/apple-touch-icon.png</image:loc>
+      <image:title>Liam's Call apple touch icon</image:title>
+      <image:caption>Liam's Call home-screen icon</image:caption>
     </image:image>
   </url>
   <url>

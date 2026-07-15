@@ -476,6 +476,22 @@ app.get('/.well-known/brand.json', (_req, res) => {
   return res.sendFile(file);
 });
 
+// Permanent redirects so crawlers that cached old logo URLs land on the new icon.
+const LOGO_REDIRECTS = {
+  '/assets/logo-icon.svg': '/assets/logo-icon.png',
+  '/assets/favicon.svg': '/assets/favicon.png',
+  '/assets/logo.png': '/assets/logo-icon.png',
+  '/favicon.png': '/assets/favicon.png',
+  '/apple-touch-icon.png': '/assets/apple-touch-icon.png',
+  '/apple-touch-icon-precomposed.png': '/assets/apple-touch-icon.png',
+};
+for (const [from, to] of Object.entries(LOGO_REDIRECTS)) {
+  app.get(from, (_req, res) => {
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    return res.redirect(301, to);
+  });
+}
+
 app.use(express.static(PUBLIC_DIR));
 
 function modelForProvider(provider) {

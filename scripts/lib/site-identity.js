@@ -69,12 +69,12 @@ function organizationSchema() {
     url: `${SITE_IDENTITY.url}/`,
     logo: {
       '@type': 'ImageObject',
-      url: `${SITE_IDENTITY.url}/assets/logo.png`,
-      width: 624,
-      height: 589,
-      contentUrl: `${SITE_IDENTITY.url}/assets/logo.png`,
+      url: `${SITE_IDENTITY.url}/assets/logo-icon.png`,
+      width: 500,
+      height: 500,
+      contentUrl: `${SITE_IDENTITY.url}/assets/logo-icon.png`,
     },
-    image: `${SITE_IDENTITY.url}/assets/logo.png`,
+    image: `${SITE_IDENTITY.url}/assets/logo-icon.png`,
     email: 'hello@liamscall.ca',
     description: SITE_IDENTITY.shortDescription,
     disambiguatingDescription: SITE_IDENTITY.disambiguatingDescription,
@@ -168,9 +168,9 @@ function blogPostingSchema({
       url: `${SITE_IDENTITY.url}/`,
       logo: {
         '@type': 'ImageObject',
-        url: `${SITE_IDENTITY.url}/assets/logo.png`,
-        width: 624,
-        height: 589,
+        url: `${SITE_IDENTITY.url}/assets/logo-icon.png`,
+        width: 500,
+        height: 500,
       },
     },
     mainEntityOfPage: {
@@ -186,7 +186,7 @@ function blogPostingSchema({
       ? image
       : `${SITE_IDENTITY.url}${image.startsWith('/') ? image : `/${image}`}`;
   } else {
-    schema.image = `${SITE_IDENTITY.url}/assets/logo.png`;
+    schema.image = `${SITE_IDENTITY.url}/assets/logo-icon.png`;
   }
   return schema;
 }
@@ -307,14 +307,29 @@ function brandJson() {
     ],
     logos: [
       {
-        url: `${SITE_IDENTITY.url}/assets/logo.png`,
+        url: `${SITE_IDENTITY.url}/assets/logo-icon.png`,
         variant: 'primary',
         type: 'raster',
       },
       {
-        url: `${SITE_IDENTITY.url}/assets/logo-icon.svg`,
+        url: `${SITE_IDENTITY.url}/assets/logo-icon.png`,
         variant: 'icon',
-        type: 'svg',
+        type: 'raster',
+      },
+      {
+        url: `${SITE_IDENTITY.url}/favicon.ico`,
+        variant: 'favicon',
+        type: 'raster',
+      },
+      {
+        url: `${SITE_IDENTITY.url}/assets/favicon.png`,
+        variant: 'favicon',
+        type: 'raster',
+      },
+      {
+        url: `${SITE_IDENTITY.url}/assets/apple-touch-icon.png`,
+        variant: 'apple-touch-icon',
+        type: 'raster',
       },
       {
         url: `${SITE_IDENTITY.url}/assets/logo-horizontal.svg`,

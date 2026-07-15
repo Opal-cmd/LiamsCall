@@ -42,14 +42,29 @@
   ],
   "logos": [
     {
-      "url": "https://liamscall.com/assets/logo.png",
+      "url": "https://liamscall.com/assets/logo-icon.png",
       "variant": "primary",
       "type": "raster"
     },
     {
-      "url": "https://liamscall.com/assets/logo-icon.svg",
+      "url": "https://liamscall.com/assets/logo-icon.png",
       "variant": "icon",
-      "type": "svg"
+      "type": "raster"
+    },
+    {
+      "url": "https://liamscall.com/favicon.ico",
+      "variant": "favicon",
+      "type": "raster"
+    },
+    {
+      "url": "https://liamscall.com/assets/favicon.png",
+      "variant": "favicon",
+      "type": "raster"
+    },
+    {
+      "url": "https://liamscall.com/assets/apple-touch-icon.png",
+      "variant": "apple-touch-icon",
+      "type": "raster"
     },
     {
       "url": "https://liamscall.com/assets/logo-horizontal.svg",

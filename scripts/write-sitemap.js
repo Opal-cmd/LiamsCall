@@ -47,7 +47,7 @@ function escapeHtml(str) {
 
 function brandImage() {
   return {
-    loc: `${SITE}/assets/logo.png`,
+    loc: `${SITE}/assets/logo-icon.png`,
     title: SITE_IDENTITY.siteName,
     caption: `${SITE_IDENTITY.siteName} - ${SITE_IDENTITY.subCategory}`,
   };
@@ -148,14 +148,14 @@ function main() {
       images: [
         logo,
         {
-          loc: `${SITE}/assets/logo-icon.png`,
-          title: `${SITE_IDENTITY.siteName} icon`,
-          caption: `${SITE_IDENTITY.siteName} crest logo`,
+          loc: `${SITE}/assets/favicon.png`,
+          title: `${SITE_IDENTITY.siteName} favicon`,
+          caption: `${SITE_IDENTITY.siteName} site icon`,
         },
         {
-          loc: `${SITE}/assets/logo-horizontal.svg`,
-          title: `${SITE_IDENTITY.siteName} wordmark`,
-          caption: 'Primary horizontal logo for Liam\'s Call',
+          loc: `${SITE}/assets/apple-touch-icon.png`,
+          title: `${SITE_IDENTITY.siteName} apple touch icon`,
+          caption: `${SITE_IDENTITY.siteName} home-screen icon`,
         },
       ],
     },

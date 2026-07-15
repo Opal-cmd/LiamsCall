@@ -52,12 +52,14 @@ function shell(title, description, active, body, extras = {}) {
   <meta property="og:title" content="${ogTitle}">
   <meta property="og:description" content="${description}">
   <meta property="og:url" content="${canonical}">
-  <meta property="og:image" content="https://liamscall.com/assets/logo.png">
+  <meta property="og:image" content="https://liamscall.com/assets/logo-icon.png">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="${ogTitle}">
   <meta name="twitter:description" content="${description}">
   <title>${title} — Liam's Call</title>
-  <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">${schema}
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">${schema}
   <link rel="stylesheet" href="/assets/site.css">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>* { box-sizing: border-box; }</style>
@@ -67,7 +69,7 @@ function shell(title, description, active, body, extras = {}) {
     <div id="sidebar-overlay"></div>
     <aside id="site-sidebar" class="site-sidebar">
       <a class="sidebar-home-btn" href="/">
-        <img src="/assets/logo-icon.svg" alt="">
+        <img src="/assets/logo-icon.png" alt="">
         <span>Liam's Call</span>
       </a>
       <nav class="side-nav">
@@ -103,7 +105,7 @@ function shell(title, description, active, body, extras = {}) {
           </svg>
         </button>
         <a class="mobile-top-brand" href="/">
-          <img src="/assets/logo-icon.svg" alt="">
+          <img src="/assets/logo-icon.png" alt="">
           <span>Liam's Call</span>
         </a>
       </div>
