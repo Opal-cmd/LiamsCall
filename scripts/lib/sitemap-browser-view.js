@@ -121,10 +121,11 @@ function buildBrowserHtml(xml, publicDir) {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="robots" content="noindex,follow">
-	<title>XML Sitemap — Liam's Call</title>
+  <title>XML Sitemap — Liam's Call</title>
+	<link rel="stylesheet" href="/assets/site.css">
 	<style type="text/css">
 		body {
-			font-family: Helvetica, Arial, sans-serif;
+			font-family: var(--font-sans);
 			font-size: 13px;
 			color: #545353;
 			margin: 0;

@@ -4,32 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Liam's Call — UI Kit</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --green-dark:   #0f4a3a;
-      --green-send:   #1f6b52;
-      --green-mid:    #145743;
-      --green-light:  #2d8a68;
-      --beige-main:   #e8dfd3;
-      --beige-widget: #ddd2c4;
-      --beige-dark:   #c9bfb2;
-      --white:        #ffffff;
-      --gray-100:     #f9fafb;
-      --gray-200:     #f3f4f6;
-      --gray-400:     #9ca3af;
-      --gray-600:     #4b5563;
-      --gray-900:     #111827;
-      --border:       #e5e7eb;
-    }
-
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f9fafb;
+      font-family: var(--font-sans);
+      background: var(--gray-100);
       color: var(--gray-900);
       line-height: 1.5;
     }
@@ -74,7 +55,7 @@
     .btn {
       display: inline-flex; align-items: center; justify-content: center;
       border-radius: 9999px; padding: 10px 24px;
-      font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 600; font-family: var(--font-sans);
       cursor: default; line-height: 1; border: none; letter-spacing: 0.01em;
     }
     .btn-primary   { background: var(--green-dark); color: #fff; }
@@ -87,7 +68,7 @@
       background: var(--green-dark); border-radius: 9999px; padding: 12px 32px;
     }
     .nav-pill span {
-      color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; cursor: default;
+      color: #fff; font-size: 13px; font-family: var(--font-sans); cursor: default;
     }
     .nav-pill span.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
     .nav-pill span.muted  { opacity: 0.7; }
@@ -95,7 +76,7 @@
     .nav-pills-compact { display: flex; gap: 6px; flex-wrap: wrap; }
     .nav-pill-sm {
       background: var(--green-dark); color: #fff; border-radius: 9999px;
-      padding: 6px 14px; font-size: 11px; font-weight: 500; font-family: 'Inter', sans-serif;
+      padding: 6px 14px; font-size: 11px; font-weight: 500; font-family: var(--font-sans);
     }
 
     /* ── Chat input ─────────────────────────────────────── */
@@ -105,11 +86,11 @@
     }
     .chat-input-fake {
       flex: 1; background: #fff; border-radius: 9999px; padding: 10px 18px;
-      font-size: 13px; color: var(--gray-400); font-family: 'Inter', sans-serif;
+      font-size: 13px; color: var(--gray-400); font-family: var(--font-sans);
     }
     .chat-send-btn {
       background: var(--green-send); border-radius: 16px; padding: 10px 20px;
-      color: #fff; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif;
+      color: #fff; font-size: 13px; font-weight: 600; font-family: var(--font-sans);
       white-space: nowrap; flex-shrink: 0;
     }
 
@@ -132,7 +113,7 @@
     .bubble-row-assistant { display: flex; justify-content: flex-start; }
     .bubble {
       max-width: 78%; padding: 10px 14px;
-      font-size: 13px; line-height: 1.5; font-family: 'Inter', sans-serif;
+      font-size: 13px; line-height: 1.5; font-family: var(--font-sans);
     }
     .bubble-user {
       background: var(--green-dark); color: #f8fffd;

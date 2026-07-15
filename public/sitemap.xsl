@@ -16,6 +16,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta name="robots" content="noindex,follow"/>
         <title>XML Sitemap</title>
+        <link rel="stylesheet" href="/assets/site.css"/>
         <style type="text/css">
           * { box-sizing: border-box; }
           body {
@@ -23,7 +24,7 @@
             padding: 0;
             background: #ffffff;
             color: #545353;
-            font-family: Helvetica, Arial, sans-serif;
+            font-family: var(--font-sans);
             font-size: 13px;
             line-height: 1.45;
           }
