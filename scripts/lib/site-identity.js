@@ -11,9 +11,9 @@ const SITE_IDENTITY = {
     "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
   /** One-line disambiguation for Google/AI Overview (not LimeCall / phone widgets). */
   disambiguatingDescription:
-    "Liam's Call (liamscall.com) is a free Canadian AI web chat for caregivers and families facing mental health, addiction, and housing challenges — not LimeCall, not a click-to-call widget company, and not an AI phone receptionist or marketing platform.",
+    "Liam's Call (liamscall.com) is a free AI web chat for caregivers and families in Canada and the United States facing mental health, addiction, and housing challenges — not LimeCall, not a click-to-call widget company, and not an AI phone receptionist or marketing platform.",
   fullDescription:
-    "Liam's Call is a Canadian mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.\n\n" +
+    "Liam's Call is a mental health technology project focused on caregiver and family wellbeing in Canada and the United States. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.\n\n" +
     "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
   /**
    * Official profiles Google can treat as the same entity (schema.org sameAs).
@@ -236,7 +236,7 @@ const ABOUT_FAQS = [
   {
     question: "What is Liam's Call?",
     answer:
-      "Liam's Call (liamscall.com) is a free Canadian AI web chat for caregivers and families facing mental health, addiction, and housing challenges. It is not a click-to-call product, phone receptionist service, or marketing platform.",
+      "Liam's Call (liamscall.com) is a free AI web chat for caregivers and families in Canada and the United States facing mental health, addiction, and housing challenges. It is not a click-to-call product, phone receptionist service, or marketing platform.",
   },
   {
     question: "Who is Liam's Call for?",
