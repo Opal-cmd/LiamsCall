@@ -101,37 +101,12 @@
         ]
     }
     </script>
+    <link rel="stylesheet" href="/assets/site.css">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* Self-hosted Inter — variable font, no Google Fonts request */
-        @font-face {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url('/assets/fonts/inter-latin-ext-wght-normal.woff2') format('woff2');
-            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-        }
-        @font-face {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url('/assets/fonts/inter-latin-wght-normal.woff2') format('woff2');
-            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-        }
-    </style>
-    <style>
         :root {
-            --green-dark: #0f4a3a;
-            --green-send: #1f6b52;
-            --beige-main: #e8dfd3;
-            --beige-widget: #ddd2c4;
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
             --dur: 1.05s;
-        }
-
-        :root {
             /* Updated by syncViewportMetrics() from visualViewport / innerWidth×innerHeight */
             --app-height: 100dvh;
             --app-width: 100%;
@@ -147,7 +122,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-sans);
             overflow: hidden;
             overflow-x: hidden;
             width: 100%;
@@ -164,15 +139,16 @@
             box-sizing: border-box;
         }
 
-        .font-serif-brand { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.02em; }
-        .pill-dark { background: var(--green-dark); color: #fff; border-radius: 9999px; }
+        .font-brand { font-family: var(--font-sans); font-weight: 700; letter-spacing: -0.02em; }
+        /* Alias kept for existing markup */
+        .font-serif-brand { font-family: var(--font-sans); font-weight: 700; letter-spacing: -0.02em; }
 
         /* Logo inside the green nav pill — white on dark green */
         #landing-header .nav-logo-icon {
             filter: brightness(0) invert(1);
         }
         .btn-send { background: var(--green-send); }
-        .btn-send:hover { background: #185a44; }
+        .btn-send:hover { background: var(--green-send-hover); }
         #chat-send { white-space: nowrap; }
         #chat-form { width: 100%; min-width: 0; }
 
@@ -1640,7 +1616,7 @@
 </head>
 <body class="m-0 overflow-hidden bg-white">
     <noscript>
-        <div style="max-width:40rem;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;color:#374151;line-height:1.6;">
+        <div style="max-width:40rem;margin:2rem auto;padding:0 1rem;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;color:#374151;line-height:1.6;">
             <h1 style="color:#0f4a3a;font-size:1.5rem;">Liam's Call</h1>
             <p><strong>Liam's Call (liamscall.com)</strong> exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. Accessible, judgment-free support — available at any hour, without a waitlist or a co-pay.</p>
             <p>Mental health technology for caregivers and families in Canada and the United States (Mental Health, Addiction, Homelessness). No account required. In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.</p>
@@ -1748,10 +1724,10 @@
             <nav class="flex flex-col gap-5 text-sm text-gray-900 shrink-0">
                 <button type="button" class="nav-link text-left" data-nav="chat">New Chat</button>
                 <a class="nav-link text-left" href="/resources">Resources</a>
-                <a class="nav-link text-left" href="/about">About Us</a>
+                <a class="nav-link text-left" href="/about">About</a>
             </nav>
             <div class="mt-auto pt-3 sm:pt-5 md:pt-8 shrink-0">
-                <div class="ad-card rounded-xl overflow-hidden border border-gray-200 bg-[#1a2d5a] text-white text-[9px] md:text-[10px] leading-snug shadow-sm">
+                <div class="ad-card rounded-xl overflow-hidden border border-gray-200 bg-[var(--navy-promo)] text-white text-[9px] md:text-[10px] leading-snug shadow-sm">
                     <div class="px-3 py-2 border-b border-white/10 font-semibold tracking-wide">Resources</div>
                     <div class="px-3 py-3 space-y-2">
                         <p class="font-semibold text-[11px]">Mental health, addiction and housing support for you and your loved ones.</p>
@@ -2308,7 +2284,7 @@
 
                     <div class="rounded-xl border border-gray-200 bg-white p-4">
                         <h3 class="font-semibold text-gray-800 mb-2">How the AI works</h3>
-                        <p>Liam's Call uses a large language model (AI) to have supportive, open-ended conversations. The AI is specifically guided to respond with warmth and care to caregiving challenges, emotional distress, and questions about mental health resources.</p>
+                        <p>Liam's Call uses AI to help you, in many languages.</p>
                         <p class="mt-2"><strong class="text-gray-700">Important:</strong> Liam's Call is a support tool, not a clinical service. The AI is not a therapist, counsellor, or medical professional. It does not diagnose conditions, prescribe treatment, or replace professional mental health care. If you or someone you know is in crisis, please use the resources on our <button type="button" class="underline text-[var(--green-dark)] font-medium" data-nav="resources">Resources page</button> or call 9-8-8 immediately.</p>
                     </div>
 
@@ -2814,7 +2790,7 @@
             // Markdown links → clickable anchors (Gemini often uses [label](url))
             s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (_m, label, url) => {
                 const safeHref = url.replace(/"/g, '');
-                return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="underline font-medium" style="color:#1d4f91;">${label}</a>`;
+                return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="underline font-medium" style="color:var(--green-dark);">${label}</a>`;
             });
             s = s.replace(/\*\*\*([^*\n]+)\*\*\*/g, '<strong>$1</strong>');
             s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
