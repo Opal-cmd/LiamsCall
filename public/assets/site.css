@@ -172,40 +172,6 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-.ad-slot {
-  border-radius: 0.75rem;
-  overflow: hidden;
-  border: 1px dashed rgba(15, 74, 58, 0.28);
-  background: #fafaf8;
-  font-size: 10px;
-  line-height: 1.35;
-  min-height: 5.5rem;
-}
-
-.ad-slot-label {
-  padding: 0.4rem 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-bottom: 1px solid #ece7df;
-  color: #9a6700;
-  font-size: 0.65rem;
-}
-
-.ad-slot-body {
-  padding: 0.65rem 0.75rem;
-  color: #6b7280;
-}
-
-.ad-slot-body p {
-  margin: 0 0 0.35rem;
-}
-
-.ad-slot-body p:last-child {
-  margin-bottom: 0;
-  color: #9ca3af;
-}
-
 .sidebar-legal {
   display: flex;
   align-items: center;

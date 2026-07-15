@@ -83,13 +83,6 @@ function shell(title, description, active, body, extras = {}) {
             <p>Explore guides, tips, and tools for caregivers and families.</p>
           </div>
         </a>
-        <div class="ad-slot ad-slot--placeholder" data-ad-slot="sidebar" aria-label="Sidebar ad">
-          <div class="ad-slot-label">Sponsored</div>
-          <div class="ad-slot-body">
-            <p>Sidebar ad</p>
-            <p>Standard insertion area — Google Ads appear here after publisher approval.</p>
-          </div>
-        </div>
         <div class="sidebar-legal">
           ${navLink('privacy', '/privacy', 'Privacy')}
           <span>·</span>
