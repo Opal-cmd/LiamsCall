@@ -26,7 +26,7 @@ function extractPage(key) {
 }
 
 // Every standalone page shares this sidebar-driven shell — the same nav
-// structure (logo/home, New Chat, Resources, About Us, ad card, legal
+// structure (logo/home, New Chat, Resources, About, ad card, legal
 // links) as the in-app chat sidebar, so leaving the SPA to visit a real
 // URL never feels like a different site.
 function shell(title, description, active, body, extras = {}) {
@@ -58,173 +58,11 @@ function shell(title, description, active, body, extras = {}) {
   <meta name="twitter:description" content="${description}">
   <title>${title} — Liam's Call</title>
   <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">${schema}
+  <link rel="stylesheet" href="/assets/site.css">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <style>
-    :root { --green-dark: #0f4a3a; --beige-main: #e8dfd3; --sidebar-w: 16rem; }
-    * { box-sizing: border-box; }
-    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f3f0ea; margin: 0; color: #1f2937; }
-    a { color: var(--green-dark); }
-    .pill-dark { background: var(--green-dark); color: #fff; border-radius: 9999px; }
-
-    .page-shell { display: flex; min-height: 100vh; align-items: stretch; }
-
-    /* Sidebar — mirrors the in-app chat sidebar's nav, ad card, and legal links */
-    .site-sidebar {
-      width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
-      flex-shrink: 0;
-      background: #fff;
-      border-right: 1px solid #f3f4f6;
-      padding: 1.75rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-    }
-    .sidebar-home-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      margin-bottom: 1.75rem;
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-    .sidebar-home-btn img {
-      height: 1.75rem;
-      width: auto;
-      filter: invert(18%) sepia(60%) saturate(800%) hue-rotate(120deg) brightness(70%) contrast(120%);
-    }
-    .sidebar-home-btn span {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--green-dark);
-      letter-spacing: -0.02em;
-    }
-    .side-nav { display: flex; flex-direction: column; gap: 1.15rem; font-size: 0.9rem; color: #111827; flex-shrink: 0; }
-    .side-link { color: inherit; text-decoration: none; cursor: pointer; }
-    .side-link:hover { opacity: 0.75; }
-    .side-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; color: var(--green-dark); }
-    .sidebar-spacer { margin-top: auto; padding-top: 1.5rem; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.75rem; }
-    .sidebar-cta {
-      display: block; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;
-      background: #1a2d5a; color: #fff; font-size: 10px; line-height: 1.35; text-decoration: none;
-    }
-    .sidebar-cta-title { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; color: #fff; }
-    .sidebar-cta-body { padding: 0.7rem 0.75rem; }
-    .sidebar-cta-body p { margin: 0 0 0.5rem; color: #fff; }
-    .sidebar-cta-body p:last-child { margin-bottom: 0; color: rgba(255,255,255,0.7); }
-    .ad-slot {
-      border-radius: 0.75rem; overflow: hidden; border: 1px dashed rgba(15,74,58,0.28);
-      background: #fafaf8; font-size: 10px; line-height: 1.35; min-height: 5.5rem;
-    }
-    .ad-slot-label {
-      padding: 0.4rem 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-      border-bottom: 1px solid #ece7df; color: #9a6700; font-size: 0.65rem;
-    }
-    .ad-slot-body { padding: 0.65rem 0.75rem; color: #6b7280; }
-    .ad-slot-body p { margin: 0 0 0.35rem; }
-    .ad-slot-body p:last-child { margin-bottom: 0; color: #9ca3af; }
-    .sidebar-legal { display: flex; align-items: center; gap: 0.55rem; margin-top: 0.25rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
-    .sidebar-legal a,
-    .sidebar-legal a.side-link {
-      font-size: 10px !important;
-      line-height: 1.3;
-      font-weight: 400 !important;
-      color: #d1d5db !important;
-      text-decoration: none !important;
-    }
-    .sidebar-legal a:hover,
-    .sidebar-legal a.side-link:hover { color: #6b7280 !important; }
-    .sidebar-legal a.side-link.active {
-      color: #9ca3af !important;
-      font-weight: 500 !important;
-      text-decoration: underline !important;
-      text-underline-offset: 2px;
-    }
-    .sidebar-legal span { font-size: 10px; color: #e5e7eb; line-height: 1; }
-
-    .blog-crumb {
-      margin: 0 0 0.85rem;
-      font-size: 0.82rem;
-      line-height: 1.35;
-      color: #9ca3af;
-    }
-    .blog-crumb a {
-      color: #60a5fa;
-      text-decoration: none;
-    }
-    .blog-crumb a:hover { text-decoration: underline; text-underline-offset: 2px; }
-    .blog-crumb span[aria-hidden="true"] { margin: 0 0.35rem; color: #d1d5db; }
-
-    /* Mobile top bar + drawer */
-    .mobile-topbar { display: none; }
-    #sidebar-overlay { display: none; }
-
-    .site-main { flex: 1; min-width: 0; }
-    main { max-width: 42rem; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
-    h1 { font-size: clamp(1.45rem, 3vw, 1.85rem); font-weight: 700; color: var(--green-dark); letter-spacing: -0.02em; margin: 0 0 1.25rem; text-align: center; }
-
-    @media (max-width: 767px) {
-      .site-sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 15.5rem;
-        min-width: 15.5rem;
-        transform: translateX(-100%);
-        transition: transform 260ms ease;
-        z-index: 60;
-        box-shadow: 0 12px 32px rgba(15, 74, 58, 0.2);
-      }
-      .site-sidebar.is-open { transform: translateX(0); }
-
-      #sidebar-overlay.is-open {
-        display: block;
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.35);
-        z-index: 50;
-      }
-
-      .mobile-topbar {
-        display: flex;
-        align-items: center;
-        position: relative;
-        height: 3.25rem;
-        padding: 0 1rem;
-        border-bottom: 1px solid rgba(15, 74, 58, 0.08);
-        background: rgba(243, 240, 234, 0.92);
-        backdrop-filter: blur(10px);
-        position: sticky;
-        top: 0;
-        z-index: 30;
-      }
-      .mobile-menu-toggle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.15rem;
-        height: 2.15rem;
-        border-radius: 0.65rem;
-        border: none;
-        background: var(--green-dark);
-        color: #fff;
-        cursor: pointer;
-        flex-shrink: 0;
-      }
-      .mobile-menu-toggle svg { width: 1.05rem; height: 1.05rem; stroke: currentColor; }
-      .mobile-top-brand { display: flex; align-items: center; gap: 0.5rem; margin: 0 auto; text-decoration: none; }
-      .mobile-top-brand img { height: 1.35rem; width: auto; }
-      .mobile-top-brand span { font-size: 0.92rem; font-weight: 700; color: var(--green-dark); letter-spacing: -0.02em; }
-
-      main { padding: 1.75rem 1.1rem 3rem; }
-    }
-  </style>
+  <style>* { box-sizing: border-box; }</style>
 </head>
-<body>
+<body class="page-shell-root">
   <div class="page-shell">
     <div id="sidebar-overlay"></div>
     <aside id="site-sidebar" class="site-sidebar">
@@ -235,7 +73,7 @@ function shell(title, description, active, body, extras = {}) {
       <nav class="side-nav">
         ${navLink('chat', '/', 'New Chat')}
         ${navLink('resources', '/resources', 'Resources')}
-        ${navLink('about', '/about', 'About Us')}
+        ${navLink('about', '/about', 'About')}
       </nav>
       <div class="sidebar-spacer">
         <a class="sidebar-cta" href="/resources">
