@@ -69,8 +69,12 @@ function organizationSchema() {
     url: `${SITE_IDENTITY.url}/`,
     logo: {
       '@type': 'ImageObject',
-      url: `${SITE_IDENTITY.url}/assets/logo-icon.svg`,
+      url: `${SITE_IDENTITY.url}/assets/logo.png`,
+      width: 624,
+      height: 589,
+      contentUrl: `${SITE_IDENTITY.url}/assets/logo.png`,
     },
+    image: `${SITE_IDENTITY.url}/assets/logo.png`,
     email: 'hello@liamscall.ca',
     description: SITE_IDENTITY.shortDescription,
     disambiguatingDescription: SITE_IDENTITY.disambiguatingDescription,
@@ -164,7 +168,9 @@ function blogPostingSchema({
       url: `${SITE_IDENTITY.url}/`,
       logo: {
         '@type': 'ImageObject',
-        url: `${SITE_IDENTITY.url}/assets/logo-icon.svg`,
+        url: `${SITE_IDENTITY.url}/assets/logo.png`,
+        width: 624,
+        height: 589,
       },
     },
     mainEntityOfPage: {
@@ -180,7 +186,7 @@ function blogPostingSchema({
       ? image
       : `${SITE_IDENTITY.url}${image.startsWith('/') ? image : `/${image}`}`;
   } else {
-    schema.image = `${SITE_IDENTITY.url}/assets/logo-icon.svg`;
+    schema.image = `${SITE_IDENTITY.url}/assets/logo.png`;
   }
   return schema;
 }

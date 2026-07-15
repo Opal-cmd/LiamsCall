@@ -46,7 +46,7 @@ function escapeHtml(str) {
 
 function brandImage() {
   return {
-    loc: `${SITE}/assets/logo-icon.svg`,
+    loc: `${SITE}/assets/logo.png`,
     title: SITE_IDENTITY.siteName,
     caption: `${SITE_IDENTITY.siteName} - ${SITE_IDENTITY.subCategory}`,
   };
@@ -146,6 +146,11 @@ function main() {
       changefreq: 'daily',
       images: [
         logo,
+        {
+          loc: `${SITE}/assets/logo-icon.svg`,
+          title: `${SITE_IDENTITY.siteName} icon`,
+          caption: `${SITE_IDENTITY.siteName} crest logo`,
+        },
         {
           loc: `${SITE}/assets/logo-horizontal.svg`,
           title: `${SITE_IDENTITY.siteName} wordmark`,

@@ -52,7 +52,7 @@ function shell(title, description, active, body, extras = {}) {
   <meta property="og:title" content="${ogTitle}">
   <meta property="og:description" content="${description}">
   <meta property="og:url" content="${canonical}">
-  <meta property="og:image" content="https://liamscall.com/assets/logo-icon.svg">
+  <meta property="og:image" content="https://liamscall.com/assets/logo.png">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="${ogTitle}">
   <meta name="twitter:description" content="${description}">
