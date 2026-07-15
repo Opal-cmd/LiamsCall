@@ -128,11 +128,6 @@ function buildBrowserHtml(xml) {
 <body>
 	<div id="content">
 		<h1>XML Sitemap</h1>
-		<p class="expl">
-			This XML Sitemap is meant for consumption by search engines.<br>
-			You can find more information about XML sitemaps on
-			<a href="https://www.sitemaps.org/protocol.html" target="_blank" rel="noopener">sitemaps.org</a>.
-		</p>
 		<p class="expl">This XML Sitemap contains ${urls.length} URLs.</p>
 		<table id="sitemap" cellpadding="3">
 			<thead>

@@ -80,11 +80,6 @@
       <body>
         <div id="content">
           <h1>XML Sitemap</h1>
-          <p class="expl">
-            This XML Sitemap is meant for consumption by search engines.<br/>
-            You can find more information about XML sitemaps on
-            <a href="https://www.sitemaps.org/protocol.html" target="_blank" rel="noopener">sitemaps.org</a>.
-          </p>
           <xsl:if test="count(sitemap:urlset/sitemap:url) &gt; 0">
             <p class="expl">
               This XML Sitemap contains
