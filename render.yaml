@@ -1,0 +1,49 @@
+# Staging Web Service for supervisor review.
+# Production (liamscall.onrender.com) stays on the main branch — create/keep that
+# service separately in the Render dashboard if it is not already listed here.
+#
+# After push: Render Dashboard → New → Blueprint → connect this repo,
+# or New → Web Service → branch "staging" using the settings below.
+
+services:
+  - type: web
+    name: liamscall-staging
+    runtime: node
+    plan: free
+    region: oregon
+    branch: staging
+    buildCommand: npm install && npm run blog:build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PROVIDER_CHAIN
+        value: gemini,openai
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: MAX_TOKENS
+        value: "4096"
+      # Set these in the Render dashboard (do not commit secrets):
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: BLOG_ADMIN_PASSWORD
+        sync: false
+      - key: ALLOWED_ORIGIN
+        sync: false
+      - key: JWST_API_KEY
+        sync: false
+      - key: TURNSTILE_SITE_KEY
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+      - key: ADSENSE_CLIENT_ID
+        sync: false
+      - key: ADSENSE_SLOT_SIDEBAR
+        sync: false
+      - key: ADSENSE_SLOT_ARTICLE
+        sync: false
+      - key: BLOG_ADMIN_TOKEN_HOURS
+        value: "12"
