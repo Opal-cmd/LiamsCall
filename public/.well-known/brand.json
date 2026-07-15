@@ -1,0 +1,143 @@
+{
+  "$schema": "https://adcontextprotocol.org/schemas/v3/brand.json",
+  "version": "1.0",
+  "last_updated": "2026-07-15",
+  "id": "liams_call",
+  "names": [
+    {
+      "en": "Liam's Call"
+    },
+    {
+      "en": "Liams Call"
+    },
+    {
+      "en": "liamscall.com"
+    },
+    {
+      "en": "LiamsCall"
+    },
+    {
+      "en-CA": "Liam's Call"
+    }
+  ],
+  "keller_type": "independent",
+  "tagline": "Free caregiver support for mental health, addiction, and housing — Canada and the United States.",
+  "description": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+  "properties": [
+    {
+      "url": "https://liamscall.com/",
+      "type": "website",
+      "name": "Liam's Call"
+    },
+    {
+      "url": "https://liamscall.com/resources",
+      "type": "website",
+      "name": "Crisis & Support Resources"
+    },
+    {
+      "url": "https://liamscall.com/about",
+      "type": "website",
+      "name": "About Us"
+    }
+  ],
+  "logos": [
+    {
+      "url": "https://liamscall.com/assets/logo.png",
+      "variant": "primary",
+      "type": "raster"
+    },
+    {
+      "url": "https://liamscall.com/assets/logo-icon.svg",
+      "variant": "icon",
+      "type": "svg"
+    },
+    {
+      "url": "https://liamscall.com/assets/logo-horizontal.svg",
+      "variant": "horizontal",
+      "type": "svg"
+    }
+  ],
+  "colors": {
+    "primary": "#0f4a3a",
+    "secondary": "#1f6b52",
+    "accent": "#1a2d5a",
+    "background": "#f3f0ea",
+    "text": "#1f2937",
+    "heading": "#0f4a3a",
+    "body": "#374151",
+    "surface_1": "#e8dfd3",
+    "surface_2": "#ffffff",
+    "border": "#e5e7eb"
+  },
+  "fonts": {
+    "primary": "Inter",
+    "body": "Inter",
+    "display": "Inter"
+  },
+  "tone": {
+    "voice": "Calm, plain, and warm — like a steady, kind friend who knows the system. Empathetic first, informational second. Never clinical detachment or melodrama.",
+    "attributes": [
+      "empathetic",
+      "calm",
+      "plainspoken",
+      "nonjudgmental",
+      "succinct",
+      "ask-first"
+    ],
+    "dos": [
+      "Acknowledge emotional weight before offering steps or resources",
+      "Prefer one gentle clarifying question at a time",
+      "Contextualize phone numbers (what it is, who it is for, free or not)",
+      "Use verified Canada and U.S. crisis directories only — never invent local hotlines",
+      "Frame the product as a free caregiver and family support chat, not a sales or phone tool"
+    ],
+    "donts": [
+      "Do not use exclamation points",
+      "Do not claim to be a therapist, crisis line, or medical professional",
+      "Do not invent clinic or shelter phone numbers",
+      "Do not disclose AI providers, captcha vendors, or advertising networks",
+      "Do not confuse Liam's Call with click-to-call or phone-receptionist products"
+    ]
+  },
+  "industries": [
+    "Health Sciences",
+    "Social Services",
+    "Civic Services",
+    "Mental Health",
+    "Addiction Support",
+    "Housing Support",
+    "Caregiver Support"
+  ],
+  "target_audience": {
+    "primary": "Caregivers and family members supporting a loved one through mental health, addiction, or housing challenges in Canada and the United States",
+    "also": [
+      "People seeking next steps for themselves around mental health, addiction, or housing",
+      "Adults looking for verified crisis lines and national directories without creating an account"
+    ],
+    "regions": [
+      "CA",
+      "US"
+    ],
+    "preferences": {
+      "language": [
+        "en",
+        "en-CA"
+      ],
+      "accessibility": "judgment-free, no waitlist, no co-pay, no account required"
+    }
+  },
+  "contact": {
+    "email": "hello@liamscall.ca",
+    "support_email": "hello@liamscall.ca",
+    "safety_email": "safety@liamscall.ca",
+    "url": "https://liamscall.com/"
+  },
+  "sameAs": [
+    "https://github.com/Opal-cmd/LiamsCall"
+  ],
+  "related": {
+    "site_identity": "https://liamscall.com/site-identity.json",
+    "sitemap": "https://liamscall.com/sitemap.xml",
+    "robots": "https://liamscall.com/robots.txt"
+  }
+}

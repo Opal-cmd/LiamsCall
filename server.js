@@ -465,6 +465,17 @@ app.get('/site-identity.json', (_req, res) => {
   return res.sendFile(file);
 });
 
+app.get('/.well-known/brand.json', (_req, res) => {
+  const file = path.join(PUBLIC_DIR, '.well-known', 'brand.json');
+  if (!fs.existsSync(file)) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  return res.sendFile(file);
+});
+
 app.use(express.static(PUBLIC_DIR));
 
 function modelForProvider(provider) {
@@ -522,10 +533,10 @@ function getApiConfig(provider, modelOverride, systemPrompt) {
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       buildBody: (messages) => {
         const body = {
-          model,
+        model,
           messages: [{ role: 'system', content: prompt }, ...messages],
-          stream: true,
-          max_tokens: MAX_TOKENS,
+        stream: true,
+        max_tokens: MAX_TOKENS,
         };
         if (useReasoningGate) {
           body.reasoning_effort = process.env.GEMINI_REASONING_EFFORT || 'none';
@@ -1085,10 +1096,10 @@ app.post('/api/chat', async (req, res) => {
   if (CAPTCHA_ENABLED) {
     const gate = captchaGateResult(req);
     if (gate.required) {
-      return res.status(403).json({
-        error: 'Please complete the verification check before chatting.',
-        captchaRequired: true,
-      });
+    return res.status(403).json({
+      error: 'Please complete the verification check before chatting.',
+      captchaRequired: true,
+    });
     }
   }
 

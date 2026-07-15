@@ -266,6 +266,142 @@ function sitemapXmlComment() {
   ].join('\n');
 }
 
+/**
+ * AdCP brand.json (Brand Canonical Document) for /.well-known/brand.json.
+ * @see https://docs.adcontextprotocol.org/docs/brand-protocol/brand-json
+ */
+function brandJson() {
+  const today = new Date().toISOString().slice(0, 10);
+  return {
+    $schema: 'https://adcontextprotocol.org/schemas/v3/brand.json',
+    version: '1.0',
+    last_updated: today,
+    id: 'liams_call',
+    names: [
+      { en: "Liam's Call" },
+      { en: 'Liams Call' },
+      { en: 'liamscall.com' },
+      { en: 'LiamsCall' },
+      { 'en-CA': "Liam's Call" },
+    ],
+    keller_type: 'independent',
+    tagline:
+      'Free caregiver support for mental health, addiction, and housing — Canada and the United States.',
+    description: SITE_IDENTITY.shortDescription,
+    properties: [
+      {
+        url: `${SITE_IDENTITY.url}/`,
+        type: 'website',
+        name: "Liam's Call",
+      },
+      {
+        url: `${SITE_IDENTITY.url}/resources`,
+        type: 'website',
+        name: 'Crisis & Support Resources',
+      },
+      {
+        url: `${SITE_IDENTITY.url}/about`,
+        type: 'website',
+        name: 'About Us',
+      },
+    ],
+    logos: [
+      {
+        url: `${SITE_IDENTITY.url}/assets/logo.png`,
+        variant: 'primary',
+        type: 'raster',
+      },
+      {
+        url: `${SITE_IDENTITY.url}/assets/logo-icon.svg`,
+        variant: 'icon',
+        type: 'svg',
+      },
+      {
+        url: `${SITE_IDENTITY.url}/assets/logo-horizontal.svg`,
+        variant: 'horizontal',
+        type: 'svg',
+      },
+    ],
+    colors: {
+      primary: '#0f4a3a',
+      secondary: '#1f6b52',
+      accent: '#1a2d5a',
+      background: '#f3f0ea',
+      text: '#1f2937',
+      heading: '#0f4a3a',
+      body: '#374151',
+      surface_1: '#e8dfd3',
+      surface_2: '#ffffff',
+      border: '#e5e7eb',
+    },
+    fonts: {
+      primary: 'Inter',
+      body: 'Inter',
+      display: 'Inter',
+    },
+    tone: {
+      voice:
+        'Calm, plain, and warm — like a steady, kind friend who knows the system. Empathetic first, informational second. Never clinical detachment or melodrama.',
+      attributes: [
+        'empathetic',
+        'calm',
+        'plainspoken',
+        'nonjudgmental',
+        'succinct',
+        'ask-first',
+      ],
+      dos: [
+        'Acknowledge emotional weight before offering steps or resources',
+        'Prefer one gentle clarifying question at a time',
+        'Contextualize phone numbers (what it is, who it is for, free or not)',
+        'Use verified Canada and U.S. crisis directories only — never invent local hotlines',
+        'Frame the product as a free caregiver and family support chat, not a sales or phone tool',
+      ],
+      donts: [
+        'Do not use exclamation points',
+        'Do not claim to be a therapist, crisis line, or medical professional',
+        'Do not invent clinic or shelter phone numbers',
+        'Do not disclose AI providers, captcha vendors, or advertising networks',
+        'Do not confuse Liam\'s Call with click-to-call or phone-receptionist products',
+      ],
+    },
+    industries: [
+      'Health Sciences',
+      'Social Services',
+      'Civic Services',
+      'Mental Health',
+      'Addiction Support',
+      'Housing Support',
+      'Caregiver Support',
+    ],
+    target_audience: {
+      primary:
+        'Caregivers and family members supporting a loved one through mental health, addiction, or housing challenges in Canada and the United States',
+      also: [
+        'People seeking next steps for themselves around mental health, addiction, or housing',
+        'Adults looking for verified crisis lines and national directories without creating an account',
+      ],
+      regions: ['CA', 'US'],
+      preferences: {
+        language: ['en', 'en-CA'],
+        accessibility: 'judgment-free, no waitlist, no co-pay, no account required',
+      },
+    },
+    contact: {
+      email: 'hello@liamscall.ca',
+      support_email: 'hello@liamscall.ca',
+      safety_email: 'safety@liamscall.ca',
+      url: `${SITE_IDENTITY.url}/`,
+    },
+    sameAs: SITE_IDENTITY.sameAs,
+    related: {
+      site_identity: `${SITE_IDENTITY.url}/site-identity.json`,
+      sitemap: `${SITE_IDENTITY.url}/sitemap.xml`,
+      robots: `${SITE_IDENTITY.url}/robots.txt`,
+    },
+  };
+}
+
 module.exports = {
   SITE_IDENTITY,
   metaDescription,
@@ -275,6 +411,7 @@ module.exports = {
   faqPageSchema,
   blogPostingSchema,
   howToSchema,
+  brandJson,
   RESOURCES_FAQS,
   ABOUT_FAQS,
   sitemapXmlComment,

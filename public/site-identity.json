@@ -76,5 +76,9 @@
       "image"
     ],
     "notes": "Production sitemap lists core site pages only. Blog remains on the staging branch."
+  },
+  "brand": {
+    "url": "https://liamscall.com/.well-known/brand.json",
+    "notes": "AdCP brand.json for AI agents and AEO discovery."
   }
 }

@@ -2,8 +2,9 @@
 # Site category: Health Sciences, Social/Civic Services
 # Sub-category: Mental Health, Addiction, Homelessness
 #
-# sitemap.xml = machine-readable (crawlers)
-# /sitemap     = human-readable HTML map of main pages + blog
+# sitemap.xml              = machine-readable (crawlers)
+# /sitemap                 = human-readable HTML map of main pages
+# /.well-known/brand.json  = AdCP brand identity for AI agents (AEO)
 # Do not index /admin.
 
 User-agent: *

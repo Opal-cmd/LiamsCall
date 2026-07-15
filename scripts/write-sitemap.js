@@ -12,6 +12,7 @@ const {
   SITE_IDENTITY,
   organizationSchema,
   speakableSpec,
+  brandJson,
 } = require('./lib/site-identity');
 const { shell } = require('./generate-legal-pages');
 const { extractH1 } = require('./lib/sitemap-browser-view');
@@ -147,7 +148,7 @@ function main() {
       images: [
         logo,
         {
-          loc: `${SITE}/assets/logo-icon.svg`,
+          loc: `${SITE}/assets/logo-icon.png`,
           title: `${SITE_IDENTITY.siteName} icon`,
           caption: `${SITE_IDENTITY.siteName} crest logo`,
         },
@@ -253,13 +254,26 @@ ${entries.map(renderUrl).join('\n')}
           extensions: ['image'],
           notes: 'Production sitemap lists core site pages only. Blog remains on the staging branch.',
         },
+        brand: {
+          url: `${SITE}/.well-known/brand.json`,
+          notes: 'AdCP brand.json for AI agents and AEO discovery.',
+        },
       },
       null,
       2,
     )}\n`,
   );
 
-  console.log(`Wrote production sitemap (${entries.length} URLs) + HTML sitemap + site-identity.json`);
+  const wellKnownDir = path.join(PUBLIC_DIR, '.well-known');
+  fs.mkdirSync(wellKnownDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(wellKnownDir, 'brand.json'),
+    `${JSON.stringify(brandJson(), null, 2)}\n`,
+  );
+
+  console.log(
+    `Wrote production sitemap (${entries.length} URLs) + HTML sitemap + site-identity.json + .well-known/brand.json`,
+  );
 }
 
 main();
