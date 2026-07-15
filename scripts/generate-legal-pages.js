@@ -98,15 +98,27 @@ function shell(title, description, active, body, extras = {}) {
     .side-link { color: inherit; text-decoration: none; cursor: pointer; }
     .side-link:hover { opacity: 0.75; }
     .side-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; color: var(--green-dark); }
-    .sidebar-spacer { margin-top: auto; padding-top: 1.5rem; flex-shrink: 0; }
-    .ad-card { border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb; background: #1a2d5a; color: #fff; font-size: 10px; line-height: 1.35; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-    .ad-card-title { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; letter-spacing: 0.02em; }
-    .ad-card-body { padding: 0.7rem 0.75rem; }
-    .ad-card-body p { margin: 0 0 0.5rem; }
-    .ad-card-body p:last-child { margin-bottom: 0; }
-    .ad-card-body p:first-child { font-weight: 600; font-size: 11px; }
-    .ad-card-body p:last-child { color: rgba(255,255,255,0.7); }
-    .sidebar-legal { display: flex; align-items: center; gap: 0.55rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
+    .sidebar-spacer { margin-top: auto; padding-top: 1.5rem; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+    .sidebar-cta {
+      display: block; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;
+      background: #1a2d5a; color: #fff; font-size: 10px; line-height: 1.35; text-decoration: none;
+    }
+    .sidebar-cta-title { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; color: #fff; }
+    .sidebar-cta-body { padding: 0.7rem 0.75rem; }
+    .sidebar-cta-body p { margin: 0 0 0.5rem; color: #fff; }
+    .sidebar-cta-body p:last-child { margin-bottom: 0; color: rgba(255,255,255,0.7); }
+    .ad-slot {
+      border-radius: 0.75rem; overflow: hidden; border: 1px dashed rgba(15,74,58,0.28);
+      background: #fafaf8; font-size: 10px; line-height: 1.35; min-height: 5.5rem;
+    }
+    .ad-slot-label {
+      padding: 0.4rem 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      border-bottom: 1px solid #ece7df; color: #9a6700; font-size: 0.65rem;
+    }
+    .ad-slot-body { padding: 0.65rem 0.75rem; color: #6b7280; }
+    .ad-slot-body p { margin: 0 0 0.35rem; }
+    .ad-slot-body p:last-child { margin-bottom: 0; color: #9ca3af; }
+    .sidebar-legal { display: flex; align-items: center; gap: 0.55rem; margin-top: 0.25rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
     .sidebar-legal a,
     .sidebar-legal a.side-link {
       font-size: 10px !important;
@@ -206,11 +218,18 @@ function shell(title, description, active, body, extras = {}) {
         ${navLink('about', '/about', 'About Us')}
       </nav>
       <div class="sidebar-spacer">
-        <div class="ad-card">
-          <div class="ad-card-title">Resources</div>
-          <div class="ad-card-body">
+        <a class="sidebar-cta" href="/resources">
+          <div class="sidebar-cta-title">Resources</div>
+          <div class="sidebar-cta-body">
             <p>Mental health, addiction and housing support for you and your loved ones.</p>
             <p>Explore guides, tips, and tools for caregivers and families.</p>
+          </div>
+        </a>
+        <div class="ad-slot ad-slot--placeholder" data-ad-slot="sidebar" aria-label="Sidebar ad">
+          <div class="ad-slot-label">Sponsored</div>
+          <div class="ad-slot-body">
+            <p>Sidebar ad</p>
+            <p>Standard insertion area — Google Ads appear here after publisher approval.</p>
           </div>
         </div>
         <div class="sidebar-legal">

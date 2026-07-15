@@ -11,3 +11,4 @@ logo/
 /index.html
 .blog-generate-result.json
 .blog-discover-result.json
+content/blog/.desk-audit.log

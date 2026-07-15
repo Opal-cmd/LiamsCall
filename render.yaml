@@ -39,3 +39,11 @@ services:
         sync: false
       - key: TURNSTILE_SECRET_KEY
         sync: false
+      - key: ADSENSE_CLIENT_ID
+        sync: false
+      - key: ADSENSE_SLOT_SIDEBAR
+        sync: false
+      - key: ADSENSE_SLOT_ARTICLE
+        sync: false
+      - key: BLOG_ADMIN_TOKEN_HOURS
+        value: "12"

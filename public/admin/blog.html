@@ -199,6 +199,7 @@
       <div class="tabs">
         <button class="tab active" data-tab="drafts" type="button">1. Needs review</button>
         <button class="tab" data-tab="live" type="button">2. Live on site</button>
+        <button class="tab" data-tab="sources" type="button">3. Topics &amp; sources</button>
       </div>
 
       <div id="list-view">
@@ -216,6 +217,32 @@
             <button id="refresh-live-btn" class="btn secondary" type="button">Refresh</button>
           </div>
           <div id="live-list" class="list"></div>
+        </div>
+
+        <div id="sources-view" class="card hidden stack">
+          <div>
+            <strong>Idea sources &amp; topic queue</strong>
+            <p class="help" style="margin:0.35rem 0 0;">Edit inspiration seeds and the writing queue. RSS feeds are listed for reference — keep only trusted orgs. Never republish full articles.</p>
+          </div>
+          <div class="field">
+            <label>RSS feeds (read-only name + URL)</label>
+            <div id="feeds-list" class="list"></div>
+          </div>
+          <div class="field">
+            <label>Curated seed links</label>
+            <div id="seeds-list" class="list"></div>
+            <div class="row" style="margin-top:0.5rem;">
+              <button id="add-seed-btn" class="btn secondary" type="button">Add seed</button>
+              <button id="save-sources-btn" class="btn" type="button">Save sources</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Topic queue</label>
+            <div id="topics-list" class="list"></div>
+            <div class="row" style="margin-top:0.5rem;">
+              <button id="save-topics-btn" class="btn" type="button">Save topics</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -236,10 +263,14 @@
             <label for="title">Title</label>
             <input id="title" type="text">
           </div>
-          <div class="row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;">
+          <div class="row" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.75rem;">
             <div class="field">
               <label for="category">Category</label>
               <input id="category" type="text">
+            </div>
+            <div class="field">
+              <label for="region">Region</label>
+              <input id="region" type="text" placeholder="Canada">
             </div>
             <div class="field">
               <label for="date">Date</label>
@@ -257,6 +288,11 @@
             <label for="description">Short summary (for Google / social)</label>
             <input id="description" type="text">
             <div class="help">One sentence. Keep it calm and clear.</div>
+          </div>
+          <div class="field">
+            <label for="image">Optional hero image path</label>
+            <input id="image" type="text" placeholder="/assets/your-image.jpg">
+            <div class="help">Use a path under /assets/ or leave blank. In the post body you can also add images like ![description](/assets/photo.jpg)</div>
           </div>
         </div>
 
@@ -283,6 +319,8 @@
       token: sessionStorage.getItem('lc_blog_admin') || '',
       tab: 'drafts',
       currentSlug: null,
+      sources: { feeds: [], seeds: [] },
+      topics: [],
     };
 
     const $ = (id) => document.getElementById(id);
@@ -324,6 +362,10 @@
       });
       $('drafts-view').classList.toggle('hidden', tab !== 'drafts');
       $('live-view').classList.toggle('hidden', tab !== 'live');
+      $('sources-view').classList.toggle('hidden', tab !== 'sources');
+      if (tab === 'sources') {
+        refreshSourcesPanel().catch((e) => showBanner(e.message, 'err'));
+      }
     }
 
     function showList() {
@@ -406,9 +448,11 @@
       state.currentSlug = draft.slug;
       $('title').value = draft.title || '';
       $('category').value = draft.category || '';
+      $('region').value = draft.region || 'Canada';
       $('date').value = draft.date || '';
       $('risk').value = draft.risk === 'safe' ? 'safe' : 'review';
       $('description').value = draft.description || '';
+      $('image').value = draft.image || '';
       $('body').value = draft.body || '';
       $('preview').innerHTML = draft.html || '';
       showEditor();
@@ -420,9 +464,11 @@
       const payload = {
         title: $('title').value.trim(),
         category: $('category').value.trim(),
+        region: $('region').value.trim() || 'Canada',
         date: $('date').value,
         risk: $('risk').value,
         description: $('description').value.trim(),
+        image: $('image').value.trim(),
         body: $('body').value,
       };
       const saved = await api('/api/blog-admin/drafts/' + encodeURIComponent(state.currentSlug), {
@@ -495,6 +541,136 @@
       $('preview').innerHTML = '<h1>' + escapeHtml(data.title || '') + '</h1>' + (data.html || '');
     }
 
+    async function refreshSourcesPanel() {
+      const [sources, topicsData] = await Promise.all([
+        api('/api/blog-admin/sources'),
+        api('/api/blog-admin/topics'),
+      ]);
+      state.sources = {
+        feeds: sources.feeds || [],
+        seeds: (sources.seeds || []).map((s) => ({ ...s })),
+      };
+      state.topics = (topicsData.topics || []).map((t) => ({ ...t }));
+      renderFeeds();
+      renderSeeds();
+      renderTopics();
+    }
+
+    function renderFeeds() {
+      const box = $('feeds-list');
+      if (!state.sources.feeds.length) {
+        box.innerHTML = '<div class="empty">No RSS feeds configured.</div>';
+        return;
+      }
+      box.innerHTML = state.sources.feeds.map((f) => `
+        <div class="item">
+          <div>
+            <h3>${escapeHtml(f.name || f.id)}</h3>
+            <p>${escapeHtml(f.url || '')}</p>
+            <div class="meta">Risk default: ${escapeHtml(f.default_risk || 'review')}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSeeds() {
+      const box = $('seeds-list');
+      if (!state.sources.seeds.length) {
+        box.innerHTML = '<div class="empty">No seed links yet. Add one below.</div>';
+        return;
+      }
+      box.innerHTML = state.sources.seeds.map((s, idx) => `
+        <div class="item" style="grid-template-columns:1fr;">
+          <div class="stack" style="gap:0.45rem;">
+            <input data-seed-field="title" data-seed-idx="${idx}" value="${escapeHtml(s.title || '')}" placeholder="Title">
+            <input data-seed-field="url" data-seed-idx="${idx}" value="${escapeHtml(s.url || '')}" placeholder="https://...">
+            <div class="row" style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.45rem;">
+              <input data-seed-field="category" data-seed-idx="${idx}" value="${escapeHtml(s.category || '')}" placeholder="Category">
+              <select data-seed-field="risk" data-seed-idx="${idx}">
+                <option value="safe"${s.risk === 'safe' ? ' selected' : ''}>safe</option>
+                <option value="review"${s.risk !== 'safe' ? ' selected' : ''}>review</option>
+              </select>
+              <button class="btn danger" type="button" data-remove-seed="${idx}">Remove</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      box.querySelectorAll('[data-seed-field]').forEach((el) => {
+        el.addEventListener('change', () => {
+          const i = Number(el.getAttribute('data-seed-idx'));
+          const field = el.getAttribute('data-seed-field');
+          if (!state.sources.seeds[i]) return;
+          state.sources.seeds[i][field] = el.value;
+        });
+      });
+      box.querySelectorAll('[data-remove-seed]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const i = Number(btn.getAttribute('data-remove-seed'));
+          state.sources.seeds.splice(i, 1);
+          renderSeeds();
+        });
+      });
+    }
+
+    function renderTopics() {
+      const box = $('topics-list');
+      if (!state.topics.length) {
+        box.innerHTML = '<div class="empty">Topic queue is empty.</div>';
+        return;
+      }
+      box.innerHTML = state.topics.map((t, idx) => `
+        <div class="item" style="grid-template-columns:1fr;">
+          <div class="stack" style="gap:0.4rem;">
+            <strong>${escapeHtml(t.title || t.id)}</strong>
+            <div class="meta">${escapeHtml(t.id)}</div>
+            <textarea data-topic-field="angle" data-topic-idx="${idx}" style="min-height:70px;">${escapeHtml(t.angle || '')}</textarea>
+            <div class="row" style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.45rem;">
+              <input data-topic-field="category" data-topic-idx="${idx}" value="${escapeHtml(t.category || '')}" placeholder="Category">
+              <select data-topic-field="risk" data-topic-idx="${idx}">
+                <option value="safe"${t.risk === 'safe' ? ' selected' : ''}>safe</option>
+                <option value="review"${t.risk !== 'safe' ? ' selected' : ''}>review</option>
+              </select>
+              <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;">
+                <input type="checkbox" data-topic-field="used" data-topic-idx="${idx}"${t.used ? ' checked' : ''}>
+                Already used
+              </label>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      box.querySelectorAll('[data-topic-field]').forEach((el) => {
+        el.addEventListener('change', () => {
+          const i = Number(el.getAttribute('data-topic-idx'));
+          const field = el.getAttribute('data-topic-field');
+          if (!state.topics[i]) return;
+          state.topics[i][field] = el.type === 'checkbox' ? el.checked : el.value;
+        });
+      });
+    }
+
+    async function saveSources() {
+      hideBanner();
+      const saved = await api('/api/blog-admin/sources', {
+        method: 'PUT',
+        body: JSON.stringify(state.sources),
+      });
+      state.sources = saved;
+      renderFeeds();
+      renderSeeds();
+      showBanner('Sources saved.', 'ok');
+    }
+
+    async function saveTopics() {
+      hideBanner();
+      const saved = await api('/api/blog-admin/topics', {
+        method: 'PUT',
+        body: JSON.stringify({ topics: state.topics }),
+      });
+      state.topics = saved.topics || [];
+      renderTopics();
+      showBanner('Topics saved.', 'ok');
+    }
+
     $('login-btn').addEventListener('click', async () => {
       hideBanner();
       try {
@@ -534,6 +710,12 @@
     $('approve-btn').addEventListener('click', () => approveDraft().catch((e) => showBanner(e.message, 'err')));
     $('delete-btn').addEventListener('click', () => deleteDraft().catch((e) => showBanner(e.message, 'err')));
     $('preview-btn').addEventListener('click', () => updatePreview().catch((e) => showBanner(e.message, 'err')));
+    $('add-seed-btn').addEventListener('click', () => {
+      state.sources.seeds.push({ title: '', url: '', category: 'Caregiving', risk: 'safe' });
+      renderSeeds();
+    });
+    $('save-sources-btn').addEventListener('click', () => saveSources().catch((e) => showBanner(e.message, 'err')));
+    $('save-topics-btn').addEventListener('click', () => saveTopics().catch((e) => showBanner(e.message, 'err')));
 
     (async function boot() {
       if (!state.token) {

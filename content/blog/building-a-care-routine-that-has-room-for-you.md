@@ -3,6 +3,7 @@ title: "Building a Care Routine That Has Room for You"
 slug: building-a-care-routine-that-has-room-for-you
 date: 2026-07-09
 category: Routines
+region: Ontario
 description: "A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours."
 risk: safe
 ---

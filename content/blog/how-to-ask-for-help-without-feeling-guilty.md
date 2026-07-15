@@ -3,6 +3,7 @@ title: "How to Ask for Help Without Feeling Guilty"
 slug: how-to-ask-for-help-without-feeling-guilty
 date: 2026-07-05
 category: Communication
+region: Canada
 description: "Why caregivers avoid asking for help, how to break the guilt loop, and how to make requests specific enough that people can say yes."
 risk: safe
 ---

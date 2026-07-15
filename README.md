@@ -56,7 +56,9 @@ npm run blog:approve -- my-slug    # publish a draft from content/blog/drafts/
 - Review drafts: `content/blog/drafts/`
 - Topic queue: `content/blog/topics.yaml` (`risk: safe` can auto-publish; `risk: review` lands in Blog desk drafts for a human to approve)
 - Idea sources: `content/blog/sources.yaml` (RSS + curated seeds - inspiration only, never copied)
-- **Blog desk (for non-coders):** open [http://localhost:3000/admin/blog](http://localhost:3000/admin/blog) (or `/admin/blog` on the live site). Set `BLOG_ADMIN_PASSWORD` in `.env` / Render. Log in → **Needs review** → edit if needed → **Approve & publish**. **Live on site** can move a post back to drafts.
+- **Blog desk (for non-coders):** open [http://localhost:3000/admin/blog](http://localhost:3000/admin/blog) (or `/admin/blog` on the live site). Set `BLOG_ADMIN_PASSWORD` in `.env` / Render. Log in → **Needs review** → edit if needed → **Approve & publish**. **Live on site** can move a post back to drafts. **Topics & sources** edits the discovery queue without coding.
+- Blog index filters by **category** and **region**. Ad placeholders use `data-ad-slot` (see [`docs/ad-slots.md`](docs/ad-slots.md)); enable Ads after approval via `ADSENSE_*` env vars at build time.
+- Agent mention rules: [`AGENTS.md`](AGENTS.md). Demo checklist: [`docs/supervisor-demo.md`](docs/supervisor-demo.md).
 - Cron: [`.github/workflows/blog-cron.yml`](.github/workflows/blog-cron.yml) (Mon/Thu generate) + [`.github/workflows/blog-discover.yml`](.github/workflows/blog-discover.yml) (weekly ideas) — set repo secret `GEMINI_API_KEY`
 
 ## Deploy (Render)

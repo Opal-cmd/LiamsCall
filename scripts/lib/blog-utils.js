@@ -106,8 +106,26 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+function isSafeImageSrc(src) {
+  const s = String(src || '').trim();
+  if (!s || /["'<>\s]/.test(s)) return false;
+  if (s.startsWith('/assets/') || s.startsWith('/blog/')) return true;
+  try {
+    const u = new URL(s);
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return false;
+    return ALLOWED_HOSTS.has(u.hostname.toLowerCase()) || u.hostname.toLowerCase().endsWith('.liamscall.com');
+  } catch {
+    return false;
+  }
+}
+
 function inlineMarkdown(text) {
   let s = escapeHtml(text);
+  s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_m, alt, src) => {
+    const rawSrc = String(src || '').trim();
+    if (!isSafeImageSrc(rawSrc)) return escapeHtml(`![${alt}](${rawSrc})`);
+    return `<img src="${rawSrc.replace(/"/g, '')}" alt="${escapeHtml(alt)}" loading="lazy" class="blog-img">`;
+  });
   s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|tel:[^)\s]+)\)/g, (_m, label, href) => {
     const safeHref = href.replace(/"/g, '');
     const external = safeHref.startsWith('http');
@@ -142,6 +160,12 @@ function markdownToHtml(md) {
     if (!trimmed) {
       flushPara();
       flushList();
+      continue;
+    }
+    if (/^!\[/.test(trimmed) && /\]\([^)\s]+\)$/.test(trimmed)) {
+      flushPara();
+      flushList();
+      out.push(`<figure class="blog-figure">${inlineMarkdown(trimmed)}</figure>`);
       continue;
     }
     if (/^###\s+/.test(trimmed)) {
@@ -212,8 +236,10 @@ function loadPost(filePath) {
     title: meta.title || slug,
     date: meta.date || '1970-01-01',
     category: meta.category || 'Caregiving',
+    region: meta.region || 'Canada',
     description: meta.description || extractExcerpt(body),
     risk: (meta.risk || 'safe').toLowerCase(),
+    image: meta.image || '',
     body,
     html: markdownToHtml(body),
   };
@@ -408,6 +434,95 @@ function loadSources() {
   return parseSourcesYaml(fs.readFileSync(p, 'utf8'));
 }
 
+function serializeSources({ feeds = [], seeds = [] } = {}) {
+  const feedBlocks = feeds.map((f) => {
+    const lines = [
+      `  - id: ${f.id}`,
+      `    name: ${yamlQuote(f.name || f.id)}`,
+      `    url: ${yamlQuote(f.url || '')}`,
+      `    default_risk: ${(f.default_risk || 'review').toLowerCase()}`,
+    ];
+    if (f.notes) lines.push(`    notes: ${yamlQuote(f.notes)}`);
+    return lines.join('\n');
+  });
+  const seedBlocks = seeds.map((s) => {
+    const lines = [
+      `  - title: ${yamlQuote(s.title || '')}`,
+      `    url: ${yamlQuote(s.url || '')}`,
+      `    category: ${yamlQuote(s.category || 'Caregiving')}`,
+      `    risk: ${(s.risk || 'safe').toLowerCase()}`,
+    ];
+    return lines.join('\n');
+  });
+  return `# Allowlisted idea sources for blog discovery.
+# We only use titles/summaries to invent ORIGINAL Liam's Call angles.
+# Never scrape or republish full articles.
+
+feeds:
+${feedBlocks.join('\n\n')}
+
+# Curated inspiration links when RSS is thin or unavailable.
+# title + url only - discovery will invent a new angle, not rewrite the page.
+seeds:
+${seedBlocks.join('\n\n')}
+`;
+}
+
+function saveSources(data) {
+  const p = path.join(CONTENT_DIR, 'sources.yaml');
+  fs.writeFileSync(p, serializeSources(data), 'utf8');
+}
+
+function adsenseConfig() {
+  const client = String(process.env.ADSENSE_CLIENT_ID || '').trim();
+  const sidebarSlot = String(process.env.ADSENSE_SLOT_SIDEBAR || '').trim();
+  const articleSlot = String(process.env.ADSENSE_SLOT_ARTICLE || '').trim();
+  return {
+    enabled: Boolean(client && /^ca-pub-\d+$/i.test(client)),
+    client,
+    sidebarSlot,
+    articleSlot,
+  };
+}
+
+function renderAdSlot(slotName, { label = 'Ad space' } = {}) {
+  const ads = adsenseConfig();
+  const slotId =
+    slotName === 'article' ? ads.articleSlot : ads.sidebarSlot;
+  if (ads.enabled && slotId) {
+    return `
+        <div class="ad-slot" data-ad-slot="${escapeHtml(slotName)}" aria-label="${escapeHtml(label)}">
+          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${escapeHtml(ads.client)}" crossorigin="anonymous"></script>
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="${escapeHtml(ads.client)}"
+               data-ad-slot="${escapeHtml(slotId)}"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>`;
+  }
+  return `
+        <div class="ad-slot ad-slot--placeholder" data-ad-slot="${escapeHtml(slotName)}" aria-label="${escapeHtml(label)}">
+          <div class="ad-slot-label">Sponsored</div>
+          <div class="ad-slot-body">
+            <p>${escapeHtml(label)}</p>
+            <p>Standard insertion area — Google Ads appear here after publisher approval.</p>
+          </div>
+        </div>`;
+}
+
+function renderChatCtaCard() {
+  return `
+        <a class="sidebar-cta" href="/">
+          <div class="sidebar-cta-title">Chat</div>
+          <div class="sidebar-cta-body">
+            <p>Need to talk something through?</p>
+            <p>Open Liam's Call AI for caregiver, mental health, addiction, and housing support.</p>
+          </div>
+        </a>`;
+}
+
 function markTopicUsed(topicId) {
   let raw = fs.readFileSync(TOPICS_PATH, 'utf8');
   const lines = raw.split(/\r?\n/);
@@ -484,14 +599,40 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
     .side-link { font-size: 0.9rem; color: #111827; text-decoration: none; }
     .side-link:hover { opacity: 0.75; }
     .side-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; color: var(--green-dark); }
-    .sidebar-spacer { margin-top: auto; padding-top: 1.5rem; flex-shrink: 0; }
-    .ad-card { border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb; background: #1a2d5a; color: #fff; font-size: 10px; line-height: 1.35; }
-    .ad-card-title { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; }
-    .ad-card-body { padding: 0.7rem 0.75rem; }
-    .ad-card-body p { margin: 0 0 0.5rem; }
-    .ad-card-body p:last-child { margin-bottom: 0; color: rgba(255,255,255,0.7); }
-    .ad-card-body p:first-child { font-weight: 600; font-size: 11px; color: #fff; }
-    .sidebar-legal { display: flex; align-items: center; gap: 0.55rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
+    .sidebar-spacer { margin-top: auto; padding-top: 1.5rem; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+    .sidebar-cta {
+      display: block; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;
+      background: #1a2d5a; color: #fff; font-size: 10px; line-height: 1.35; text-decoration: none;
+    }
+    .sidebar-cta-title { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; color: #fff; }
+    .sidebar-cta-body { padding: 0.7rem 0.75rem; }
+    .sidebar-cta-body p { margin: 0 0 0.5rem; color: #fff; }
+    .sidebar-cta-body p:last-child { margin-bottom: 0; color: rgba(255,255,255,0.7); }
+    .sidebar-cta-body p:first-child { font-weight: 600; font-size: 11px; color: #fff; }
+    .ad-slot {
+      border-radius: 0.75rem; overflow: hidden; border: 1px dashed rgba(15,74,58,0.28);
+      background: #fafaf8; font-size: 10px; line-height: 1.35; min-height: 5.5rem;
+    }
+    .ad-slot--placeholder { color: #6b7280; }
+    .ad-slot-label {
+      padding: 0.4rem 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      border-bottom: 1px solid #ece7df; color: #9a6700; font-size: 0.65rem;
+    }
+    .ad-slot-body { padding: 0.65rem 0.75rem; }
+    .ad-slot-body p { margin: 0 0 0.35rem; }
+    .ad-slot-body p:last-child { margin-bottom: 0; color: #9ca3af; }
+    .ad-slot-article { margin: 1.5rem 0; }
+    .blog-figure { margin: 0 0 1.25rem; }
+    .blog-img { display: block; max-width: 100%; height: auto; border-radius: 0.75rem; }
+    .blog-filters { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0 0 1.25rem; }
+    .blog-filter {
+      appearance: none; border: 1px solid #e5e7eb; background: #fff; color: #374151;
+      border-radius: 999px; padding: 0.35rem 0.75rem; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    }
+    .blog-filter.is-active { background: var(--green-dark); color: #fff; border-color: var(--green-dark); }
+    .blog-filter-meta { font-size: 0.75rem; color: #9ca3af; margin: -0.5rem 0 1rem; }
+    .post-card.is-hidden { display: none; }
+    .sidebar-legal { display: flex; align-items: center; gap: 0.55rem; margin-top: 0.25rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
     .sidebar-legal a { font-size: 10px !important; color: #d1d5db !important; text-decoration: none !important; }
     .sidebar-legal span { font-size: 10px; color: #e5e7eb; }
     .mobile-topbar { display: none; }
@@ -574,13 +715,8 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
         ${navLink('about', '/about', 'About Us')}
       </nav>
       <div class="sidebar-spacer">
-        <div class="ad-card">
-          <div class="ad-card-title">Chat</div>
-          <div class="ad-card-body">
-            <p>Need to talk something through?</p>
-            <p>Open Liam's Call AI for caregiver, mental health, addiction, and housing support.</p>
-          </div>
-        </div>
+        ${renderChatCtaCard()}
+        ${renderAdSlot('sidebar', { label: 'Sidebar ad' })}
         <div class="sidebar-legal">
           ${navLink('privacy', '/privacy', 'Privacy')}
           <span>&middot;</span>
@@ -686,8 +822,12 @@ module.exports = {
   saveTopics,
   appendTopics,
   loadSources,
+  saveSources,
+  serializeSources,
   markTopicUsed,
   formatDateDisplay,
   blogShell,
   writeSitemap,
+  renderAdSlot,
+  adsenseConfig,
 };

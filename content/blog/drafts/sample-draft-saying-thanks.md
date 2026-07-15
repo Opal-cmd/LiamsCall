@@ -3,6 +3,7 @@ title: "Sample draft: Saying thanks to the person who helps you help"
 slug: sample-draft-saying-thanks
 date: 2026-07-14
 category: Communication
+region: Canada
 description: "A short practice draft so the blog desk has something to review. Safe to edit or delete."
 risk: review
 ---

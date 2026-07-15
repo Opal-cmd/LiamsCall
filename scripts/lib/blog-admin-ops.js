@@ -14,6 +14,10 @@ const {
   toSlug,
   parseFrontmatter,
   markdownToHtml,
+  loadSources,
+  saveSources,
+  loadTopics,
+  saveTopics,
 } = require('./blog-utils');
 
 function rebuildBlog() {
@@ -37,6 +41,7 @@ function listDrafts() {
         title: post.title,
         date: post.date,
         category: post.category,
+        region: post.region || 'Canada',
         description: post.description,
         risk: post.risk,
         status: 'draft',
@@ -51,6 +56,7 @@ function listPublished() {
     title: post.title,
     date: post.date,
     category: post.category,
+    region: post.region || 'Canada',
     description: post.description,
     risk: post.risk,
     status: 'published',
@@ -79,27 +85,31 @@ function getDraft(slug) {
     title: post.title,
     date: post.date,
     category: post.category,
+    region: post.region || 'Canada',
     description: post.description,
     risk: post.risk,
     body: post.body,
+    image: post.image || '',
     raw,
     html: post.html,
     status: 'draft',
   };
 }
 
-function writeMarkdown({ title, slug, date, category, description, risk, body }) {
-  return `---
-title: ${JSON.stringify(title)}
-slug: ${toSlug(slug || title)}
-date: ${date || new Date().toISOString().slice(0, 10)}
-category: ${JSON.stringify(category || 'Caregiving')}
-description: ${JSON.stringify(description || '')}
-risk: ${(risk || 'review').toLowerCase()}
----
-
-${String(body || '').trim()}
-`;
+function writeMarkdown({ title, slug, date, category, region, description, risk, body, image }) {
+  const lines = [
+    '---',
+    `title: ${JSON.stringify(title)}`,
+    `slug: ${toSlug(slug || title)}`,
+    `date: ${date || new Date().toISOString().slice(0, 10)}`,
+    `category: ${JSON.stringify(category || 'Caregiving')}`,
+    `region: ${JSON.stringify(region || 'Canada')}`,
+    `description: ${JSON.stringify(description || '')}`,
+    `risk: ${(risk || 'review').toLowerCase()}`,
+  ];
+  if (image) lines.push(`image: ${JSON.stringify(image)}`);
+  lines.push('---', '', String(body || '').trim(), '');
+  return lines.join('\n');
 }
 
 function saveDraft(slug, updates = {}) {
@@ -111,9 +121,11 @@ function saveDraft(slug, updates = {}) {
     slug: nextSlug,
     date: updates.date ?? current.date,
     category: updates.category ?? current.category,
+    region: updates.region ?? current.region ?? 'Canada',
     description: updates.description ?? current.description,
     risk: updates.risk ?? current.risk ?? 'review',
     body: updates.body ?? current.body,
+    image: updates.image ?? current.image ?? '',
   });
 
   // Soft validate
@@ -200,6 +212,58 @@ function previewMarkdown(rawOrParts) {
   return { title, html: markdownToHtml(body) };
 }
 
+function getSources() {
+  return loadSources();
+}
+
+function updateSources(payload = {}) {
+  const current = loadSources();
+  const feeds = Array.isArray(payload.feeds) ? payload.feeds : current.feeds;
+  const seeds = Array.isArray(payload.seeds) ? payload.seeds : current.seeds;
+  const cleanFeeds = feeds
+    .filter((f) => f && f.id && f.url)
+    .map((f) => ({
+      id: String(f.id).trim(),
+      name: String(f.name || f.id).trim(),
+      url: String(f.url).trim(),
+      default_risk: String(f.default_risk || 'review').toLowerCase() === 'safe' ? 'safe' : 'review',
+      notes: String(f.notes || '').trim(),
+    }));
+  const cleanSeeds = seeds
+    .filter((s) => s && s.title && s.url)
+    .map((s) => ({
+      title: String(s.title).trim(),
+      url: String(s.url).trim(),
+      category: String(s.category || 'Caregiving').trim(),
+      risk: String(s.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
+    }));
+  saveSources({ feeds: cleanFeeds, seeds: cleanSeeds });
+  return loadSources();
+}
+
+function getTopics() {
+  return loadTopics();
+}
+
+function updateTopics(payload = {}) {
+  const incoming = Array.isArray(payload.topics) ? payload.topics : null;
+  if (!incoming) throw new Error('topics array required.');
+  const cleaned = incoming
+    .filter((t) => t && t.id && t.title)
+    .map((t) => ({
+      id: String(t.id).trim(),
+      title: String(t.title).trim(),
+      category: String(t.category || 'Caregiving').trim(),
+      risk: String(t.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
+      used: Boolean(t.used),
+      angle: String(t.angle || '').trim(),
+      source_url: String(t.source_url || '').trim(),
+      source_name: String(t.source_name || '').trim(),
+    }));
+  saveTopics(cleaned);
+  return loadTopics();
+}
+
 module.exports = {
   listDrafts,
   listPublished,
@@ -210,4 +274,8 @@ module.exports = {
   unpublish,
   rebuildBlog,
   previewMarkdown,
+  getSources,
+  updateSources,
+  getTopics,
+  updateTopics,
 };

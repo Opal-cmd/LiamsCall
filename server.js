@@ -29,7 +29,10 @@ const TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY || '';
 const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '';
 const CAPTCHA_ENABLED = Boolean(TURNSTILE_SITE_KEY && TURNSTILE_SECRET_KEY);
 const BLOG_ADMIN_PASSWORD = process.env.BLOG_ADMIN_PASSWORD || '';
+const BLOG_ADMIN_TOKEN_HOURS = Math.max(1, Number(process.env.BLOG_ADMIN_TOKEN_HOURS) || 12);
 const blogAdminOps = require('./scripts/lib/blog-admin-ops');
+const BLOG_AUDIT_PATH = path.join(__dirname, 'content', 'blog', '.desk-audit.log');
+const blogLoginAttempts = new Map(); // ip → { count, resetAt }
 const CAPTCHA_COOKIE_NAME = 'lc_captcha';
 const CAPTCHA_TTL_MS = 24 * 60 * 60 * 1000;
 // Soft threshold: force captcha once an IP is this close to the per-minute rate limit.
@@ -959,8 +962,55 @@ function blogAdminConfigured() {
   return Boolean(BLOG_ADMIN_PASSWORD);
 }
 
+function appendBlogAudit(action, detail = {}) {
+  try {
+    const line = JSON.stringify({
+      at: new Date().toISOString(),
+      action,
+      ...detail,
+    });
+    fs.appendFileSync(BLOG_AUDIT_PATH, `${line}\n`, 'utf8');
+  } catch {
+    // Audit failures should not block desk actions.
+  }
+}
+
+function clientIp(req) {
+  return String(req.ip || req.headers['x-forwarded-for'] || 'unknown')
+    .split(',')[0]
+    .trim();
+}
+
+function checkBlogLoginThrottle(ip) {
+  const now = Date.now();
+  const row = blogLoginAttempts.get(ip) || { count: 0, resetAt: now + 15 * 60 * 1000 };
+  if (now > row.resetAt) {
+    blogLoginAttempts.set(ip, { count: 0, resetAt: now + 15 * 60 * 1000 });
+    return { ok: true };
+  }
+  if (row.count >= 8) {
+    return { ok: false, retryMinutes: Math.ceil((row.resetAt - now) / 60000) };
+  }
+  return { ok: true };
+}
+
+function noteBlogLoginAttempt(ip, success) {
+  const now = Date.now();
+  if (success) {
+    blogLoginAttempts.delete(ip);
+    return;
+  }
+  const row = blogLoginAttempts.get(ip) || { count: 0, resetAt: now + 15 * 60 * 1000 };
+  if (now > row.resetAt) {
+    blogLoginAttempts.set(ip, { count: 1, resetAt: now + 15 * 60 * 1000 });
+    return;
+  }
+  row.count += 1;
+  blogLoginAttempts.set(ip, row);
+}
+
 function signBlogAdminToken() {
-  const exp = Date.now() + 12 * 60 * 60 * 1000;
+  const exp = Date.now() + BLOG_ADMIN_TOKEN_HOURS * 60 * 60 * 1000;
   const payload = `blog:${exp}`;
   const sig = crypto.createHmac('sha256', BLOG_ADMIN_PASSWORD).update(payload).digest('hex');
   return Buffer.from(`${payload}.${sig}`).toString('base64url');
@@ -1000,12 +1050,27 @@ app.post('/api/blog-admin/login', (req, res) => {
       error: 'Blog desk is not set up yet. Ask the site owner to set BLOG_ADMIN_PASSWORD in the server settings.',
     });
   }
+  const ip = clientIp(req);
+  const throttle = checkBlogLoginThrottle(ip);
+  if (!throttle.ok) {
+    appendBlogAudit('login_blocked', { ip });
+    return res.status(429).json({
+      error: `Too many login tries. Wait about ${throttle.retryMinutes} minute(s) and try again.`,
+    });
+  }
   const password = String(req.body?.password || '');
   const expected = Buffer.from(BLOG_ADMIN_PASSWORD);
   const got = Buffer.from(password);
   const ok =
     expected.length === got.length && crypto.timingSafeEqual(expected, got);
-  if (!ok) return res.status(401).json({ error: 'That password did not work.' });
+  if (!ok) {
+    noteBlogLoginAttempt(ip, false);
+    appendBlogAudit('login_failed', { ip });
+    return res.status(401).json({ error: 'That password did not work.' });
+  }
+
+  noteBlogLoginAttempt(ip, true);
+  appendBlogAudit('login_ok', { ip });
 
   const persistHint =
     process.env.NODE_ENV === 'production'
@@ -1052,7 +1117,9 @@ app.delete('/api/blog-admin/drafts/:slug', requireBlogAdmin, (req, res) => {
 
 app.post('/api/blog-admin/drafts/:slug/approve', requireBlogAdmin, (req, res) => {
   try {
-    res.json(blogAdminOps.approveDraft(req.params.slug));
+    const result = blogAdminOps.approveDraft(req.params.slug);
+    appendBlogAudit('approve', { slug: result.slug, ip: clientIp(req) });
+    res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not publish draft.' });
   }
@@ -1060,7 +1127,9 @@ app.post('/api/blog-admin/drafts/:slug/approve', requireBlogAdmin, (req, res) =>
 
 app.post('/api/blog-admin/published/:slug/unpublish', requireBlogAdmin, (req, res) => {
   try {
-    res.json(blogAdminOps.unpublish(req.params.slug));
+    const result = blogAdminOps.unpublish(req.params.slug);
+    appendBlogAudit('unpublish', { slug: result.slug, ip: clientIp(req) });
+    res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not move post back to drafts.' });
   }
@@ -1071,6 +1140,46 @@ app.post('/api/blog-admin/preview', requireBlogAdmin, (req, res) => {
     res.json(blogAdminOps.previewMarkdown(req.body || {}));
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not preview.' });
+  }
+});
+
+app.get('/api/blog-admin/sources', requireBlogAdmin, (_req, res) => {
+  try {
+    res.json(blogAdminOps.getSources());
+  } catch (error) {
+    res.status(500).json({ error: error.message || 'Could not load sources.' });
+  }
+});
+
+app.put('/api/blog-admin/sources', requireBlogAdmin, (req, res) => {
+  try {
+    const result = blogAdminOps.updateSources(req.body || {});
+    appendBlogAudit('sources_update', {
+      ip: clientIp(req),
+      seeds: result.seeds?.length,
+      feeds: result.feeds?.length,
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not save sources.' });
+  }
+});
+
+app.get('/api/blog-admin/topics', requireBlogAdmin, (_req, res) => {
+  try {
+    res.json({ topics: blogAdminOps.getTopics() });
+  } catch (error) {
+    res.status(500).json({ error: error.message || 'Could not load topics.' });
+  }
+});
+
+app.put('/api/blog-admin/topics', requireBlogAdmin, (req, res) => {
+  try {
+    const topics = blogAdminOps.updateTopics(req.body || {});
+    appendBlogAudit('topics_update', { ip: clientIp(req), count: topics.length });
+    res.json({ topics });
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not save topics.' });
   }
 });
 

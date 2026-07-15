@@ -3,6 +3,7 @@ title: "Grief While They're Still Here: Understanding Anticipatory Loss"
 slug: grief-while-theyre-still-here
 date: 2026-07-07
 category: Mental Health
+region: Canada
 description: "Anticipatory grief has no public ritual. What it feels like for caregivers, why it's normal, and gentle ways to let it have somewhere to go."
 risk: safe
 ---

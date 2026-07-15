@@ -40,7 +40,8 @@
         }
     },
     "mainEntityOfPage": "https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you",
-    "articleSection": "Routines"
+    "articleSection": "Routines",
+    "contentLocation": "Ontario"
 }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -66,14 +67,40 @@
     .side-link { font-size: 0.9rem; color: #111827; text-decoration: none; }
     .side-link:hover { opacity: 0.75; }
     .side-link.active { font-weight: 600; text-decoration: underline; text-underline-offset: 4px; color: var(--green-dark); }
-    .sidebar-spacer { margin-top: auto; padding-top: 1.5rem; flex-shrink: 0; }
-    .ad-card { border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb; background: #1a2d5a; color: #fff; font-size: 10px; line-height: 1.35; }
-    .ad-card-title { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; }
-    .ad-card-body { padding: 0.7rem 0.75rem; }
-    .ad-card-body p { margin: 0 0 0.5rem; }
-    .ad-card-body p:last-child { margin-bottom: 0; color: rgba(255,255,255,0.7); }
-    .ad-card-body p:first-child { font-weight: 600; font-size: 11px; color: #fff; }
-    .sidebar-legal { display: flex; align-items: center; gap: 0.55rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
+    .sidebar-spacer { margin-top: auto; padding-top: 1.5rem; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+    .sidebar-cta {
+      display: block; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;
+      background: #1a2d5a; color: #fff; font-size: 10px; line-height: 1.35; text-decoration: none;
+    }
+    .sidebar-cta-title { padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; color: #fff; }
+    .sidebar-cta-body { padding: 0.7rem 0.75rem; }
+    .sidebar-cta-body p { margin: 0 0 0.5rem; color: #fff; }
+    .sidebar-cta-body p:last-child { margin-bottom: 0; color: rgba(255,255,255,0.7); }
+    .sidebar-cta-body p:first-child { font-weight: 600; font-size: 11px; color: #fff; }
+    .ad-slot {
+      border-radius: 0.75rem; overflow: hidden; border: 1px dashed rgba(15,74,58,0.28);
+      background: #fafaf8; font-size: 10px; line-height: 1.35; min-height: 5.5rem;
+    }
+    .ad-slot--placeholder { color: #6b7280; }
+    .ad-slot-label {
+      padding: 0.4rem 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      border-bottom: 1px solid #ece7df; color: #9a6700; font-size: 0.65rem;
+    }
+    .ad-slot-body { padding: 0.65rem 0.75rem; }
+    .ad-slot-body p { margin: 0 0 0.35rem; }
+    .ad-slot-body p:last-child { margin-bottom: 0; color: #9ca3af; }
+    .ad-slot-article { margin: 1.5rem 0; }
+    .blog-figure { margin: 0 0 1.25rem; }
+    .blog-img { display: block; max-width: 100%; height: auto; border-radius: 0.75rem; }
+    .blog-filters { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0 0 1.25rem; }
+    .blog-filter {
+      appearance: none; border: 1px solid #e5e7eb; background: #fff; color: #374151;
+      border-radius: 999px; padding: 0.35rem 0.75rem; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    }
+    .blog-filter.is-active { background: var(--green-dark); color: #fff; border-color: var(--green-dark); }
+    .blog-filter-meta { font-size: 0.75rem; color: #9ca3af; margin: -0.5rem 0 1rem; }
+    .post-card.is-hidden { display: none; }
+    .sidebar-legal { display: flex; align-items: center; gap: 0.55rem; margin-top: 0.25rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6; }
     .sidebar-legal a { font-size: 10px !important; color: #d1d5db !important; text-decoration: none !important; }
     .sidebar-legal span { font-size: 10px; color: #e5e7eb; }
     .mobile-topbar { display: none; }
@@ -156,11 +183,20 @@
         <a class="side-link" href="/about">About Us</a>
       </nav>
       <div class="sidebar-spacer">
-        <div class="ad-card">
-          <div class="ad-card-title">Chat</div>
-          <div class="ad-card-body">
+        
+        <a class="sidebar-cta" href="/">
+          <div class="sidebar-cta-title">Chat</div>
+          <div class="sidebar-cta-body">
             <p>Need to talk something through?</p>
             <p>Open Liam's Call AI for caregiver, mental health, addiction, and housing support.</p>
+          </div>
+        </a>
+        
+        <div class="ad-slot ad-slot--placeholder" data-ad-slot="sidebar" aria-label="Sidebar ad">
+          <div class="ad-slot-label">Sponsored</div>
+          <div class="ad-slot-body">
+            <p>Sidebar ad</p>
+            <p>Standard insertion area — Google Ads appear here after publisher approval.</p>
           </div>
         </div>
         <div class="sidebar-legal">
@@ -188,8 +224,9 @@
         <nav class="blog-crumb" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>Building a Care Routine That Has Room for You</span></nav>
         
     <a class="blog-back" href="/blog">&larr; Back to blog</a>
-    <p class="blog-meta"><span>Routines</span> · <time datetime="2026-07-09">July 9, 2026</time></p>
+    <p class="blog-meta"><span>Routines</span> · <span>Ontario</span> · <time datetime="2026-07-09">July 9, 2026</time></p>
     <h1>Building a Care Routine That Has Room for You</h1>
+    
     <article class="blog-body">
       <p>Routine often gets described as a burden — a rigid structure that boxes you in. But for caregivers, a well-built daily routine is less a cage and more a container. It absorbs the cognitive load of constant decision-making, creates predictability for the person you care for, and — when designed intentionally — carves out space that belongs to you.</p>
 <p>The research on routines in caregiving contexts is consistent: predictable schedules reduce agitation in people with dementia, improve sleep for both parties, and lower caregiver-reported stress levels over time. The structure itself is protective, not just for the person receiving care but for you. Knowing what comes next reduces the mental overhead of perpetual improvisation.</p>
@@ -197,6 +234,16 @@
 <p>Build in contingency. Routines fail. Illness disrupts schedules. Unexpected appointments happen. A routine that assumes everything will go according to plan becomes a source of stress rather than relief when it does not. Build a 15-minute buffer between transitions, and have one fallback option for your own break time (a shorter version of it, rather than nothing).</p>
 <p>Review the routine every few weeks. The needs of the person you care for will change, and so will yours. A routine that worked in January may not work in June. Treating it as a living document — something you adjust rather than abandon when it stops fitting — keeps it functional over the long term.</p>
     </article>
+    <div class="ad-slot-article">
+      
+        <div class="ad-slot ad-slot--placeholder" data-ad-slot="article" aria-label="In-article ad">
+          <div class="ad-slot-label">Sponsored</div>
+          <div class="ad-slot-body">
+            <p>In-article ad</p>
+            <p>Standard insertion area — Google Ads appear here after publisher approval.</p>
+          </div>
+        </div>
+    </div>
     <p class="blog-back-wrap"><a class="blog-back" href="/blog">&larr; Back to blog</a></p>
     <div class="blog-cta">
       <p>If this resonates, you can keep going in a private chat - no account required.</p>

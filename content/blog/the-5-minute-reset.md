@@ -3,6 +3,7 @@ title: "The 5-Minute Reset: Micro-breaks That Actually Work"
 slug: the-5-minute-reset
 date: 2026-07-03
 category: Practical Tips
+region: Canada
 description: "When a full break feels impossible, five-minute resets can still help. Breathing, grounding, and other micro-breaks caregivers actually use."
 risk: safe
 ---

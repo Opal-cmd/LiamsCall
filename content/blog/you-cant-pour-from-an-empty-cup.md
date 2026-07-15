@@ -3,6 +3,7 @@ title: "You Can't Pour From an Empty Cup"
 slug: you-cant-pour-from-an-empty-cup
 date: 2026-07-01
 category: Caregiver Wellbeing
+region: Canada
 description: "Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support."
 risk: safe
 ---
