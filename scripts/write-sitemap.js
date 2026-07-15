@@ -94,7 +94,6 @@ function writeHtmlSitemap(pages) {
   .sitemap-item a { text-decoration: none; font-weight: 600; color: var(--green-dark); }
   .sitemap-item a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .sitemap-item p { margin: 0.35rem 0 0; color: #6b7280; font-size: 0.85rem; line-height: 1.5; }
-  .sitemap-note { margin-top: 1.5rem; padding: 0.9rem 1rem; border-radius: 0.85rem; background: #fff; border: 1px dashed rgba(15,74,58,0.25); color: #6b7280; font-size: 0.82rem; line-height: 1.5; text-align: left; }
 </style>
 <p class="sitemap-lead speakable-summary">${escapeHtml(SITE_IDENTITY.shortDescription)}</p>
 <p class="sitemap-lead">
@@ -103,12 +102,7 @@ function writeHtmlSitemap(pages) {
   <strong>${escapeHtml(SITE_IDENTITY.category)}</strong>
   / <strong>${escapeHtml(SITE_IDENTITY.subCategory)}</strong>.
 </p>
-<ul class="sitemap-list">${items}</ul>
-<p class="sitemap-note">
-  Machine-readable crawl file:
-  <a href="/sitemap.xml">sitemap.xml</a>.
-  The blog is in development on staging and is not listed here yet.
-</p>`;
+<ul class="sitemap-list">${items}</ul>`;
 
   const html = shell(
     'Sitemap',
