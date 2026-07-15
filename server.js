@@ -385,14 +385,49 @@ app.use((req, res, next) => {
 // Serve ONLY the public folder — server code, env files, and backups
 // live outside the web root and can never be downloaded.
 // Sitemap / site-identity are registered first so we can set crawler-only headers.
-app.get('/sitemap.xml', (_req, res) => {
+app.get('/sitemap.xsl', (_req, res) => {
+  const file = path.join(PUBLIC_DIR, 'sitemap.xsl');
+  if (!fs.existsSync(file)) {
+    return res.status(404).type('text/plain').send('Stylesheet not found');
+  }
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  return res.sendFile(file);
+});
+
+app.get('/sitemap.xml', (req, res) => {
   const file = path.join(PUBLIC_DIR, 'sitemap.xml');
   if (!fs.existsSync(file)) {
     return res.status(404).type('text/plain').send('Sitemap not found');
   }
-  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   res.setHeader('Cache-Control', 'public, max-age=3600');
+
+  // Chrome removed client-side XSLT — serve the same table view as HTML for browsers.
+  // Crawlers and explicit XML clients still get the protocol sitemap.
+  const ua = String(req.get('user-agent') || '').toLowerCase();
+  const accept = String(req.get('accept') || '');
+  const isBot = /googlebot|bingbot|yandex|duckduckbot|slurp|baiduspider|semrush|ahrefs|dotbot|mj12bot|facebookexternalhit|twitterbot|linkedinbot|applebot|gptbot|claudebot|bytespider/.test(
+    ua,
+  );
+  const wantsHtml =
+    !isBot &&
+    accept.includes('text/html') &&
+    !/\bapplication\/(xml|xhtml\+xml)\b/.test(accept.split(',')[0] || '');
+
+  if (wantsHtml) {
+    try {
+      const { buildBrowserHtml } = require('./scripts/lib/sitemap-browser-view');
+      const xml = fs.readFileSync(file, 'utf8');
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.send(buildBrowserHtml(xml));
+    } catch (err) {
+      console.warn('sitemap browser view failed, serving XML:', err.message);
+    }
+  }
+
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   return res.sendFile(file);
 });
 
