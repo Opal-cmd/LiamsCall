@@ -152,6 +152,7 @@
   ],
   "related": {
     "site_identity": "https://liamscall.com/site-identity.json",
+    "llms": "https://liamscall.com/llms.txt",
     "sitemap": "https://liamscall.com/sitemap.xml",
     "robots": "https://liamscall.com/robots.txt"
   }

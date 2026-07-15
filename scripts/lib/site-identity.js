@@ -411,6 +411,7 @@ function brandJson() {
     sameAs: SITE_IDENTITY.sameAs,
     related: {
       site_identity: `${SITE_IDENTITY.url}/site-identity.json`,
+      llms: `${SITE_IDENTITY.url}/llms.txt`,
       sitemap: `${SITE_IDENTITY.url}/sitemap.xml`,
       robots: `${SITE_IDENTITY.url}/robots.txt`,
     },

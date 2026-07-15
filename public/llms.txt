@@ -1,0 +1,25 @@
+# Liam's Call
+
+> Free AI web chat for caregivers and families in Canada and the United States facing mental health, addiction, or housing challenges. Judgment-free support any hour — no account, waitlist, or co-pay. Not a crisis line, medical provider, or phone-receptionist product.
+
+Liam's Call (liamscall.com) helps people understand their situation, find verified next steps, and stay supported through hard caregiving chapters. In a crisis, call or text 9-8-8 (Canada & U.S.) or call 9-1-1.
+
+## Primary pages
+
+- [Home / Chat](https://liamscall.com/): Free anonymous caregiver support chat
+- [Crisis & Support Resources](https://liamscall.com/resources): Verified Canada and U.S. crisis lines and directories
+- [About](https://liamscall.com/about): Who we are and how the AI works
+- [Privacy](https://liamscall.com/privacy): How we handle data and approximate location
+- [Terms](https://liamscall.com/terms): Terms of use
+- [Sitemap](https://liamscall.com/sitemap): Human-readable site map
+
+## Machine-readable identity (for AI agents)
+
+- [brand.json](https://liamscall.com/.well-known/brand.json): AdCP brand identity — logos, colors, voice, audience
+- [site-identity.json](https://liamscall.com/site-identity.json): Site category, mission, organization schema
+- [sitemap.xml](https://liamscall.com/sitemap.xml): Crawl map of live pages
+- [robots.txt](https://liamscall.com/robots.txt): Crawler access rules
+
+## Optional
+
+- [llms.txt](https://liamscall.com/llms.txt): This file

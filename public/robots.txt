@@ -2,11 +2,72 @@
 # Site category: Health Sciences, Social/Civic Services
 # Sub-category: Mental Health, Addiction, Homelessness
 #
-# sitemap.xml              = machine-readable (crawlers)
-# /sitemap                 = human-readable HTML map of main pages
-# /.well-known/brand.json  = AdCP brand identity for AI agents (AEO)
+# Prefer these discovery files for AI agents:
+#   /.well-known/brand.json  — AdCP brand identity (AEO)
+#   /llms.txt                — curated site map for language models
+#   /site-identity.json      — organization / mission JSON
+#   /sitemap.xml             — URL crawl map
 # Do not index /admin.
 
+# --- AI search / answer crawlers (explicit allow) ---
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+Allow: /site-identity.json
+Allow: /sitemap.xml
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+User-agent: GPTBot
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+User-agent: Claude-User
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+User-agent: anthropic-ai
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+User-agent: Perplexity-User
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+User-agent: Google-Extended
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+User-agent: Applebot-Extended
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+User-agent: Bytespider
+Allow: /
+Allow: /.well-known/brand.json
+Allow: /llms.txt
+
+# --- Default ---
 User-agent: *
 Allow: /
 Disallow: /admin
