@@ -1783,13 +1783,13 @@
                     >
                     <div>
                         <h1 class="font-serif-brand text-xl sm:text-2xl text-gray-900 leading-tight">Liam's Call</h1>
-                        <p class="text-xs sm:text-sm text-gray-600 mt-0.5">Free caregiver chat — mental health, addiction &amp; housing · localized help</p>
+                        <p class="text-xs sm:text-sm text-gray-600 mt-0.5">Mental health, addiction and housing support for you and your loved ones</p>
                     </div>
                 </div>
 
                 <div id="chat-messages" class="space-y-3" aria-live="polite" aria-label="Chat messages">
                     <div class="flex justify-start welcome-msg">
-                        <div class="bubble bubble-assistant">Hi — I'm Liam's Call AI. I help with caregiving, mental health, addiction, and housing questions for you or someone you love. Free support wherever you are — no account needed. What would you like to talk about today?</div>
+                        <div class="bubble bubble-assistant">Hi, I'm here to help with caregiving questions, stress, routines, and support. What would you like to talk about today?</div>
                     </div>
                 </div>
 
@@ -2633,7 +2633,7 @@
             conversation = [];
             chatMessages.innerHTML = `
                 <div class="flex justify-start welcome-msg">
-                    <div class="bubble bubble-assistant">Hi — I'm Liam's Call AI. I help with caregiving, mental health, addiction, and housing questions for you or someone you love. Free support wherever you are — no account needed. What would you like to talk about today?</div>
+                    <div class="bubble bubble-assistant">Hi, I'm here to help with caregiving questions, stress, routines, and support. What would you like to talk about today?</div>
                 </div>`;
             navigate('chat');
         }
@@ -2863,9 +2863,18 @@
             });
         }
 
+        function stripChatDashes(text) {
+            // Ban spaced hyphen / en / em dash separators in chat bubbles.
+            // Keep tight hyphens in phones (1-800-…) and compact ranges (6-10).
+            return String(text || '')
+                .replace(/\s+[—–‐‑‒―]\s+/g, ', ')
+                .replace(/\s+-\s+/g, ', ')
+                .replace(/[—–‐‑‒―]/g, ', ');
+        }
+
         function setBubbleContent(bubble, text, role) {
             if (role === 'assistant') {
-                bubble.innerHTML = renderAssistantMarkdown(text);
+                bubble.innerHTML = renderAssistantMarkdown(stripChatDashes(text));
             } else {
                 bubble.textContent = text;
             }
