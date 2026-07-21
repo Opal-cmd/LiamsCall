@@ -227,7 +227,7 @@ const RESOURCES_FAQS = [
   {
     question: "Is Liam's Call a crisis line or medical service?",
     answer:
-      "No. Liam's Call is a free informational AI chat for caregivers and families. It is not a medical professional, therapist, or emergency service. In a crisis, call or text 9-8-8 (Canada or the U.S.), or call 9-1-1 for emergencies.",
+      "No. Liam's Call is a free informational AI chat for caregivers and families. It is not a medical professional, therapist, or emergency service. In a crisis, contact your local emergency number — in Canada or the U.S., call or text 9-8-8, or call 9-1-1.",
   },
   {
     question: "Do I need an account to use Liam's Call?",

@@ -163,7 +163,7 @@ function main() {
       file: 'resources.html',
       label: 'Crisis & Support Resources',
       blurb:
-        'Verified Canada and United States crisis lines and directories — 988, 911, 211, SAMHSA, ConnexOntario, and more. Chat localizes help worldwide.',
+        'Static Canada and U.S. crisis directories on this page; use the chat for localized help worldwide.',
       priority: '0.8',
       changefreq: 'weekly',
     },
