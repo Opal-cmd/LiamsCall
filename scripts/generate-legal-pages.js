@@ -57,9 +57,9 @@ function shell(title, description, active, body, extras = {}) {
   <meta name="twitter:title" content="${ogTitle}">
   <meta name="twitter:description" content="${description}">
   <title>${title} — Liam's Call</title>
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" href="/assets/favicon.png">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">${schema}
+  <link rel="icon" href="/favicon.ico?v=2" sizes="any">
+  <link rel="icon" type="image/png" href="/assets/favicon.png?v=2">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=2">${schema}
   <link rel="stylesheet" href="/assets/site.css">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>* { box-sizing: border-box; }</style>
