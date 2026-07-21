@@ -5,7 +5,7 @@
   "category": "Health Sciences, Social/Civic Services",
   "subCategory": "Mental Health, Addiction, Homelessness",
   "shortDescription": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
-  "fullDescription": "Liam's Call is a mental health technology project focused on caregiver and family wellbeing in Canada and the United States. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.\n\nLiam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
+  "fullDescription": "Liam's Call is a mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.\n\nLiam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
   "languages": [
     "en-CA",
     "en"
@@ -30,11 +30,7 @@
     "image": "https://liamscall.com/assets/logo-icon.png",
     "email": "hello@liamscall.ca",
     "description": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
-    "disambiguatingDescription": "Liam's Call (liamscall.com) is a free AI web chat for caregivers and families in Canada and the United States facing mental health, addiction, and housing challenges — not LimeCall, not a click-to-call widget company, and not an AI phone receptionist or marketing platform.",
-    "areaServed": [
-      "CA",
-      "US"
-    ],
+    "disambiguatingDescription": "Liam's Call (liamscall.com) is a free AI web chat for caregivers and families facing mental health, addiction, and housing challenges — not LimeCall, not a click-to-call widget company, and not an AI phone receptionist or marketing platform.",
     "knowsAbout": [
       "mental health",
       "addiction",

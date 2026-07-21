@@ -160,7 +160,7 @@ const pages = [
     key: 'about',
     file: 'public/about.html',
     description:
-      "About Liam's Call (liamscall.com): mental health, addiction, and housing support for caregivers and families in Canada and the United States — free, no waitlist or co-pay.",
+      "About Liam's Call (liamscall.com): mental health, addiction, and housing support for caregivers and families — free, no waitlist or co-pay.",
     schema: {
       '@context': 'https://schema.org',
       '@graph': [

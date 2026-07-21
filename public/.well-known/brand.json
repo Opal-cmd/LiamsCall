@@ -1,7 +1,7 @@
 {
   "$schema": "https://adcontextprotocol.org/schemas/v3/brand.json",
   "version": "1.0",
-  "last_updated": "2026-07-15",
+  "last_updated": "2026-07-21",
   "id": "liams_call",
   "names": [
     {
@@ -21,7 +21,7 @@
     }
   ],
   "keller_type": "independent",
-  "tagline": "Free caregiver support for mental health, addiction, and housing — Canada and the United States.",
+  "tagline": "Free caregiver support for mental health, addiction, and housing.",
   "description": "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
   "properties": [
     {
@@ -103,7 +103,8 @@
       "Acknowledge emotional weight before offering steps or resources",
       "Prefer one gentle clarifying question at a time",
       "Contextualize phone numbers (what it is, who it is for, free or not)",
-      "Use verified Canada and U.S. crisis directories only — never invent local hotlines",
+      "Localize resources to the visitor’s city, region, and country (or the place they name)",
+      "Prefer official national/regional helplines and directories — never invent local hotlines",
       "Frame the product as a free caregiver and family support chat, not a sales or phone tool"
     ],
     "donts": [
@@ -124,14 +125,10 @@
     "Caregiver Support"
   ],
   "target_audience": {
-    "primary": "Caregivers and family members supporting a loved one through mental health, addiction, or housing challenges in Canada and the United States",
+    "primary": "Caregivers and family members supporting a loved one through mental health, addiction, or housing challenges",
     "also": [
       "People seeking next steps for themselves around mental health, addiction, or housing",
-      "Adults looking for verified crisis lines and national directories without creating an account"
-    ],
-    "regions": [
-      "CA",
-      "US"
+      "Adults looking for local crisis lines and directories without creating an account"
     ],
     "preferences": {
       "language": [

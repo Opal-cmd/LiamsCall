@@ -5,7 +5,7 @@
   <url>
     <!-- title: Liam's Call -->
     <loc>https://liamscall.com/</loc>
-    <lastmod>2026-07-15</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -27,35 +27,35 @@
   <url>
     <!-- title: Crisis & Support Resources -->
     <loc>https://liamscall.com/resources</loc>
-    <lastmod>2026-07-15</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <!-- title: About Us -->
     <loc>https://liamscall.com/about</loc>
-    <lastmod>2026-07-15</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <!-- title: Sitemap -->
     <loc>https://liamscall.com/sitemap</loc>
-    <lastmod>2026-07-15</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <!-- title: Privacy Policy -->
     <loc>https://liamscall.com/privacy</loc>
-    <lastmod>2026-07-15</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <!-- title: Terms of Use -->
     <loc>https://liamscall.com/terms</loc>
-    <lastmod>2026-07-15</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

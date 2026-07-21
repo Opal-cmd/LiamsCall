@@ -11,9 +11,9 @@ const SITE_IDENTITY = {
     "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
   /** One-line disambiguation for Google/AI Overview (not LimeCall / phone widgets). */
   disambiguatingDescription:
-    "Liam's Call (liamscall.com) is a free AI web chat for caregivers and families in Canada and the United States facing mental health, addiction, and housing challenges — not LimeCall, not a click-to-call widget company, and not an AI phone receptionist or marketing platform.",
+    "Liam's Call (liamscall.com) is a free AI web chat for caregivers and families facing mental health, addiction, and housing challenges — not LimeCall, not a click-to-call widget company, and not an AI phone receptionist or marketing platform.",
   fullDescription:
-    "Liam's Call is a mental health technology project focused on caregiver and family wellbeing in Canada and the United States. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.\n\n" +
+    "Liam's Call is a mental health technology project focused on caregiver and family wellbeing. We are a small team with a deep personal connection to the challenges of caregiving — many of us have navigated the mental and emotional weight of supporting a loved one through illness, aging, or crisis.\n\n" +
     "Liam's Call (liamscall.com) exists for one reason: to make sure no caregiver or family member facing a mental health, addiction, or housing challenge has to face it alone. We believe that accessible, judgment-free support — available at any hour, without a waitlist or a co-pay — can make a real difference in people's lives.",
   /**
    * Official profiles Google can treat as the same entity (schema.org sameAs).
@@ -33,8 +33,6 @@ const SITE_IDENTITY = {
     'Addiction',
     'Homelessness',
     'caregiver support',
-    'Canada',
-    'Ontario',
   ],
   knowsAbout: [
     'mental health',
@@ -78,7 +76,6 @@ function organizationSchema() {
     email: 'hello@liamscall.ca',
     description: SITE_IDENTITY.shortDescription,
     disambiguatingDescription: SITE_IDENTITY.disambiguatingDescription,
-    areaServed: ['CA', 'US'],
     knowsAbout: SITE_IDENTITY.knowsAbout,
     category: SITE_IDENTITY.category,
     contactPoint: [
@@ -242,12 +239,12 @@ const ABOUT_FAQS = [
   {
     question: "What is Liam's Call?",
     answer:
-      "Liam's Call (liamscall.com) is a free AI web chat for caregivers and families in Canada and the United States facing mental health, addiction, and housing challenges. It is not a click-to-call product, phone receptionist service, or marketing platform.",
+      "Liam's Call (liamscall.com) is a free AI web chat for caregivers and families facing mental health, addiction, and housing challenges. It is not a click-to-call product, phone receptionist service, or marketing platform.",
   },
   {
     question: "Who is Liam's Call for?",
     answer:
-      'Caregivers, family members, and anyone seeking next steps around mental health, addiction, or housing support in Canada and the U.S.',
+      'Caregivers, family members, and anyone seeking next steps around mental health, addiction, or housing support — wherever they are.',
   },
   {
     question: "Is Liam's Call free?",
@@ -285,8 +282,7 @@ function brandJson() {
       { 'en-CA': "Liam's Call" },
     ],
     keller_type: 'independent',
-    tagline:
-      'Free caregiver support for mental health, addiction, and housing — Canada and the United States.',
+    tagline: 'Free caregiver support for mental health, addiction, and housing.',
     description: SITE_IDENTITY.shortDescription,
     properties: [
       {
@@ -369,7 +365,8 @@ function brandJson() {
         'Acknowledge emotional weight before offering steps or resources',
         'Prefer one gentle clarifying question at a time',
         'Contextualize phone numbers (what it is, who it is for, free or not)',
-        'Use verified Canada and U.S. crisis directories only — never invent local hotlines',
+        'Localize resources to the visitor’s city, region, and country (or the place they name)',
+        'Prefer official national/regional helplines and directories — never invent local hotlines',
         'Frame the product as a free caregiver and family support chat, not a sales or phone tool',
       ],
       donts: [
@@ -391,12 +388,11 @@ function brandJson() {
     ],
     target_audience: {
       primary:
-        'Caregivers and family members supporting a loved one through mental health, addiction, or housing challenges in Canada and the United States',
+        'Caregivers and family members supporting a loved one through mental health, addiction, or housing challenges',
       also: [
         'People seeking next steps for themselves around mental health, addiction, or housing',
-        'Adults looking for verified crisis lines and national directories without creating an account',
+        'Adults looking for local crisis lines and directories without creating an account',
       ],
-      regions: ['CA', 'US'],
       preferences: {
         language: ['en', 'en-CA'],
         accessibility: 'judgment-free, no waitlist, no co-pay, no account required',

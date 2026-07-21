@@ -1,13 +1,13 @@
 # Liam's Call
 
-> Free AI web chat for caregivers and families in Canada and the United States facing mental health, addiction, or housing challenges. Judgment-free support any hour — no account, waitlist, or co-pay. Not a crisis line, medical provider, or phone-receptionist product.
+> Free AI web chat for caregivers and families facing mental health, addiction, or housing challenges. Judgment-free support any hour — no account, waitlist, or co-pay. Localized help based on where you are. Not a crisis line, medical provider, or phone-receptionist product.
 
-Liam's Call (liamscall.com) helps people understand their situation, find verified next steps, and stay supported through hard caregiving chapters. In a crisis, call or text 9-8-8 (Canada & U.S.) or call 9-1-1.
+Liam's Call (liamscall.com) helps people understand their situation, find verified next steps, and stay supported through hard caregiving chapters. In a crisis, contact your local emergency number — in Canada and the U.S., call or text 9-8-8 or call 9-1-1.
 
 ## Primary pages
 
-- [Home / Chat](https://liamscall.com/): Free anonymous caregiver support chat
-- [Crisis & Support Resources](https://liamscall.com/resources): Verified Canada and U.S. crisis lines and directories
+- [Home / Chat](https://liamscall.com/): Free anonymous caregiver support chat (localizes to your area)
+- [Crisis & Support Resources](https://liamscall.com/resources): Verified Canada and U.S. crisis lines and directories (static list); chat for other regions
 - [About](https://liamscall.com/about): Who we are and how the AI works
 - [Privacy](https://liamscall.com/privacy): How we handle data and approximate location
 - [Terms](https://liamscall.com/terms): Terms of use
