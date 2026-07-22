@@ -57,9 +57,11 @@ function shell(title, description, active, body, extras = {}) {
   <meta name="twitter:title" content="${ogTitle}">
   <meta name="twitter:description" content="${description}">
   <title>${title} — Liam's Call</title>
-  <link rel="icon" href="/favicon.ico?v=2" sizes="any">
-  <link rel="icon" type="image/png" href="/assets/favicon.png?v=2">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=2">${schema}
+  <link rel="icon" href="https://liamscall.com/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="https://liamscall.com/assets/favicon-192.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="https://liamscall.com/assets/favicon-96.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://liamscall.com/assets/apple-touch-icon.png">
+  <link rel="shortcut icon" href="https://liamscall.com/favicon.ico">${schema}
   <link rel="stylesheet" href="/assets/site.css">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>* { box-sizing: border-box; }</style>

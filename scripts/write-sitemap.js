@@ -147,7 +147,7 @@ function main() {
       images: [
         logo,
         {
-          loc: `${SITE}/assets/favicon.png`,
+          loc: `${SITE}/assets/favicon-192.png`,
           title: `${SITE_IDENTITY.siteName} favicon`,
           caption: `${SITE_IDENTITY.siteName} site icon`,
         },
@@ -155,6 +155,11 @@ function main() {
           loc: `${SITE}/assets/apple-touch-icon.png`,
           title: `${SITE_IDENTITY.siteName} apple touch icon`,
           caption: `${SITE_IDENTITY.siteName} home-screen icon`,
+        },
+        {
+          loc: `${SITE}/favicon.ico`,
+          title: `${SITE_IDENTITY.siteName} favicon.ico`,
+          caption: `${SITE_IDENTITY.siteName} root favicon`,
         },
       ],
     },

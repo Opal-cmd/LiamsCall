@@ -5,7 +5,7 @@
   <url>
     <!-- title: Liam's Call -->
     <loc>https://liamscall.com/</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -14,7 +14,7 @@
       <image:caption>Liam's Call - Mental Health, Addiction, Homelessness</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://liamscall.com/assets/favicon.png</image:loc>
+      <image:loc>https://liamscall.com/assets/favicon-192.png</image:loc>
       <image:title>Liam's Call favicon</image:title>
       <image:caption>Liam's Call site icon</image:caption>
     </image:image>
@@ -23,39 +23,44 @@
       <image:title>Liam's Call apple touch icon</image:title>
       <image:caption>Liam's Call home-screen icon</image:caption>
     </image:image>
+    <image:image>
+      <image:loc>https://liamscall.com/favicon.ico</image:loc>
+      <image:title>Liam's Call favicon.ico</image:title>
+      <image:caption>Liam's Call root favicon</image:caption>
+    </image:image>
   </url>
   <url>
     <!-- title: Crisis & Support Resources -->
     <loc>https://liamscall.com/resources</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <!-- title: About Us -->
     <loc>https://liamscall.com/about</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <!-- title: Sitemap -->
     <loc>https://liamscall.com/sitemap</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <!-- title: Privacy Policy -->
     <loc>https://liamscall.com/privacy</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <!-- title: Terms of Use -->
     <loc>https://liamscall.com/terms</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

@@ -318,6 +318,11 @@ function brandJson() {
         type: 'raster',
       },
       {
+        url: `${SITE_IDENTITY.url}/assets/favicon-192.png`,
+        variant: 'favicon',
+        type: 'raster',
+      },
+      {
         url: `${SITE_IDENTITY.url}/assets/favicon.png`,
         variant: 'favicon',
         type: 'raster',

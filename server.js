@@ -501,9 +501,9 @@ app.get('/llms.txt', (_req, res) => {
 // Permanent redirects so crawlers that cached old logo URLs land on the new icon.
 const LOGO_REDIRECTS = {
   '/assets/logo-icon.svg': '/assets/logo-icon.png',
-  '/assets/favicon.svg': '/assets/favicon.png',
+  '/assets/favicon.svg': '/assets/favicon-192.png',
   '/assets/logo.png': '/assets/logo-icon.png',
-  '/favicon.png': '/assets/favicon.png',
+  '/favicon.png': '/assets/favicon-192.png',
   '/apple-touch-icon.png': '/assets/apple-touch-icon.png',
   '/apple-touch-icon-precomposed.png': '/assets/apple-touch-icon.png',
 };
@@ -513,6 +513,18 @@ for (const [from, to] of Object.entries(LOGO_REDIRECTS)) {
     return res.redirect(301, to);
   });
 }
+
+// Explicit favicon responses for Googlebot (clean Content-Type, crawlable, no query string).
+app.get('/favicon.ico', (_req, res) => {
+  res.setHeader('Content-Type', 'image/x-icon');
+  res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+  return res.sendFile(path.join(PUBLIC_DIR, 'favicon.ico'));
+});
+app.get('/assets/favicon-192.png', (_req, res) => {
+  res.setHeader('Content-Type', 'image/png');
+  res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+  return res.sendFile(path.join(PUBLIC_DIR, 'assets', 'favicon-192.png'));
+});
 
 app.use(express.static(PUBLIC_DIR));
 
