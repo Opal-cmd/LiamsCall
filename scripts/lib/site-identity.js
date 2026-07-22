@@ -239,7 +239,7 @@ const ABOUT_FAQS = [
   {
     question: "What is Liam's Call?",
     answer:
-      "Liam's Call (liamscall.com) is a free AI web chat for caregivers and families facing mental health, addiction, and housing challenges. It is not a click-to-call product, phone receptionist service, or marketing platform.",
+      "Liam's Call (liamscall.com) is an AI technology project for caregivers and families facing mental health, addiction, and housing challenges.",
   },
   {
     question: "Who is Liam's Call for?",
