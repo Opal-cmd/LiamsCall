@@ -93,8 +93,6 @@ function shell(title, description, active, body, extras = {}) {
           ${navLink('terms', '/terms', 'Terms')}
           <span>·</span>
           ${navLink('sitemap', '/sitemap', 'Sitemap')}
-          <span>·</span>
-          <a class="side-link" href="/.well-known/brand.json" title="Machine-readable brand identity for AI agents">Brand</a>
         </div>
       </div>
     </aside>
