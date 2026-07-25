@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "test": "node --test",
     "sitemap:write": "node scripts/write-sitemap.js",
     "pages:legal": "node scripts/generate-legal-pages.js"
   },
