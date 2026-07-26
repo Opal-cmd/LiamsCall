@@ -223,9 +223,17 @@ function buildSystemPrompt(geo, messages) {
   }
 
   if (isResourceListRequest(messages)) {
-    base +=
-      ' ACTIVE REQUEST: The visitor wants a local resource list. Reply with exactly 5 compact items using the 2-line list format above.' +
-      ' Intro: 1 short sentence only. Each item: name line + "📞 number · 🌐 url" line. Do not start a 6th item.';
+    if (canUseVerifiedNorthAmericaResourceTable(geo, messages)) {
+      base +=
+        ' ACTIVE REQUEST: The visitor wants a local resource list. Reply with exactly 5 compact items using the 2-line list format above.' +
+        ' Intro: 1 short sentence only. Each item: name line + "📞 number · 🌐 url" line. Do not start a 6th item.';
+    } else {
+      base +=
+        ' ACTIVE REQUEST: The visitor wants local resources, but this location is not covered by the verified North America table.' +
+        ' This overrides the general 5-item resource-list rule: do not force exactly 5 items, and do not force every item to have a phone and URL.' +
+        ' Share only phone numbers and plain https URLs you are confident are real; otherwise point to official government, municipal, or recognized national directories/search paths and ask for city/region/country if needed.' +
+        ' It is better to list fewer verified options than to guess.';
+    }
   }
 
   const prevAssistant = getPreviousAssistantMessage(messages);
@@ -295,6 +303,14 @@ function prepareMessagesForProvider(messages) {
 function isResourceListRequest(messages) {
   const last = (messages[messages.length - 1]?.content || '').toLowerCase();
   return /\b(list|near me|nearby|shelters?|resources?|hotlines?|clinics?|programs?|where can|options?)\b/.test(last);
+}
+
+function canUseVerifiedNorthAmericaResourceTable(geo, messages) {
+  const countryCode = String(geo?.countryCode || '').toUpperCase();
+  if (countryCode === 'US' || countryCode === 'CA') return true;
+
+  const last = (messages[messages.length - 1]?.content || '').toLowerCase();
+  return /\b(canada|canadian|united states|u\.s\.|usa|u\.s\.a\.|america|american)\b/.test(last);
 }
 
 function looksTruncated(text) {
@@ -1238,24 +1254,33 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Liams Call AI server running at http://localhost:${PORT}`);
-  const configured = getProviderCandidates();
-  console.log(`Provider chain: ${configured.map((c) => `${c.provider}(${c.model})`).join(' → ')}`);
-  console.log(`Max output tokens: ${MAX_TOKENS}`);
-  if (configured.length === 0) console.warn('WARNING: No AI providers configured — chat will fail.');
-  if (ALLOWED_ORIGINS.length) {
-    console.log(`CORS allowed origins: ${ALLOWED_ORIGINS.join(', ')}`);
-  } else {
-    console.warn('WARNING: ALLOWED_ORIGIN not set — all origins allowed (fine for local dev only).');
-  }
-  if (TURNSTILE_SITE_KEY && !TURNSTILE_SECRET_KEY) {
-    console.warn('WARNING: TURNSTILE_SITE_KEY is set but TURNSTILE_SECRET_KEY is missing — captcha disabled.');
-  } else if (!TURNSTILE_SITE_KEY && TURNSTILE_SECRET_KEY) {
-    console.warn('WARNING: TURNSTILE_SECRET_KEY is set but TURNSTILE_SITE_KEY is missing — captcha disabled.');
-  } else if (CAPTCHA_ENABLED) {
-    console.log('Captcha: Cloudflare Turnstile enabled (suspicious visitors only).');
-  } else {
-    console.warn('WARNING: Turnstile keys not set — captcha protection is disabled.');
-  }
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Liams Call AI server running at http://localhost:${PORT}`);
+    const configured = getProviderCandidates();
+    console.log(`Provider chain: ${configured.map((c) => `${c.provider}(${c.model})`).join(' → ')}`);
+    console.log(`Max output tokens: ${MAX_TOKENS}`);
+    if (configured.length === 0) console.warn('WARNING: No AI providers configured — chat will fail.');
+    if (ALLOWED_ORIGINS.length) {
+      console.log(`CORS allowed origins: ${ALLOWED_ORIGINS.join(', ')}`);
+    } else {
+      console.warn('WARNING: ALLOWED_ORIGIN not set — all origins allowed (fine for local dev only).');
+    }
+    if (TURNSTILE_SITE_KEY && !TURNSTILE_SECRET_KEY) {
+      console.warn('WARNING: TURNSTILE_SITE_KEY is set but TURNSTILE_SECRET_KEY is missing — captcha disabled.');
+    } else if (!TURNSTILE_SITE_KEY && TURNSTILE_SECRET_KEY) {
+      console.warn('WARNING: TURNSTILE_SECRET_KEY is set but TURNSTILE_SITE_KEY is missing — captcha disabled.');
+    } else if (CAPTCHA_ENABLED) {
+      console.log('Captcha: Cloudflare Turnstile enabled (suspicious visitors only).');
+    } else {
+      console.warn('WARNING: Turnstile keys not set — captcha protection is disabled.');
+    }
+  });
+}
+
+module.exports = {
+  app,
+  buildSystemPrompt,
+  canUseVerifiedNorthAmericaResourceTable,
+  isResourceListRequest,
+};
