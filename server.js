@@ -172,16 +172,6 @@ Keep responses concise by default. Prefer one clarifying question when intent is
 
 const SYSTEM_PROMPT = process.env.SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT;
 
-// Tiny prompt for continuation rounds — avoids resending the 24k-char system prompt.
-const LIST_COMPLETION_PROMPT = `
-Complete a truncated resource list. Output ONLY the missing lines/items.
-Format per item:
-🏠 **Name**: short description
-📞 phone · 🌐 https://site.org
-No intro. No apology. Do not repeat items that already have phone and website.
-Never invent phone numbers or URLs. Never use " - ", " – ", or " — ".
-`.trim();
-
 // Geo cache: IP → { country, countryCode, region, city, fetched }
 const geoCache = new Map();
 const GEO_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
@@ -809,7 +799,7 @@ async function streamProviderWithContinuation(provider, config, baseMessages, re
   let totalTokensSent = 0;
   let finishReason = null;
   const maxRounds = 4;
-  const useReasoningGate = config.model && /gemini-2\.5|gemini-3/i.test(config.model);
+  const shouldCompleteResourceList = isResourceListRequest(baseMessages);
   const tailPrompt =
     'Continue exactly where you stopped. Output ONLY the unfinished list lines. No intro. No apology. Do not repeat completed items.';
 
@@ -818,26 +808,12 @@ async function streamProviderWithContinuation(provider, config, baseMessages, re
     let body;
     if (!isContinuation) {
       body = config.buildBody(baseMessages);
-    } else if (provider === 'anthropic') {
+    } else {
       body = config.buildBody([
         ...baseMessages,
         { role: 'assistant', content: accumulated },
         { role: 'user', content: tailPrompt },
       ]);
-    } else {
-      const lastUser = [...baseMessages].reverse().find((m) => m.role === 'user')?.content || '';
-      body = {
-        model: config.model,
-        messages: [
-          { role: 'system', content: LIST_COMPLETION_PROMPT },
-          { role: 'user', content: lastUser },
-          { role: 'assistant', content: accumulated },
-          { role: 'user', content: tailPrompt },
-        ],
-        stream: true,
-        max_tokens: Math.min(MAX_TOKENS, 1536),
-        ...(useReasoningGate ? { reasoning_effort: process.env.GEMINI_REASONING_EFFORT || 'none' } : {}),
-      };
     }
 
     const upstream = await fetch(config.url, {
@@ -852,7 +828,7 @@ async function streamProviderWithContinuation(provider, config, baseMessages, re
 
     const hitLengthCap = result.finishReason === 'length';
     const listStillOpen = resourceListIncomplete(accumulated);
-    if (!hitLengthCap && !listStillOpen) break;
+    if (!hitLengthCap && !(shouldCompleteResourceList && listStillOpen)) break;
     if (round === maxRounds - 1) break;
   }
 
