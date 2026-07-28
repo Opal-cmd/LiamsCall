@@ -249,8 +249,16 @@ function getPreviousAssistantMessage(messages) {
 }
 
 function isConvoRecoveryRequest(messages) {
-  const last = (messages[messages.length - 1]?.content || '').toLowerCase();
-  return /\b(dropped|cut off|stopped|unfinished|incomplete|didn't finish|didnt finish|where were you|continue|pick up|left off|u suck|you suck|useless|terrible|wtf|bro)\b/.test(last);
+  const last = (messages[messages.length - 1]?.content || '').toLowerCase().trim();
+  const compact = last.replace(/[^\w\s']/g, ' ').replace(/\s+/g, ' ').trim();
+  if (/^(please\s+)?(continue|finish|finish it|keep going|go on|more)(\s+(please|thanks|thank you))?$/.test(compact)) {
+    return true;
+  }
+  return (
+    /\b(your|you|it|reply|response|message|answer|list)\b.{0,40}\b(dropped|cut off|stopped|unfinished|incomplete|didn't finish|didnt finish)\b/.test(last) ||
+    /\b(dropped|cut off|stopped|unfinished|incomplete|didn't finish|didnt finish)\b.{0,40}\b(your|you|it|reply|response|message|answer|list)\b/.test(last) ||
+    /\b(where were you|pick up where (you )?left off|left off)\b/.test(last)
+  );
 }
 
 function splitResourceListSections(text) {
@@ -273,22 +281,8 @@ function resourceListIncomplete(text) {
 }
 
 function prepareMessagesForProvider(messages) {
-  if (messages.length < 2) return messages;
-  const prevAssistant = getPreviousAssistantMessage(messages);
-  const last = messages[messages.length - 1];
-  if (!last || last.role !== 'user') return messages;
-
-  if (isConvoRecoveryRequest(messages) && resourceListIncomplete(prevAssistant)) {
-    return [
-      ...messages.slice(0, -1),
-      {
-        role: 'user',
-        content:
-          'Your last reply cut off before finishing the resource list. Please finish that list now — start from the unfinished item, same compact 2-line format with phone and website. Do not repeat items that already have both. One short acknowledgment first, then the list.',
-      },
-    ];
-  }
-
+  // Keep the visitor's latest turn intact. buildSystemPrompt adds recovery
+  // instructions when needed, but safety checks must still see the real text.
   return messages;
 }
 
@@ -1238,24 +1232,39 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Liams Call AI server running at http://localhost:${PORT}`);
-  const configured = getProviderCandidates();
-  console.log(`Provider chain: ${configured.map((c) => `${c.provider}(${c.model})`).join(' → ')}`);
-  console.log(`Max output tokens: ${MAX_TOKENS}`);
-  if (configured.length === 0) console.warn('WARNING: No AI providers configured — chat will fail.');
-  if (ALLOWED_ORIGINS.length) {
-    console.log(`CORS allowed origins: ${ALLOWED_ORIGINS.join(', ')}`);
-  } else {
-    console.warn('WARNING: ALLOWED_ORIGIN not set — all origins allowed (fine for local dev only).');
-  }
-  if (TURNSTILE_SITE_KEY && !TURNSTILE_SECRET_KEY) {
-    console.warn('WARNING: TURNSTILE_SITE_KEY is set but TURNSTILE_SECRET_KEY is missing — captcha disabled.');
-  } else if (!TURNSTILE_SITE_KEY && TURNSTILE_SECRET_KEY) {
-    console.warn('WARNING: TURNSTILE_SECRET_KEY is set but TURNSTILE_SITE_KEY is missing — captcha disabled.');
-  } else if (CAPTCHA_ENABLED) {
-    console.log('Captcha: Cloudflare Turnstile enabled (suspicious visitors only).');
-  } else {
-    console.warn('WARNING: Turnstile keys not set — captcha protection is disabled.');
-  }
-});
+function startServer() {
+  return app.listen(PORT, () => {
+    console.log(`Liams Call AI server running at http://localhost:${PORT}`);
+    const configured = getProviderCandidates();
+    console.log(`Provider chain: ${configured.map((c) => `${c.provider}(${c.model})`).join(' → ')}`);
+    console.log(`Max output tokens: ${MAX_TOKENS}`);
+    if (configured.length === 0) console.warn('WARNING: No AI providers configured — chat will fail.');
+    if (ALLOWED_ORIGINS.length) {
+      console.log(`CORS allowed origins: ${ALLOWED_ORIGINS.join(', ')}`);
+    } else {
+      console.warn('WARNING: ALLOWED_ORIGIN not set — all origins allowed (fine for local dev only).');
+    }
+    if (TURNSTILE_SITE_KEY && !TURNSTILE_SECRET_KEY) {
+      console.warn('WARNING: TURNSTILE_SITE_KEY is set but TURNSTILE_SECRET_KEY is missing — captcha disabled.');
+    } else if (!TURNSTILE_SITE_KEY && TURNSTILE_SECRET_KEY) {
+      console.warn('WARNING: TURNSTILE_SECRET_KEY is set but TURNSTILE_SITE_KEY is missing — captcha disabled.');
+    } else if (CAPTCHA_ENABLED) {
+      console.log('Captcha: Cloudflare Turnstile enabled (suspicious visitors only).');
+    } else {
+      console.warn('WARNING: Turnstile keys not set — captcha protection is disabled.');
+    }
+  });
+}
+
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = {
+  app,
+  startServer,
+  sanitizeMessages,
+  isConvoRecoveryRequest,
+  prepareMessagesForProvider,
+  resourceListIncomplete,
+};
