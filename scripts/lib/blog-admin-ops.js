@@ -291,21 +291,44 @@ function getTopics() {
   return loadTopics();
 }
 
+function slugifyTopicId(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
+
 function updateTopics(payload = {}) {
   const incoming = Array.isArray(payload.topics) ? payload.topics : null;
   if (!incoming) throw new Error('topics array required.');
+  const usedIds = new Set();
   const cleaned = incoming
-    .filter((t) => t && t.id && t.title)
-    .map((t) => ({
-      id: String(t.id).trim(),
-      title: String(t.title).trim(),
-      category: String(t.category || 'Caregiving').trim(),
-      risk: String(t.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
-      used: Boolean(t.used),
-      angle: String(t.angle || '').trim(),
-      source_url: String(t.source_url || '').trim(),
-      source_name: String(t.source_name || '').trim(),
-    }));
+    .map((t) => {
+      if (!t) return null;
+      const title = String(t.title || '').trim();
+      let id = String(t.id || '').trim() || slugifyTopicId(title);
+      if (!title || !id) return null;
+      if (usedIds.has(id)) {
+        let n = 2;
+        while (usedIds.has(`${id}-${n}`)) n += 1;
+        id = `${id}-${n}`;
+      }
+      usedIds.add(id);
+      return {
+        id,
+        title,
+        category: String(t.category || 'Caregiving').trim(),
+        risk: String(t.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
+        used: Boolean(t.used),
+        angle: String(t.angle || '').trim(),
+        source_url: String(t.source_url || '').trim(),
+        source_name: String(t.source_name || '').trim(),
+      };
+    })
+    .filter(Boolean);
   saveTopics(cleaned);
   return loadTopics();
 }
