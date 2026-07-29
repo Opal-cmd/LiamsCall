@@ -2,7 +2,7 @@
 title: "Ontario Detox Near Me: How to Find Help That Is Actually Open"
 slug: ontario-detox-near-me
 date: 2026-07-15
-category: Mental Health
+category: Addiction
 region: Ontario
 description: "Searching Ontario detox near me? ConnexOntario matches people to current withdrawal management and addiction treatment — safer than outdated Google clinic lists."
 risk: safe

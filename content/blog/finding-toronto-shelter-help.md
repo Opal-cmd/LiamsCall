@@ -2,7 +2,7 @@
 title: "Finding Toronto Shelter Help Without Guessing Phone Numbers"
 slug: finding-toronto-shelter-help
 date: 2026-07-15
-category: Housing
+category: Homelessness
 region: Ontario
 description: "Searching for a Toronto shelter? Use Central Intake, 311, and 211 Ontario instead of outdated clinic lists — verified numbers for caregivers and people in crisis."
 risk: safe

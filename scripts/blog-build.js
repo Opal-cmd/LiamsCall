@@ -76,10 +76,6 @@ function renderHowToBlock(howto) {
     </section>`;
 }
 
-function uniqueSorted(values) {
-  return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
-}
-
 function buildFilterScript() {
   return `
   <script>
@@ -131,15 +127,41 @@ function cardSizeClass(idx) {
   return pattern[idx % pattern.length];
 }
 
+/** Canonical blog topics — keep in sync with public/admin/blog.html category select. */
+const BLOG_TOPICS = ['Mental health', 'Addiction', 'Homelessness', 'Care Giver Tips'];
+
+const LEGACY_CATEGORY_MAP = {
+  'mental health': 'Mental health',
+  addiction: 'Addiction',
+  homelessness: 'Homelessness',
+  'care giver tips': 'Care Giver Tips',
+  caregiving: 'Care Giver Tips',
+  'caregiver wellbeing': 'Care Giver Tips',
+  'practical tips': 'Care Giver Tips',
+  routines: 'Care Giver Tips',
+  communication: 'Care Giver Tips',
+  housing: 'Homelessness',
+};
+
+function normalizeCategory(category) {
+  const raw = String(category || '').trim();
+  if (!raw) return 'Care Giver Tips';
+  const mapped = LEGACY_CATEGORY_MAP[raw.toLowerCase()];
+  if (mapped) return mapped;
+  const exact = BLOG_TOPICS.find((t) => t.toLowerCase() === raw.toLowerCase());
+  return exact || 'Care Giver Tips';
+}
+
 function renderPostCard(p, idx) {
+  const category = normalizeCategory(p.category);
   const img = p.image
     ? `<div class="card-media"><img src="${escapeHtml(p.image)}" alt="" loading="${idx < 3 ? 'eager' : 'lazy'}" decoding="async"></div>`
     : `<div class="card-media is-placeholder" aria-hidden="true"></div>`;
   return `
-    <a class="post-card ${cardSizeClass(idx)}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(p.category)}">
+    <a class="post-card ${cardSizeClass(idx)}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(category)}">
       ${img}
       <div class="card-copy">
-        <span class="cat">${escapeHtml(p.category)} · ${escapeHtml(formatDateDisplay(p.date))}</span>
+        <span class="cat">${escapeHtml(category)} · ${escapeHtml(formatDateDisplay(p.date))}</span>
         <h2>${escapeHtml(p.title)}</h2>
         <p>${escapeHtml(p.description)}</p>
       </div>
@@ -147,11 +169,9 @@ function renderPostCard(p, idx) {
 }
 
 function buildIndex(posts) {
-  const categories = uniqueSorted(posts.map((p) => p.category));
-
   const catButtons = [
     '<button type="button" class="blog-filter is-active" data-filter-type="category" data-filter-value="all">All topics</button>',
-    ...categories.map(
+    ...BLOG_TOPICS.map(
       (c) =>
         `<button type="button" class="blog-filter" data-filter-type="category" data-filter-value="${escapeHtml(c)}">${escapeHtml(c)}</button>`,
     ),
@@ -253,7 +273,7 @@ function buildPost(post) {
   const howtoHtml = renderHowToBlock(howto);
   const bodyHtml = `
     <a class="blog-back" href="/blog">&larr; Back to stories</a>
-    <p class="blog-meta"><span>${escapeHtml(post.category)}</span>${post.region ? ` · <span>${escapeHtml(post.region)}</span>` : ''} · <time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDateDisplay(post.date))}</time></p>
+    <p class="blog-meta"><span>${escapeHtml(normalizeCategory(post.category))}</span> · <time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDateDisplay(post.date))}</time></p>
     <h1 class="article-title">${escapeHtml(post.title)}</h1>
     <p class="speakable-summary">${escapeHtml(post.description)}</p>
     ${hero}
@@ -281,7 +301,7 @@ function buildPost(post) {
       datePublished: post.date,
       dateModified: post.date,
       url: postUrl,
-      category: post.category,
+      category: normalizeCategory(post.category),
       region: post.region,
       image: post.image,
     }),
