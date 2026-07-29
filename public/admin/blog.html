@@ -287,8 +287,10 @@
           </div>
           <div class="field">
             <label>Topic queue</label>
+            <p class="help" style="margin:0.25rem 0 0.5rem;">Add ideas for the writing queue. Each topic needs a title; the id is filled in automatically if you leave it blank.</p>
             <div id="topics-list" class="list"></div>
             <div class="row" style="margin-top:0.5rem;">
+              <button id="add-topic-btn" class="btn secondary" type="button">Add topic</button>
               <button id="save-topics-btn" class="btn" type="button">Save topics</button>
             </div>
           </div>
@@ -879,19 +881,42 @@
       });
     }
 
+    function slugifyTopicId(value) {
+      return String(value || '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 80);
+    }
+
+    function ensureUniqueTopicId(base, skipIdx) {
+      let id = base || 'topic';
+      const used = new Set(
+        state.topics
+          .map((t, i) => (i === skipIdx ? '' : String(t.id || '').trim()))
+          .filter(Boolean),
+      );
+      if (!used.has(id)) return id;
+      let n = 2;
+      while (used.has(`${id}-${n}`)) n += 1;
+      return `${id}-${n}`;
+    }
+
     function renderTopics() {
       const box = $('topics-list');
       if (!state.topics.length) {
-        box.innerHTML = '<div class="empty">Topic queue is empty.</div>';
+        box.innerHTML = '<div class="empty">Topic queue is empty. Add a topic below.</div>';
         return;
       }
       box.innerHTML = state.topics.map((t, idx) => `
         <div class="item" style="grid-template-columns:1fr;">
           <div class="stack" style="gap:0.4rem;">
-            <strong>${escapeHtml(t.title || t.id)}</strong>
-            <div class="meta">${escapeHtml(t.id)}</div>
-            <textarea data-topic-field="angle" data-topic-idx="${idx}" style="min-height:70px;">${escapeHtml(t.angle || '')}</textarea>
-            <div class="row" style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.45rem;">
+            <input data-topic-field="title" data-topic-idx="${idx}" value="${escapeHtml(t.title || '')}" placeholder="Topic title">
+            <input data-topic-field="id" data-topic-idx="${idx}" value="${escapeHtml(t.id || '')}" placeholder="id-slug (auto from title if blank)">
+            <textarea data-topic-field="angle" data-topic-idx="${idx}" style="min-height:70px;" placeholder="Angle / writing note">${escapeHtml(t.angle || '')}</textarea>
+            <div class="row" style="display:grid;grid-template-columns:1fr 1fr auto auto;gap:0.45rem;">
               <input data-topic-field="category" data-topic-idx="${idx}" value="${escapeHtml(t.category || '')}" placeholder="Category">
               <select data-topic-field="risk" data-topic-idx="${idx}">
                 <option value="safe"${t.risk === 'safe' ? ' selected' : ''}>safe</option>
@@ -901,16 +926,32 @@
                 <input type="checkbox" data-topic-field="used" data-topic-idx="${idx}"${t.used ? ' checked' : ''}>
                 Already used
               </label>
+              <button class="btn danger" type="button" data-remove-topic="${idx}">Remove</button>
             </div>
           </div>
         </div>
       `).join('');
       box.querySelectorAll('[data-topic-field]').forEach((el) => {
-        el.addEventListener('change', () => {
+        const sync = () => {
           const i = Number(el.getAttribute('data-topic-idx'));
           const field = el.getAttribute('data-topic-field');
           if (!state.topics[i]) return;
           state.topics[i][field] = el.type === 'checkbox' ? el.checked : el.value;
+          if (field === 'title' && !String(state.topics[i].id || '').trim()) {
+            const nextId = ensureUniqueTopicId(slugifyTopicId(el.value), i);
+            state.topics[i].id = nextId;
+            const idInput = box.querySelector(`[data-topic-field="id"][data-topic-idx="${i}"]`);
+            if (idInput) idInput.value = nextId;
+          }
+        };
+        el.addEventListener('change', sync);
+        el.addEventListener('input', sync);
+      });
+      box.querySelectorAll('[data-remove-topic]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const i = Number(btn.getAttribute('data-remove-topic'));
+          state.topics.splice(i, 1);
+          renderTopics();
         });
       });
     }
@@ -929,9 +970,19 @@
 
     async function saveTopics() {
       hideBanner();
+      const prepared = state.topics.map((t, i) => {
+        const title = String(t.title || '').trim();
+        let id = String(t.id || '').trim();
+        if (!id && title) id = ensureUniqueTopicId(slugifyTopicId(title), i);
+        return { ...t, title, id };
+      });
+      const incomplete = prepared.find((t) => t.title && !t.id);
+      if (incomplete) {
+        throw new Error('Each topic needs a title and id. Fill both, or leave id blank so it can be generated from the title.');
+      }
       const saved = await api('/api/blog-admin/topics', {
         method: 'PUT',
-        body: JSON.stringify({ topics: state.topics }),
+        body: JSON.stringify({ topics: prepared }),
       });
       state.topics = saved.topics || [];
       renderTopics();
@@ -982,6 +1033,21 @@
       renderSeeds();
     });
     $('save-sources-btn').addEventListener('click', () => saveSources().catch((e) => showBanner(e.message, 'err')));
+    $('add-topic-btn').addEventListener('click', () => {
+      state.topics.unshift({
+        id: '',
+        title: '',
+        category: 'Care Giver Tips',
+        risk: 'safe',
+        used: false,
+        angle: '',
+        source_url: '',
+        source_name: '',
+      });
+      renderTopics();
+      const firstTitle = $('topics-list').querySelector('[data-topic-field="title"]');
+      if (firstTitle) firstTitle.focus();
+    });
     $('save-topics-btn').addEventListener('click', () => saveTopics().catch((e) => showBanner(e.message, 'err')));
 
     (async function boot() {
