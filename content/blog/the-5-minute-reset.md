@@ -6,8 +6,8 @@ category: Practical Tips
 region: Canada
 description: "When a full break feels impossible, five-minute resets can still help. Breathing, grounding, and other micro-breaks caregivers actually use."
 risk: safe
+image: "/assets/blog/the-5-minute-reset.jpg"
 ---
-
 When caregiving is your day, the idea of a vacation, a spa day, or even an hour to yourself can feel absurd. But waiting for large blocks of free time before you recover is a strategy that rarely works — and it is not necessary. Brief, intentional pauses scattered through the day can meaningfully reset your nervous system, even when they last only five minutes.
 
 The science supports this. Cortisol — the body's primary stress hormone — responds to deliberate slow breathing within two to three minutes. When you activate the parasympathetic nervous system through slow exhalations (breathing in for four counts, out for six), your heart rate slows and the stress response begins to dampen. You do not need silence, a yoga mat, or even privacy. A bathroom break counts.

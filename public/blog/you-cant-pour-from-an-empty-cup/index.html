@@ -11,8 +11,8 @@
   <meta property="og:title" content="You Can't Pour From an Empty Cup - Liam's Call">
   <meta property="og:description" content="Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support.">
   <meta property="og:url" content="https://liamscall.com/blog/you-cant-pour-from-an-empty-cup">
-  <meta property="og:image" content="https://liamscall.com/assets/logo-icon.svg">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://liamscall.com/assets/blog/you-cant-pour-from-an-empty-cup.jpg">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="You Can't Pour From an Empty Cup - Liam's Call">
   <meta name="twitter:description" content="Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support.">
   <title>You Can't Pour From an Empty Cup - Liam's Call</title>
@@ -113,7 +113,7 @@
                     ".speakable-summary"
                 ]
             },
-            "image": "https://liamscall.com/assets/logo-icon.svg"
+            "image": "https://liamscall.com/assets/blog/you-cant-pour-from-an-empty-cup.jpg"
         }
     ]
 }
@@ -128,8 +128,11 @@
       --ink: #121212;
       --muted: #5c5c5c;
       --line: rgba(18, 18, 18, 0.12);
-      --paper: #f6f1ea;
-      --paper-deep: #efe7dc;
+      --paper: #f9f9f9;
+      --paper-warm: #f6f1ea;
+      --sky: #e6f0ff;
+      --mint: #f2ffe0;
+      --rose: #fff0f0;
       --sidebar-w: 15.5rem;
       --font-display: "Fraunces", Georgia, "Times New Roman", serif;
       --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
@@ -145,7 +148,7 @@
     a { color: var(--green-dark); }
     .pill-dark {
       display: inline-block;
-      background: var(--green-dark);
+      background: var(--ink);
       color: #fff !important;
       border-radius: 9999px;
       text-decoration: none;
@@ -153,8 +156,9 @@
       font-size: 0.85rem;
       font-weight: 600;
       letter-spacing: 0.01em;
+      transition: transform 180ms ease, background 180ms ease;
     }
-    .pill-dark:hover { background: var(--green-mid); }
+    .pill-dark:hover { background: var(--green-dark); transform: translateY(-1px); }
     .page-shell { display: flex; min-height: 100vh; align-items: stretch; }
     .site-sidebar {
       width: var(--sidebar-w); min-width: var(--sidebar-w); flex-shrink: 0;
@@ -195,116 +199,204 @@
     #sidebar-overlay { display: none; }
     .site-main { flex: 1; min-width: 0; background: var(--paper); }
     main.blog-main {
-      max-width: 68rem;
+      max-width: 72rem;
       margin: 0 auto;
-      padding: 2.5rem 2rem 5rem;
+      padding: 2rem 1.5rem 4rem;
     }
-    main.blog-main.is-article { max-width: 46rem; }
+    main.blog-main.is-index {
+      max-width: none;
+      margin: 0;
+      padding: 0 0 4rem;
+    }
+    main.blog-main.is-article { max-width: 46rem; padding: 2.5rem 2rem 5rem; margin: 0 auto; }
 
-    .blog-crumb { font-size: 0.75rem; color: var(--muted); margin-bottom: 1.25rem; letter-spacing: 0.02em; }
+    .blog-crumb { font-size: 0.75rem; color: var(--muted); margin: 0 1.5rem 0.5rem; letter-spacing: 0.02em; }
+    main.blog-main.is-article .blog-crumb { margin: 0 0 1.25rem; }
     .blog-crumb a { color: var(--muted); text-decoration: none; }
     .blog-crumb a:hover { color: var(--green-dark); }
 
     .blog-hero {
-      padding: 0.5rem 0 2.25rem;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 2rem;
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 1.75rem;
+      text-align: center;
     }
     .blog-kicker {
       margin: 0 0 0.85rem;
       font-size: 0.72rem;
       font-weight: 700;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--green-dark);
     }
     .blog-hero h1 {
       margin: 0 0 0.85rem;
       font-family: var(--font-display);
-      font-size: clamp(2.6rem, 7vw, 5.2rem);
+      font-size: clamp(2.6rem, 7vw, 4.8rem);
       font-weight: 650;
-      line-height: 0.95;
+      line-height: 0.98;
       letter-spacing: -0.035em;
       color: var(--ink);
     }
     .blog-hero-lead {
-      margin: 0;
+      margin: 0 auto;
       max-width: 34rem;
       font-size: 1.05rem;
       line-height: 1.55;
       color: var(--muted);
     }
 
-    .blog-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.85rem; }
+    .story-strip {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding: 0.25rem 1.5rem 1.5rem;
+      max-width: 72rem;
+      margin: 0 auto;
+      scrollbar-width: thin;
+    }
+    .story-chip {
+      flex: 0 0 7.5rem;
+      width: 7.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 200ms ease;
+    }
+    .story-chip:hover { transform: translateY(-3px); }
+    .story-chip-thumb {
+      display: block;
+      width: 7.5rem;
+      height: 7.5rem;
+      overflow: hidden;
+      background: #e8e8e8;
+      margin-bottom: 0.45rem;
+    }
+    .story-chip-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 320ms ease;
+    }
+    .story-chip:hover .story-chip-thumb img { transform: scale(1.06); }
+    .story-chip-label {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 0.72rem;
+      line-height: 1.35;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .blog-toolbar {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 0 1.5rem 1.25rem;
+    }
+    .blog-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.65rem; }
     .blog-filter {
-      appearance: none; border: 1px solid var(--line); background: transparent; color: var(--ink);
+      appearance: none; border: 1px solid var(--line); background: #fff; color: var(--ink);
       border-radius: 999px; padding: 0.4rem 0.85rem; font-size: 0.78rem; font-weight: 600; cursor: pointer;
       font-family: inherit;
     }
     .blog-filter:hover { border-color: var(--green-dark); color: var(--green-dark); }
     .blog-filter.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
-    .blog-filter-meta { font-size: 0.75rem; color: var(--muted); margin: 0 0 1.5rem; }
+    .blog-filter-meta { font-size: 0.75rem; color: var(--muted); margin: 0; }
 
-    .post-list { list-style: none; margin: 0; padding: 0; }
-    .post-list > li { border-top: 1px solid var(--line); }
-    .post-list > li:last-child { border-bottom: 1px solid var(--line); }
-    .post-card {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 1rem 1.5rem;
-      align-items: end;
-      text-decoration: none;
-      color: inherit;
-      padding: 1.6rem 0.15rem;
-      transition: background 160ms ease;
+    .masonry-feed { display: flex; flex-direction: column; gap: 0; }
+    .masonry-band { padding: 2.25rem 0 2.75rem; }
+    .masonry-band.is-empty { display: none; }
+    .masonry-band.tone-paper { background: var(--paper); }
+    .masonry-band.tone-sky { background: var(--sky); }
+    .masonry-band.tone-mint { background: var(--mint); }
+    .masonry-band.tone-rose { background: var(--rose); }
+    .masonry-band-inner {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 0 1.5rem;
     }
-    .post-card:hover { background: rgba(15, 74, 58, 0.04); }
-    .post-card.is-featured {
-      padding: 2rem 0.15rem 2.15rem;
-      background: linear-gradient(180deg, rgba(15,74,58,0.06), transparent 70%);
-    }
-    .post-card .cat {
-      display: block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--green-dark);
-      margin-bottom: 0.55rem;
-    }
-    .post-card h2 {
-      margin: 0;
-      font-family: var(--font-display);
-      font-size: clamp(1.55rem, 3.4vw, 2.55rem);
-      font-weight: 650;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      color: var(--ink);
-    }
-    .post-card.is-featured h2 { font-size: clamp(2rem, 5vw, 3.4rem); }
-    .post-card p {
-      margin: 0.7rem 0 0;
-      max-width: 38rem;
-      font-size: 0.98rem;
-      line-height: 1.55;
-      color: var(--muted);
-    }
-    .post-card .date {
-      font-size: 0.78rem;
-      color: var(--muted);
-      white-space: nowrap;
-      padding-bottom: 0.2rem;
-    }
-    .post-card.is-hidden { display: none; }
-
     .blog-section-label {
-      margin: 2.25rem 0 0.75rem;
+      margin: 0 0 1.15rem;
       font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--muted);
+      text-align: center;
     }
+    .masonry-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.25rem 1.15rem;
+      align-items: start;
+    }
+    .post-card {
+      grid-column: span 4;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      transition: transform 220ms ease;
+    }
+    .post-card:hover { transform: translateY(-4px); }
+    .post-card.size-wide { grid-column: span 8; }
+    .post-card.size-tall .card-media { aspect-ratio: 3 / 4; }
+    .post-card.size-wide .card-media { aspect-ratio: 16 / 10; }
+    .post-card.size-std .card-media { aspect-ratio: 4 / 3; }
+    .post-card.is-hidden { display: none; }
+    .card-media {
+      width: 100%;
+      overflow: hidden;
+      background: #ddd;
+      aspect-ratio: 4 / 3;
+    }
+    .card-media.is-placeholder {
+      background: linear-gradient(135deg, #dfe8e4, #c5d4ce);
+    }
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 420ms ease;
+    }
+    .post-card:hover .card-media img { transform: scale(1.04); }
+    .card-copy { padding: 0 0.1rem 0.35rem; }
+    .post-card .cat {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+    }
+    .post-card h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+      font-weight: 650;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+    }
+    .post-card.size-wide h2 {
+      font-size: clamp(1.55rem, 3vw, 2.35rem);
+    }
+    .post-card p {
+      margin: 0.55rem 0 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .empty-feed { padding: 2rem 1.5rem; color: var(--muted); }
 
     .blog-back {
       display: inline-flex; align-items: center; gap: 0.3rem;
@@ -379,12 +471,25 @@
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
     }
+    .blog-cta.band-cta {
+      max-width: 72rem;
+      margin: 2rem auto 0;
+      padding: 2rem 1.5rem;
+      border: none;
+      text-align: center;
+    }
     .blog-cta p { margin: 0 0 0.9rem; font-size: 1.05rem; color: var(--ink); font-family: var(--font-display); }
     .blog-disclaimer { margin-top: 1.5rem; font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
 
-    @media (max-width: 900px) {
-      .post-card { grid-template-columns: 1fr; gap: 0.55rem; }
-      .post-card .date { padding-bottom: 0; }
+    @media (max-width: 1000px) {
+      .post-card, .post-card.size-wide { grid-column: span 6; }
+    }
+    @media (max-width: 700px) {
+      .masonry-grid { grid-template-columns: 1fr; }
+      .post-card, .post-card.size-wide, .post-card.size-tall { grid-column: span 1; }
+      .post-card.size-tall .card-media,
+      .post-card.size-wide .card-media,
+      .post-card.size-std .card-media { aspect-ratio: 16 / 10; }
     }
     @media (max-width: 767px) {
       .site-sidebar {
@@ -399,7 +504,7 @@
       .mobile-topbar {
         display: flex; align-items: center; position: sticky; top: 0; z-index: 30;
         height: 3.25rem; padding: 0 1rem; border-bottom: 1px solid var(--line);
-        background: rgba(246, 241, 234, 0.94); backdrop-filter: blur(10px);
+        background: rgba(249, 249, 249, 0.94); backdrop-filter: blur(10px);
       }
       .mobile-menu-toggle {
         display: inline-flex; align-items: center; justify-content: center; width: 2.15rem; height: 2.15rem;
@@ -409,7 +514,10 @@
       .mobile-top-brand { display: flex; align-items: center; gap: 0.5rem; margin: 0 auto; text-decoration: none; }
       .mobile-top-brand img { height: 1.35rem; width: auto; }
       .mobile-top-brand span { font-family: var(--font-display); font-size: 0.95rem; font-weight: 650; color: var(--green-dark); }
-      main.blog-main { padding: 1.5rem 1.1rem 3.5rem; }
+      main.blog-main.is-article { padding: 1.5rem 1.1rem 3.5rem; }
+      .blog-hero { padding: 1.75rem 1.1rem 1.25rem; }
+      .story-strip, .blog-toolbar, .masonry-band-inner, .blog-cta.band-cta { padding-left: 1.1rem; padding-right: 1.1rem; }
+      .blog-crumb { margin-left: 1.1rem; margin-right: 1.1rem; }
     }
   </style>
 </head>
@@ -466,7 +574,7 @@
     <p class="blog-meta"><span>Caregiver Wellbeing</span> · <span>Canada</span> · <time datetime="2026-07-01">July 1, 2026</time></p>
     <h1 class="article-title">You Can't Pour From an Empty Cup</h1>
     <p class="speakable-summary">Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support.</p>
-    
+    <figure class="blog-figure"><img class="blog-img" src="/assets/blog/you-cant-pour-from-an-empty-cup.jpg" alt=""></figure>
     <article class="blog-body">
       <p>Caregiver burnout does not arrive all at once. It tends to build quietly over months, stacking small stressors — a missed meal here, a lost night of sleep there, a cancelled plan to see a friend — until the weight becomes almost impossible to carry. By the time most caregivers recognize what is happening, they are already running on empty.</p>
 <p>Burnout is not weakness. It is a physiological and psychological response to sustained stress without adequate recovery. Research published in journals like <em>The Gerontologist</em> consistently shows that family caregivers experience higher rates of depression, anxiety, immune suppression, and cardiovascular strain than non-caregivers of comparable age. Your body is not broken — it is responding exactly as it should to a relentlessly demanding situation.</p>

@@ -28,6 +28,7 @@ const {
   assertPostGuards,
   loadPost,
 } = require('./lib/blog-utils');
+const { ensurePostImage } = require('./lib/blog-images');
 
 const MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -123,18 +124,20 @@ function extractJson(text) {
   return JSON.parse(raw);
 }
 
-function writeMarkdown({ title, description, slug, category, risk, body, date }) {
-  return `---
-title: ${JSON.stringify(title)}
-slug: ${slug}
-date: ${date}
-category: ${JSON.stringify(category)}
-description: ${JSON.stringify(description)}
-risk: ${risk}
----
-
-${body.trim()}
-`;
+function writeMarkdown({ title, description, slug, category, risk, body, date, image, region }) {
+  const lines = [
+    '---',
+    `title: ${JSON.stringify(title)}`,
+    `slug: ${slug}`,
+    `date: ${date}`,
+    `category: ${JSON.stringify(category)}`,
+    `region: ${JSON.stringify(region || 'Canada')}`,
+    `description: ${JSON.stringify(description)}`,
+    `risk: ${risk}`,
+  ];
+  if (image) lines.push(`image: ${JSON.stringify(image)}`);
+  lines.push('---', '', body.trim(), '');
+  return lines.join('\n');
 }
 
 async function main() {
@@ -153,6 +156,18 @@ async function main() {
   const body = parsed.body;
   if (!body || body.length < 200) throw new Error('Generated body too short.');
 
+  let image = '';
+  try {
+    image = await ensurePostImage({
+      slug,
+      category: topic.category || 'Caregiving',
+      title,
+      sourceUrl: topic.source_url || topic.url || '',
+    });
+  } catch (err) {
+    console.warn(`Image attach skipped: ${err.message || err}`);
+  }
+
   const md = writeMarkdown({
     title,
     description,
@@ -161,6 +176,7 @@ async function main() {
     risk,
     body,
     date: todayIso(),
+    image,
   });
 
   // Validate via temp parse

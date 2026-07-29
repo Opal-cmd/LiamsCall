@@ -19,6 +19,7 @@ const {
   loadTopics,
   saveTopics,
 } = require('./blog-utils');
+const { ensurePostImage, setFrontmatterImage } = require('./blog-images');
 
 function rebuildBlog() {
   const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'blog-build.js')], {
@@ -44,6 +45,7 @@ function listDrafts() {
         region: post.region || 'Canada',
         description: post.description,
         risk: post.risk,
+        image: post.image || '',
         status: 'draft',
       };
     })
@@ -59,6 +61,7 @@ function listPublished() {
     region: post.region || 'Canada',
     description: post.description,
     risk: post.risk,
+    image: post.image || '',
     status: 'published',
     url: `/blog/${post.slug}`,
   }));
@@ -112,15 +115,32 @@ function writeMarkdown({ title, slug, date, category, region, description, risk,
   return lines.join('\n');
 }
 
-function saveDraft(slug, updates = {}) {
+async function attachImageToMarkdown(md, { slug, title, category, sourceUrl }) {
+  try {
+    const image = await ensurePostImage({
+      slug,
+      title,
+      category,
+      sourceUrl: sourceUrl || '',
+    });
+    return setFrontmatterImage(md, image);
+  } catch (err) {
+    console.warn(`Blog image attach skipped for ${slug}: ${err.message || err}`);
+    return md;
+  }
+}
+
+async function saveDraft(slug, updates = {}) {
   const filePath = draftPathFor(slug);
   const current = loadPost(filePath);
   const nextSlug = toSlug(updates.slug || current.slug);
-  const md = writeMarkdown({
-    title: updates.title ?? current.title,
+  const title = updates.title ?? current.title;
+  const category = updates.category ?? current.category;
+  let md = writeMarkdown({
+    title,
     slug: nextSlug,
     date: updates.date ?? current.date,
-    category: updates.category ?? current.category,
+    category,
     region: updates.region ?? current.region ?? 'Canada',
     description: updates.description ?? current.description,
     risk: updates.risk ?? current.risk ?? 'review',
@@ -140,6 +160,15 @@ function saveDraft(slug, updates = {}) {
     { strictSafe: false },
   );
 
+  if (!(updates.image ?? current.image)) {
+    md = await attachImageToMarkdown(md, {
+      slug: nextSlug,
+      title,
+      category,
+      sourceUrl: updates.source_url || updates.sourceUrl || '',
+    });
+  }
+
   const dest = path.join(DRAFTS_DIR, `${nextSlug}.md`);
   fs.writeFileSync(dest, md, 'utf8');
   if (dest !== filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -152,7 +181,7 @@ function deleteDraft(slug) {
   return { ok: true, slug: toSlug(slug) };
 }
 
-function approveDraft(slug) {
+async function approveDraft(slug) {
   const filePath = draftPathFor(slug);
   const post = loadPost(filePath);
   assertPostGuards(post, { strictSafe: false });
@@ -165,6 +194,14 @@ function approveDraft(slug) {
   let raw = fs.readFileSync(filePath, 'utf8');
   if (/^risk:\s*/m.test(raw)) raw = raw.replace(/^risk:\s*.*$/m, 'risk: safe');
   else raw = raw.replace(/^---\n/, '---\nrisk: safe\n');
+
+  if (!post.image) {
+    raw = await attachImageToMarkdown(raw, {
+      slug: post.slug,
+      title: post.title,
+      category: post.category,
+    });
+  }
 
   fs.writeFileSync(dest, raw, 'utf8');
   fs.unlinkSync(filePath);

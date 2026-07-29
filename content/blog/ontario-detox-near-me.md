@@ -6,8 +6,8 @@ category: Mental Health
 region: Ontario
 description: "Searching Ontario detox near me? ConnexOntario matches people to current withdrawal management and addiction treatment — safer than outdated Google clinic lists."
 risk: safe
+image: "/assets/blog/ontario-detox-near-me.jpg"
 ---
-
 “Ontario detox near me” is one of the most common searches people make when substance use has tipped from worrying into urgent. Caregivers type it for a partner or adult child. People in distress type it for themselves. What Google often shows is a mix of ads, old directories, and clinics that closed or changed their intake months ago.
 
 You do not need a perfect map of every detox bed in the province. You need a live referral.

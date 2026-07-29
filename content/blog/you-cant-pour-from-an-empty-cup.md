@@ -6,8 +6,8 @@ category: Caregiver Wellbeing
 region: Canada
 description: "Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support."
 risk: safe
+image: "/assets/blog/you-cant-pour-from-an-empty-cup.jpg"
 ---
-
 Caregiver burnout does not arrive all at once. It tends to build quietly over months, stacking small stressors — a missed meal here, a lost night of sleep there, a cancelled plan to see a friend — until the weight becomes almost impossible to carry. By the time most caregivers recognize what is happening, they are already running on empty.
 
 Burnout is not weakness. It is a physiological and psychological response to sustained stress without adequate recovery. Research published in journals like *The Gerontologist* consistently shows that family caregivers experience higher rates of depression, anxiety, immune suppression, and cardiovascular strain than non-caregivers of comparable age. Your body is not broken — it is responding exactly as it should to a relentlessly demanding situation.

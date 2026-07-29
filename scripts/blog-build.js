@@ -84,9 +84,7 @@ function buildFilterScript() {
   return `
   <script>
     (function () {
-      var list = document.getElementById('post-list');
-      if (!list) return;
-      var cards = Array.prototype.slice.call(list.querySelectorAll('.post-card'));
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.post-card'));
       var meta = document.getElementById('filter-meta');
       var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter-type]'));
       var state = { category: 'all', region: 'all' };
@@ -99,6 +97,10 @@ function buildFilterScript() {
           var ok = catOk && regionOk;
           card.classList.toggle('is-hidden', !ok);
           if (ok) shown += 1;
+        });
+        document.querySelectorAll('.masonry-band').forEach(function (band) {
+          var any = band.querySelectorAll('.post-card:not(.is-hidden)').length > 0;
+          band.classList.toggle('is-empty', !any);
         });
         if (meta) {
           var bits = [];
@@ -128,6 +130,27 @@ function buildFilterScript() {
   </script>`;
 }
 
+/** Vary card footprint for a WePresent-like masonry feel. */
+function cardSizeClass(idx) {
+  const pattern = ['size-wide', 'size-tall', 'size-std', 'size-std', 'size-wide', 'size-std', 'size-tall'];
+  return pattern[idx % pattern.length];
+}
+
+function renderPostCard(p, idx) {
+  const img = p.image
+    ? `<div class="card-media"><img src="${escapeHtml(p.image)}" alt="" loading="${idx < 3 ? 'eager' : 'lazy'}" decoding="async"></div>`
+    : `<div class="card-media is-placeholder" aria-hidden="true"></div>`;
+  return `
+    <a class="post-card ${cardSizeClass(idx)}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(p.category)}" data-region="${escapeHtml(p.region || 'Canada')}">
+      ${img}
+      <div class="card-copy">
+        <span class="cat">${escapeHtml(p.category)} · ${escapeHtml(formatDateDisplay(p.date))}</span>
+        <h2>${escapeHtml(p.title)}</h2>
+        <p>${escapeHtml(p.description)}</p>
+      </div>
+    </a>`;
+}
+
 function buildIndex(posts) {
   const categories = uniqueSorted(posts.map((p) => p.category));
   const regions = uniqueSorted(posts.map((p) => p.region || 'Canada'));
@@ -148,36 +171,65 @@ function buildIndex(posts) {
     ),
   ].join('\n');
 
-  const cards = posts
+  const strip = posts
+    .slice(0, 8)
     .map(
-      (p, idx) => `
-      <li>
-        <a class="post-card${idx === 0 ? ' is-featured' : ''}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(p.category)}" data-region="${escapeHtml(p.region || 'Canada')}">
-          <div>
-            <span class="cat">${escapeHtml(p.category)}${p.region ? ` · ${escapeHtml(p.region)}` : ''}</span>
-            <h2>${escapeHtml(p.title)}</h2>
-            <p>${escapeHtml(p.description)}</p>
-          </div>
-          <span class="date">${escapeHtml(formatDateDisplay(p.date))}</span>
-        </a>
-      </li>`,
+      (p) => `
+      <a class="story-chip" href="/blog/${escapeHtml(p.slug)}">
+        <span class="story-chip-thumb">${
+          p.image
+            ? `<img src="${escapeHtml(p.image)}" alt="" loading="lazy" decoding="async">`
+            : ''
+        }</span>
+        <span class="story-chip-label">${escapeHtml(p.title)}</span>
+      </a>`,
     )
+    .join('\n');
+
+  const bands = [
+    { tone: 'paper', label: 'Latest stories', start: 0, end: 3 },
+    { tone: 'sky', label: 'Worth sitting with', start: 3, end: 5 },
+    { tone: 'mint', label: 'Practical support', start: 5, end: 7 },
+    { tone: 'rose', label: 'More from the desk', start: 7, end: posts.length },
+  ];
+
+  const bandHtml = bands
+    .map((band) => {
+      const slice = posts.slice(band.start, band.end);
+      if (!slice.length) return '';
+      const cards = slice.map((p, i) => renderPostCard(p, band.start + i)).join('\n');
+      return `
+      <section class="masonry-band tone-${band.tone}">
+        <div class="masonry-band-inner">
+          <p class="blog-section-label">${escapeHtml(band.label)}</p>
+          <div class="masonry-grid">${cards}</div>
+        </div>
+      </section>`;
+    })
     .join('\n');
 
   const bodyHtml = `
     <header class="blog-hero">
-      <p class="blog-kicker">Liam's Call stories</p>
-      <h1>Stories for caregivers. Read on.</h1>
+      <p class="blog-kicker">Liam's Call</p>
+      <h1>Stories for caregivers.</h1>
       <p class="blog-hero-lead">
-        Unexpected, grounded pieces on caregiver wellbeing, communication, and supporting a loved one through mental health, addiction, or housing challenges.
+        Grounded pieces on wellbeing, communication, and supporting someone through mental health, addiction, or housing challenges.
       </p>
     </header>
-    <p class="blog-section-label">Latest stories</p>
-    <div class="blog-filters" role="group" aria-label="Filter by topic">${catButtons}</div>
-    <div class="blog-filters" role="group" aria-label="Filter by region">${regionButtons}</div>
-    <p id="filter-meta" class="blog-filter-meta">Showing all ${posts.length} posts</p>
-    <ul id="post-list" class="post-list">${cards || '<li><p>No posts yet.</p></li>'}</ul>
-    <div class="blog-cta">
+    ${
+      strip
+        ? `<div class="story-strip" aria-label="Recent stories">${strip}</div>`
+        : ''
+    }
+    <div class="blog-toolbar">
+      <div class="blog-filters" role="group" aria-label="Filter by topic">${catButtons}</div>
+      <div class="blog-filters" role="group" aria-label="Filter by region">${regionButtons}</div>
+      <p id="filter-meta" class="blog-filter-meta">Showing all ${posts.length} posts</p>
+    </div>
+    <div id="post-list" class="masonry-feed">
+      ${bandHtml || '<p class="empty-feed">No posts yet.</p>'}
+    </div>
+    <div class="blog-cta band-cta">
       <p>Want to talk something through in the moment?</p>
       <a class="pill-dark" href="/">Open Liam's Call chat</a>
     </div>
@@ -266,6 +318,7 @@ function buildPost(post) {
     canonical: postUrl,
     active: 'blog',
     variant: 'article',
+    ogImage: post.image || '',
     breadcrumb: `<a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>${escapeHtml(post.title)}</span>`,
     schema: {
       '@context': 'https://schema.org',

@@ -1127,9 +1127,9 @@ app.get('/api/blog-admin/drafts/:slug', requireBlogAdmin, (req, res) => {
   }
 });
 
-app.put('/api/blog-admin/drafts/:slug', requireBlogAdmin, (req, res) => {
+app.put('/api/blog-admin/drafts/:slug', requireBlogAdmin, async (req, res) => {
   try {
-    res.json(blogAdminOps.saveDraft(req.params.slug, req.body || {}));
+    res.json(await blogAdminOps.saveDraft(req.params.slug, req.body || {}));
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not save draft.' });
   }
@@ -1143,9 +1143,9 @@ app.delete('/api/blog-admin/drafts/:slug', requireBlogAdmin, (req, res) => {
   }
 });
 
-app.post('/api/blog-admin/drafts/:slug/approve', requireBlogAdmin, (req, res) => {
+app.post('/api/blog-admin/drafts/:slug/approve', requireBlogAdmin, async (req, res) => {
   try {
-    const result = blogAdminOps.approveDraft(req.params.slug);
+    const result = await blogAdminOps.approveDraft(req.params.slug);
     appendBlogAudit('approve', { slug: result.slug, ip: clientIp(req) });
     res.json(result);
   } catch (error) {

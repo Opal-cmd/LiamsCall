@@ -6,8 +6,8 @@ category: Communication
 region: Canada
 description: "Why caregivers avoid asking for help, how to break the guilt loop, and how to make requests specific enough that people can say yes."
 risk: safe
+image: "/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg"
 ---
-
 Most caregivers struggle to ask for help. The reasons are layered: fear of being seen as incapable, a sense that no one else will do things "properly," not wanting to burden the people they love, or a deeply internalized belief that needing help is a form of failure. These feelings are understandable. They are also, over time, enormously costly.
 
 The guilt spiral tends to work like this: you recognize you need help, you feel guilty for needing it, you talk yourself out of asking, you keep going alone, you get more depleted, and eventually you feel guilty about how depleted you are. The loop is self-sealing. Breaking it requires a small act of courage — not a change in personality, just a willingness to say something true to another person.

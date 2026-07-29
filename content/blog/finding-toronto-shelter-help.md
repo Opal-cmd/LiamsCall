@@ -6,8 +6,8 @@ category: Housing
 region: Ontario
 description: "Searching for a Toronto shelter? Use Central Intake, 311, and 211 Ontario instead of outdated clinic lists — verified numbers for caregivers and people in crisis."
 risk: safe
+image: "/assets/blog/finding-toronto-shelter-help.jpg"
 ---
-
 If you typed “Toronto shelter” into a search engine, you are probably looking for something urgent: a bed tonight, a place for someone you love, or a next step when housing feels impossible. Random clinic pages and old phone numbers make that harder, not easier. Shelter vacancies change by the hour. A number that looked right last year can put you through to a closed program.
 
 For Toronto shelter access, start with the city’s own intake path instead of collecting individual shelter lines.

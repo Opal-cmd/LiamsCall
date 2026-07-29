@@ -6,8 +6,8 @@ category: Routines
 region: Ontario
 description: "A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours."
 risk: safe
+image: "/assets/blog/building-a-care-routine-that-has-room-for-you.jpg"
 ---
-
 Routine often gets described as a burden — a rigid structure that boxes you in. But for caregivers, a well-built daily routine is less a cage and more a container. It absorbs the cognitive load of constant decision-making, creates predictability for the person you care for, and — when designed intentionally — carves out space that belongs to you.
 
 The research on routines in caregiving contexts is consistent: predictable schedules reduce agitation in people with dementia, improve sleep for both parties, and lower caregiver-reported stress levels over time. The structure itself is protective, not just for the person receiving care but for you. Knowing what comes next reduces the mental overhead of perpetual improvisation.
