@@ -44,7 +44,7 @@ function toLoose(s) {
     .replace(/[^a-z0-9]+/g, '');
 }
 
-async function attachFile(filePath, { force, topics }) {
+async function attachFile(filePath, { force, topics, usedStockUrls }) {
   const post = loadPost(filePath);
   if (!force && post.image && post.image.startsWith('/assets/blog/')) {
     const disk = path.join(__dirname, '..', 'public', post.image.replace(/^\//, ''));
@@ -54,19 +54,21 @@ async function attachFile(filePath, { force, topics }) {
     }
   }
 
-  const sourceUrl = sourceUrlForPost(post, topics);
-  const image = await ensurePostImage({
+  const sourceUrl = post.sourceUrl || sourceUrlForPost(post, topics);
+  const { path: image, origin } = await ensurePostImage({
     slug: post.slug,
     category: post.category,
     title: post.title,
+    description: post.description,
     sourceUrl,
     force,
+    avoidStockUrls: usedStockUrls,
   });
 
   const raw = fs.readFileSync(filePath, 'utf8');
   const next = setFrontmatterImage(raw, image);
   fs.writeFileSync(filePath, next);
-  console.log(`ok ${post.slug} → ${image}${sourceUrl ? ` (source tried)` : ' (stock)'}`);
+  console.log(`ok ${post.slug} → ${image} [${origin}]`);
   return { slug: post.slug, image, skipped: false };
 }
 
@@ -79,9 +81,10 @@ async function main() {
   ];
 
   const results = [];
+  const usedStockUrls = new Set();
   for (const file of files) {
     try {
-      results.push(await attachFile(file, { force: args.force, topics }));
+      results.push(await attachFile(file, { force: args.force, topics, usedStockUrls }));
     } catch (err) {
       console.error(`fail ${path.basename(file)}: ${err.message || err}`);
     }

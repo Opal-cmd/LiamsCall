@@ -2,8 +2,13 @@
 
 /**
  * Blog hero images for Liam's Call.
- * Prefer a source page og:image when the host is allowlisted; otherwise
- * download a curated Unsplash stock photo matched to the post category.
+ *
+ * Priority order:
+ *   1. og:image from the post's inspiration source article (source_url frontmatter),
+ *      when the host is allowlisted or clearly the curated source's own domain.
+ *   2. A keyword-matched stock photo (curated Unsplash pool) chosen from the post
+ *      title + description — never a generic unrelated filler.
+ *
  * Images are saved under public/assets/blog/ and referenced as /assets/blog/{slug}.jpg
  */
 
@@ -41,63 +46,120 @@ const SOURCE_IMAGE_HOSTS = new Set([
 ]);
 
 /**
- * Curated Unsplash photos (free license) keyed by theme.
- * Format: Unsplash photo path id used with images.unsplash.com
+ * Keyword-matched stock themes. Order matters: the first rule whose keywords
+ * hit the post title/description wins. IDs are Unsplash photo paths verified
+ * to download. Each pool is visually specific to its theme.
  */
-const STOCK_BY_THEME = {
-  calm: [
-    'photo-1441974231531-c6227db76b6e',
-    'photo-1506905925346-21bda4d32df4',
-    'photo-1470071459604-3b5ec3a7fe05',
-  ],
-  care: [
-    'photo-1573497019940-1cfe75a9f7f0',
-    'photo-1576091160399-112ba8d25d1d',
-    'photo-1559839734-2b71ea197ec2',
-  ],
-  home: [
-    'photo-1480074568708-e7b720bb3f09',
-    'photo-1505693416388-ac5ce068fe85',
-    'photo-1493663284031-b7e3aefcae8e',
-  ],
-  pause: [
-    'photo-1495474472287-4d71bcdd2085',
-    'photo-1506126613408-eca07ce68773',
-    'photo-1499209974431-9dddcece7f88',
-  ],
-  community: [
-    'photo-1469571486292-0ba58a3f068b',
-    'photo-1529156069898-49953e39b3ac',
-    'photo-1511632765486-a01980e36a55',
-  ],
-  path: [
-    'photo-1449824913935-59a10b8d2000',
-    'photo-1476514525535-07fb3b4ae5f1',
-    'photo-1469474968028-657f4adf7d1f',
-  ],
+const THEME_RULES = [
+  {
+    theme: 'housing',
+    test: /housing|homeless|shelter|evict|toronto shelter|unhoused/,
+    photos: [
+      'photo-1480074568708-e7b720bb3f09', // house at dusk
+      'photo-1505693416388-ac5ce068fe85', // calm bedroom
+      'photo-1493663284031-b7e3aefcae8e', // warm home interior
+    ],
+  },
+  {
+    theme: 'recovery',
+    test: /addiction|detox|substance|recovery|sober|treatment|relapse/,
+    photos: [
+      'photo-1476514525535-07fb3b4ae5f1', // road ahead / journey
+      'photo-1449824913935-59a10b8d2000', // path forward
+      'photo-1469571486292-0ba58a3f068b', // friends supporting each other
+    ],
+  },
+  {
+    theme: 'grief',
+    test: /grief|loss|bereave|anticipatory|dying|mourning/,
+    photos: [
+      'photo-1441974231531-c6227db76b6e', // quiet forest
+      'photo-1499209974431-9dddcece7f88', // soft sunset
+      'photo-1470071459604-3b5ec3a7fe05', // misty hills
+    ],
+  },
+  {
+    theme: 'connection',
+    test: /ask for help|asking|conversation|talk|guilt|support network|friend|family meeting/,
+    photos: [
+      'photo-1573497019940-1cfe75a9f7f0', // two people talking
+      'photo-1529156069898-49953e39b3ac', // group of friends
+      'photo-1511632765486-a01980e36a55', // people holding hands
+    ],
+  },
+  {
+    theme: 'rest',
+    test: /reset|break|burnout|rest|empty cup|micro|pause|exhaust|sleep|recharge/,
+    photos: [
+      'photo-1495474472287-4d71bcdd2085', // warm coffee cup
+      'photo-1506126613408-eca07ce68773', // quiet stretch / breathing
+      'photo-1499209974431-9dddcece7f88', // calm evening light
+    ],
+  },
+  {
+    theme: 'routine',
+    test: /routine|schedule|checklist|plan|habit|appointment|organize/,
+    photos: [
+      'photo-1506905925346-21bda4d32df4', // steady horizon
+      'photo-1469474968028-56623f02e42e', // sunrise over a field
+      'photo-1470071459604-3b5ec3a7fe05', // morning mist path
+    ],
+  },
+  {
+    theme: 'crisis-support',
+    test: /crisis|988|help ?line|emergency|er visit|hospital/,
+    photos: [
+      'photo-1573497019940-1cfe75a9f7f0', // supportive conversation
+      'photo-1576091160399-112ba8d25d1d', // healthcare context
+      'photo-1559839734-2b71ea197ec2', // clinician listening
+    ],
+  },
+];
+
+/** Category fallback when no keyword rule matches. */
+const CATEGORY_THEME = {
+  homelessness: 'housing',
+  addiction: 'recovery',
+  'mental health': 'grief',
+  'care giver tips': 'rest',
 };
 
-function themeForCategory(category = '', title = '') {
-  const hay = `${category} ${title}`.toLowerCase();
-  if (/housing|homeless|shelter|home/.test(hay)) return 'home';
-  if (/addiction|substance|detox|recovery/.test(hay)) return 'path';
-  if (/grief|loss|bereave/.test(hay)) return 'calm';
-  if (/crisis|988|help phone/.test(hay)) return 'care';
-  if (/community|peer|group|family/.test(hay)) return 'community';
-  if (/reset|break|burnout|rest|routine|tip|care.?giver|caregiving|practical/.test(hay)) return 'pause';
-  if (/mental|anxiety|depress|wellbeing|well-being/.test(hay)) return 'calm';
-  return 'care';
+function pickTheme({ title = '', description = '', category = '' }) {
+  // Title keywords count double so the post's main subject outweighs
+  // incidental words in the description.
+  const titleHay = String(title).toLowerCase();
+  const descHay = String(description).toLowerCase();
+  let best = null;
+  let bestScore = 0;
+  for (const rule of THEME_RULES) {
+    const re = new RegExp(rule.test.source, 'g');
+    const score =
+      (titleHay.match(re) || []).length * 2 + (descHay.match(re) || []).length;
+    if (score > bestScore) {
+      best = rule;
+      bestScore = score;
+    }
+  }
+  if (best) return best;
+  const byCat = CATEGORY_THEME[String(category).trim().toLowerCase()];
+  return THEME_RULES.find((r) => r.theme === byCat) || THEME_RULES.find((r) => r.theme === 'connection');
 }
 
 function stockUrl(photoId, width = 1600) {
   return `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=${width}&q=80`;
 }
 
-function pickStockPhoto({ category, title, slug }) {
-  const theme = themeForCategory(category, title);
-  const pool = STOCK_BY_THEME[theme] || STOCK_BY_THEME.care;
+function pickStockPhoto({ category, title, description, slug, avoid }) {
+  const rule = pickTheme({ title, description, category });
   const hash = [...String(slug || title || 'x')].reduce((n, ch) => n + ch.charCodeAt(0), 0);
-  return stockUrl(pool[hash % pool.length]);
+  const n = rule.photos.length;
+  // Start at the slug's hash slot, then walk the pool to skip photos already
+  // used by another post in this run (avoids duplicate heroes on the index).
+  for (let step = 0; step < n; step += 1) {
+    const url = stockUrl(rule.photos[(hash + step) % n]);
+    if (!avoid || !avoid.has(url)) return { url, theme: rule.theme };
+  }
+  return { url: stockUrl(rule.photos[hash % n]), theme: rule.theme };
 }
 
 function isAllowedImageHost(hostname) {
@@ -143,6 +205,11 @@ function extractOgImage(html) {
   return '';
 }
 
+/**
+ * Fetch the source article page and return its og:image URL when safe.
+ * The image may come from the article's own host (curated sources only reach
+ * here) or an allowlisted CDN.
+ */
 async function tryOgImageFromSource(pageUrl) {
   if (!pageUrl) return '';
   let page;
@@ -152,14 +219,18 @@ async function tryOgImageFromSource(pageUrl) {
     return '';
   }
   if (page.protocol !== 'https:' && page.protocol !== 'http:') return '';
-  if (!isAllowedImageHost(page.hostname) && !SOURCE_IMAGE_HOSTS.has(page.hostname.replace(/^www\./, ''))) {
-    // Still allow known org domains without www
-    const bare = page.hostname.replace(/^www\./, '');
-    const ok = [...SOURCE_IMAGE_HOSTS].some((h) => h === bare || h.endsWith(`.${bare}`) || bare.endsWith(h.replace(/^www\./, '')));
-    if (!ok && !page.hostname.endsWith('.gov') && !page.hostname.endsWith('.ca') && !page.hostname.endsWith('.org')) {
-      return '';
-    }
-  }
+
+  const bare = page.hostname.replace(/^www\./, '');
+  const hostOk =
+    isAllowedImageHost(page.hostname) ||
+    [...SOURCE_IMAGE_HOSTS].some((h) => {
+      const b = h.replace(/^www\./, '');
+      return b === bare || bare.endsWith(`.${b}`);
+    }) ||
+    bare.endsWith('.gov') ||
+    bare.endsWith('.ca') ||
+    bare.endsWith('.org');
+  if (!hostOk) return '';
 
   const res = await fetch(page.href, {
     redirect: 'follow',
@@ -180,8 +251,13 @@ async function tryOgImageFromSource(pageUrl) {
     return '';
   }
   if (imgUrl.protocol !== 'https:' && imgUrl.protocol !== 'http:') return '';
-  // Prefer downloading only from allowlisted CDNs / same site
-  if (!isAllowedImageHost(imgUrl.hostname) && imgUrl.hostname !== page.hostname) {
+  // Only download from allowlisted CDNs, the article's own host, or its parent domain.
+  const imgBare = imgUrl.hostname.replace(/^www\./, '');
+  if (
+    !isAllowedImageHost(imgUrl.hostname) &&
+    imgUrl.hostname !== page.hostname &&
+    !imgBare.endsWith(bare.split('.').slice(-2).join('.'))
+  ) {
     return '';
   }
   return imgUrl.href;
@@ -196,14 +272,17 @@ function diskPathForSlug(slug) {
 }
 
 /**
- * Ensure a local hero image exists for a post. Returns public path like /assets/blog/slug.jpg
+ * Ensure a local hero image exists for a post.
+ * Returns { path, origin } where origin is 'source', 'stock', or 'existing'.
  */
 async function ensurePostImage({
   slug,
   category = '',
   title = '',
+  description = '',
   sourceUrl = '',
   force = false,
+  avoidStockUrls = null,
 } = {}) {
   const safeSlug = toSlug(slug || title);
   if (!safeSlug) throw new Error('slug required for blog image');
@@ -211,30 +290,27 @@ async function ensurePostImage({
   const pub = publicPathForSlug(safeSlug);
 
   if (!force && fs.existsSync(dest) && fs.statSync(dest).size > 2000) {
-    return pub;
+    return { path: pub, origin: 'existing' };
   }
 
   ensureDir(BLOG_ASSET_DIR);
 
-  let downloaded = false;
   if (sourceUrl) {
     try {
       const og = await tryOgImageFromSource(sourceUrl);
       if (og) {
         await downloadToFile(og, dest);
-        downloaded = true;
+        return { path: pub, origin: 'source' };
       }
     } catch {
-      // fall through to stock
+      // fall through to themed stock
     }
   }
 
-  if (!downloaded) {
-    const stock = pickStockPhoto({ category, title, slug: safeSlug });
-    await downloadToFile(stock, dest);
-  }
-
-  return pub;
+  const stock = pickStockPhoto({ category, title, description, slug: safeSlug, avoid: avoidStockUrls });
+  await downloadToFile(stock.url, dest);
+  if (avoidStockUrls) avoidStockUrls.add(stock.url);
+  return { path: pub, origin: `stock:${stock.theme}`, stockUrl: stock.url };
 }
 
 function setFrontmatterImage(markdown, imagePath) {
@@ -258,8 +334,8 @@ module.exports = {
   BLOG_ASSET_DIR,
   ensurePostImage,
   pickStockPhoto,
+  pickTheme,
   setFrontmatterImage,
   publicPathForSlug,
-  themeForCategory,
   tryOgImageFromSource,
 };

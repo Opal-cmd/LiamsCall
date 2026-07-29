@@ -80,7 +80,9 @@ function buildFilterScript() {
   return `
   <script>
     (function () {
-      var cards = Array.prototype.slice.call(document.querySelectorAll('[data-category].post-card, [data-category].feature-hero, [data-category].select-card'));
+      // Carousel slides stay unfiltered (like WePresent's ticker) — hiding
+      // slides breaks Swiper's centering math.
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.polaroid[data-category]:not(.is-slide)'));
       var meta = document.getElementById('filter-meta');
       var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter-type]'));
       var state = { category: 'all' };
@@ -98,6 +100,10 @@ function buildFilterScript() {
               shown += 1;
             }
           }
+        });
+        document.querySelectorAll('.polaroid-row').forEach(function (row) {
+          var any = row.querySelectorAll('.polaroid:not(.is-hidden)').length > 0;
+          row.classList.toggle('is-empty', !any);
         });
         document.querySelectorAll('[data-filter-band]').forEach(function (band) {
           var any = band.querySelectorAll('[data-category]:not(.is-hidden)').length > 0;
@@ -200,7 +206,8 @@ const LEGACY_CATEGORY_MAP = {
   housing: 'Homelessness',
 };
 
-const CARD_TONES = ['tone-paper', 'tone-sky', 'tone-mint', 'tone-rose'];
+/** Polaroid frame tones (Liam's Call brand tints), rotated per card. */
+const POLAROID_TONES = ['pl-sage', 'pl-sand', 'pl-mint', 'pl-cream', 'pl-moss', 'pl-clay'];
 
 function normalizeCategory(category) {
   const raw = String(category || '').trim();
@@ -211,90 +218,54 @@ function normalizeCategory(category) {
   return exact || 'Care Giver Tips';
 }
 
-function cardTone(idx) {
-  return CARD_TONES[idx % CARD_TONES.length];
+function polaroidTone(idx) {
+  return POLAROID_TONES[idx % POLAROID_TONES.length];
 }
 
-function mediaBlock(p, eager) {
+function polaroidMedia(p, eager) {
   if (p.image) {
-    return `<div class="card-media"><img src="${escapeHtml(p.image)}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>`;
+    return `<span class="polaroid-media"><img src="${escapeHtml(p.image)}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async"></span>`;
   }
-  return `<div class="card-media is-placeholder" aria-hidden="true"><span class="card-media-veil" aria-hidden="true"></span></div>`;
+  return `<span class="polaroid-media is-placeholder" aria-hidden="true"></span>`;
 }
 
-function renderPostCard(p, idx, sizeClass) {
+/**
+ * WePresent card: pastel frame, inset image, centered caption inside the frame.
+ * Caption = serif title + em dash + sans description.
+ */
+function renderPolaroid(p, idx, sizeClass = '', { eager = false } = {}) {
   const category = normalizeCategory(p.category);
   return `
-    <a class="post-card ${sizeClass} ${cardTone(idx)}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(category)}">
-      ${mediaBlock(p, idx < 2)}
-      <div class="card-copy">
-        <span class="cat">${escapeHtml(category)}</span>
-        <h2>${escapeHtml(p.title)}</h2>
-        <p>${escapeHtml(p.description)}</p>
-      </div>
+    <a class="polaroid ${polaroidTone(idx)} ${sizeClass}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(category)}">
+      ${polaroidMedia(p, eager)}
+      <span class="polaroid-caption"><span class="t">${escapeHtml(p.title)}</span> — ${escapeHtml(p.description)}</span>
     </a>`;
 }
 
-function renderFeatureHero(p) {
-  if (!p) return '';
-  const category = normalizeCategory(p.category);
-  return `
-    <a class="feature-hero" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(category)}">
-      <div class="feature-hero-media">
-        ${mediaBlock(p, true)}
-      </div>
-      <div class="feature-hero-copy">
-        <p class="blog-section-label">Featured story</p>
-        <span class="cat">${escapeHtml(category)} · ${escapeHtml(formatDateDisplay(p.date))}</span>
-        <h2>${escapeHtml(p.title)}</h2>
-        <p>${escapeHtml(p.description)}</p>
-        <span class="feature-hero-cta">Read story</span>
-      </div>
-    </a>`;
-}
-
-function renderSelectCard(p, idx) {
-  const category = normalizeCategory(p.category);
-  return `
-    <a class="select-card ${cardTone(idx)}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(category)}">
-      ${mediaBlock(p, false)}
-      <div class="card-copy">
-        <span class="cat">${escapeHtml(category)}</span>
-        <h2>${escapeHtml(p.title)}</h2>
-      </div>
-    </a>`;
-}
-
-function renderEditorialRows(posts, startIdx) {
+/** Alternating asymmetric two-up rows (wide/narrow, then narrow/wide). */
+function renderPolaroidRows(posts, startIdx) {
   if (!posts.length) return '';
   const rows = [];
   let i = 0;
-  let pattern = 0;
+  let row = 0;
   while (i < posts.length) {
     const abs = startIdx + i;
-    if (pattern % 3 === 0 && posts[i + 1]) {
+    if (posts[i + 1]) {
+      const flip = row % 2 === 1;
       rows.push(`
-        <div class="editorial-row is-split-wide">
-          ${renderPostCard(posts[i], abs, 'size-feature')}
-          ${renderPostCard(posts[i + 1], abs + 1, 'size-portrait')}
-        </div>`);
-      i += 2;
-    } else if (pattern % 3 === 1 && posts[i + 1]) {
-      rows.push(`
-        <div class="editorial-row is-split-narrow">
-          ${renderPostCard(posts[i], abs, 'size-portrait')}
-          ${renderPostCard(posts[i + 1], abs + 1, 'size-feature')}
+        <div class="polaroid-row ${flip ? 'is-narrow-wide' : 'is-wide-narrow'}">
+          ${renderPolaroid(posts[i], abs, flip ? 'is-narrow' : 'is-wide', { eager: abs < 2 })}
+          ${renderPolaroid(posts[i + 1], abs + 1, flip ? 'is-wide' : 'is-narrow', { eager: abs + 1 < 2 })}
         </div>`);
       i += 2;
     } else {
-      const trio = posts.slice(i, i + 3);
       rows.push(`
-        <div class="editorial-row is-trio">
-          ${trio.map((p, n) => renderPostCard(p, abs + n, n === 1 ? 'size-tall' : 'size-std')).join('\n')}
+        <div class="polaroid-row is-solo">
+          ${renderPolaroid(posts[i], abs, 'is-wide')}
         </div>`);
-      i += trio.length;
+      i += 1;
     }
-    pattern += 1;
+    row += 1;
   }
   return rows.join('\n');
 }
@@ -310,32 +281,12 @@ function buildIndex(posts) {
 
   const stripSlides = posts
     .slice(0, Math.min(8, posts.length))
-    .map((p, i) => {
-      const category = normalizeCategory(p.category);
-      const toneClass =
-        cardTone(i) === 'tone-sky'
-          ? 'is-sky'
-          : cardTone(i) === 'tone-mint'
-            ? 'is-mint'
-            : cardTone(i) === 'tone-rose'
-              ? 'is-rose'
-              : 'is-paper';
-      return `
+    .map(
+      (p, i) => `
       <div class="swiper-slide">
-        <article class="zoom-card ${toneClass}">
-          <span class="zoom-card-media">${
-            p.image
-              ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">`
-              : ''
-          }</span>
-          <div class="zoom-card-content">
-            <a class="zoom-card-link" href="/blog/${escapeHtml(p.slug)}">
-              <h3 class="zoom-card-title"><span class="t">${escapeHtml(p.title)}</span> — ${escapeHtml(category)}</h3>
-            </a>
-          </div>
-        </article>
-      </div>`;
-    })
+        ${renderPolaroid(p, i, 'is-slide')}
+      </div>`,
+    )
     .join('\n');
 
   const strip =
@@ -351,13 +302,15 @@ function buildIndex(posts) {
 
   const featured = posts[0] || null;
   const latest = posts.slice(1, 5);
-  const selects = posts.slice(0, 6);
   const more = posts.slice(5);
+  // Selects rail resurfaces the strongest pieces (WePresent-style monthly picks).
+  const selects = posts.slice(0, Math.min(8, posts.length));
+  const newsletterAside = featured || posts[0] || null;
 
   const bodyHtml = `
     <header class="blog-hero">
       <p class="blog-kicker">Liam's Call</p>
-      <h1>Stories for caregivers.</h1>
+      <h1>Stories for<br>caregivers</h1>
       <p class="blog-hero-lead">
         Grounded pieces on wellbeing, communication, and supporting someone through mental health, addiction, or housing challenges.
       </p>
@@ -370,23 +323,22 @@ function buildIndex(posts) {
 
     <div id="post-list" class="magazine-feed">
       ${
-        featured
-          ? `<section class="magazine-band tone-sky" data-filter-band>
-              <div class="magazine-band-inner">
-                ${renderFeatureHero(featured)}
+        latest.length
+          ? `<section class="section-card" data-filter-band>
+              <h2 class="section-title">Latest stories</h2>
+              <div class="polaroid-grid">
+                ${renderPolaroidRows(latest, 1)}
               </div>
             </section>`
           : ''
       }
 
       ${
-        latest.length
-          ? `<section class="magazine-band tone-paper" data-filter-band>
-              <div class="magazine-band-inner">
-                <p class="blog-section-label">Latest stories</p>
-                <div class="editorial-grid">
-                  ${renderEditorialRows(latest, 1)}
-                </div>
+        featured
+          ? `<section class="feature-band tone-periwinkle" data-filter-band>
+              <h2 class="section-title">Featured story</h2>
+              <div class="feature-band-inner">
+                ${renderPolaroid(featured, 4, 'is-hero', { eager: true })}
               </div>
             </section>`
           : ''
@@ -394,45 +346,43 @@ function buildIndex(posts) {
 
       ${
         selects.length
-          ? `<section class="magazine-band tone-mint" data-filter-band>
-              <div class="magazine-band-inner">
-                <div class="selects-head">
-                  <p class="blog-section-label">Featured selects</p>
-                  <p class="selects-lead">A short row of pieces worth sitting with — practical, calm, and specific.</p>
-                </div>
-                <div class="selects-rail" aria-label="Featured selects">
-                  ${selects.map((p, i) => renderSelectCard(p, i)).join('\n')}
-                </div>
+          ? `<section class="section-card" data-filter-band>
+              <h2 class="section-title">The quiet selects</h2>
+              <p class="section-lead">Our favorites — practical, calm, and specific pieces worth sitting with.</p>
+              <div class="selects-rail" aria-label="Featured selects">
+                ${selects.map((p, i) => renderPolaroid(p, i + 3, 'is-select')).join('\n')}
               </div>
             </section>`
           : ''
       }
 
-      <section class="magazine-band tone-rose newsletter-band">
-        <div class="magazine-band-inner newsletter-layout">
+      <section class="newsletter-band">
+        <div class="newsletter-layout">
           <div class="newsletter-copy">
-            <p class="blog-section-label">Join the list</p>
-            <h2>Like these stories? Get the quiet ones in your inbox.</h2>
-            <p>Occasional caregiver notes — no noise, no hard sell.</p>
+            <p class="newsletter-kicker">Join the list</p>
+            <h2>Like these stories? You&rsquo;ll (probably) find our notes helpful too.</h2>
             <form id="blog-newsletter" class="newsletter-form" action="#" method="post">
               <label class="sr-only" for="newsletter-email">Email</label>
-              <input id="newsletter-email" name="email" type="email" required placeholder="you@example.com" autocomplete="email">
-              <button type="submit" class="pill-dark">Join</button>
+              <input id="newsletter-email" name="email" type="email" required placeholder="Your email address" autocomplete="email">
+              <button type="submit" class="pill-dark">Submit</button>
             </form>
+            <p class="newsletter-small">Occasional caregiver notes — no noise, no hard sell.</p>
             <p id="newsletter-note" class="newsletter-note" hidden></p>
           </div>
-          <div class="newsletter-aside" aria-hidden="true"></div>
+          ${
+            newsletterAside
+              ? `<div class="newsletter-aside">${renderPolaroid(newsletterAside, 1, 'is-aside')}</div>`
+              : ''
+          }
         </div>
       </section>
 
       ${
         more.length
-          ? `<section class="magazine-band tone-paper" data-filter-band>
-              <div class="magazine-band-inner">
-                <p class="blog-section-label">More from the desk</p>
-                <div class="editorial-grid">
-                  ${renderEditorialRows(more, 5)}
-                </div>
+          ? `<section class="section-card" data-filter-band>
+              <h2 class="section-title">More from the desk</h2>
+              <div class="polaroid-grid">
+                ${renderPolaroidRows(more, 5)}
               </div>
             </section>`
           : ''
@@ -467,35 +417,75 @@ function buildIndex(posts) {
   });
 }
 
-function buildPost(post) {
+/** Page tint per category — brand-kit tints, the whole story page wears this color. */
+const STORY_TONES = {
+  'Mental health': 'story-tone-sage',
+  Addiction: 'story-tone-moss',
+  Homelessness: 'story-tone-sand',
+  'Care Giver Tips': 'story-tone-cream',
+};
+
+function buildPost(post, allPosts = []) {
   assertPostGuards(post, { strictSafe: post.risk === 'safe' });
+  const category = normalizeCategory(post.category);
+  const tone = STORY_TONES[category] || 'story-tone-cream';
   const hero =
     post.image && post.image.startsWith('/')
-      ? `<figure class="blog-figure"><img class="blog-img" src="${escapeHtml(post.image)}" alt=""></figure>`
+      ? `<figure class="story-hero-media"><img src="${escapeHtml(post.image)}" alt="" fetchpriority="high"></figure>`
       : '';
   const postUrl = `${SITE}/blog/${post.slug}`;
   const howto = HOWTO_BY_SLUG[post.slug];
   const howtoHtml = renderHowToBlock(howto);
+
+  // Related stories: same category first, then most recent others.
+  const others = allPosts.filter((p) => p.slug !== post.slug);
+  const related = [
+    ...others.filter((p) => normalizeCategory(p.category) === category),
+    ...others.filter((p) => normalizeCategory(p.category) !== category),
+  ].slice(0, 4);
+
+  const relatedHtml = related.length
+    ? `
+    <section class="story-related" aria-label="More stories">
+      <h2 class="section-title">More stories</h2>
+      <div class="polaroid-grid">
+        ${renderPolaroidRows(related, 1)}
+      </div>
+    </section>`
+    : '';
+
   const bodyHtml = `
-    <a class="blog-back" href="/blog">&larr; Back to stories</a>
-    <p class="blog-meta"><span>${escapeHtml(normalizeCategory(post.category))}</span> · <time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDateDisplay(post.date))}</time></p>
-    <h1 class="article-title">${escapeHtml(post.title)}</h1>
-    <p class="speakable-summary">${escapeHtml(post.description)}</p>
+    <header class="story-head">
+      <p class="story-kicker">${escapeHtml(category)}</p>
+      <h1 class="story-title">${escapeHtml(post.title)}</h1>
+      <p class="story-dek speakable-summary">${escapeHtml(post.description)}</p>
+    </header>
     ${hero}
-    <article class="blog-body">
-      ${post.html}
-    </article>
-    ${howtoHtml}
-    <p class="blog-back-wrap"><a class="blog-back" href="/blog">&larr; Back to stories</a></p>
-    <div class="blog-cta">
-      <p>If this resonates, you can keep going in a private chat. No account required.</p>
-      <a class="pill-dark" href="/">Talk with Liam's Call AI</a>
-      &nbsp;&nbsp;<a href="/resources" style="font-size:0.85rem;font-weight:600;">Crisis resources</a>
+    <div class="story-card">
+      <div class="story-grid">
+        <aside class="story-meta">
+          <p class="story-meta-label">Published</p>
+          <p class="story-meta-date"><time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDateDisplay(post.date))}</time></p>
+          <a class="story-back" href="/blog">&larr; All stories</a>
+        </aside>
+        <div class="story-body-col">
+          <article class="blog-body">
+            ${post.html}
+          </article>
+          ${howtoHtml}
+          <div class="blog-cta">
+            <p>If this resonates, you can keep going in a private chat. No account required.</p>
+            <a class="pill-dark" href="/">Talk with Liam's Call AI</a>
+            &nbsp;&nbsp;<a href="/resources" class="cta-alt-link">Crisis resources</a>
+          </div>
+          <p class="blog-disclaimer">
+            Liam's Call is an informational tool, not a medical professional or crisis service.
+            In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.
+          </p>
+        </div>
+      </div>
     </div>
-    <p class="blog-disclaimer">
-      Liam's Call is an informational tool, not a medical professional or crisis service.
-      In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.
-    </p>
+    ${relatedHtml}
   `;
 
   const graph = [
@@ -528,6 +518,7 @@ function buildPost(post) {
     canonical: postUrl,
     active: 'blog',
     variant: 'article',
+    articleTone: tone,
     ogImage: post.image || '',
     breadcrumb: `<a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>${escapeHtml(post.title)}</span>`,
     schema: {
@@ -558,7 +549,7 @@ function main() {
   for (const post of posts) {
     const dir = path.join(PUBLIC_BLOG_DIR, post.slug);
     ensureDir(dir);
-    fs.writeFileSync(path.join(dir, 'index.html'), buildPost(post));
+    fs.writeFileSync(path.join(dir, 'index.html'), buildPost(post, posts));
   }
 
   writeSitemap(posts);

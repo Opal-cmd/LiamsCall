@@ -12,10 +12,11 @@ description: >-
 ## Required behavior
 
 1. Every published/draft post must have frontmatter `image: "/assets/blog/{slug}.jpg"`.
-2. Prefer copying an `og:image` from the topic/source URL **only** if the host is allowlisted (SAMHSA, ConnexOntario, 988, 211, Ontario Caregiver, Kids Help Phone, Mental Health Commission, toronto.ca, Unsplash).
-3. If no safe source image exists, download a curated Unsplash stock photo via `scripts/lib/blog-images.js` (`ensurePostImage`).
-4. Never invent clinic/shelter photos. Never hotlink third-party article images in production HTML — always save under `public/assets/blog/`.
-5. After attaching images, run `node scripts/blog-build.js` so `/blog` cards show the art.
+2. **First choice — the inspiration source's image.** Posts carry `source_url` in frontmatter (written by generate/discover). `ensurePostImage` fetches that page's `og:image` when the host is a curated source (SAMHSA, ConnexOntario, 988, 211, Ontario Caregiver, Kids Help Phone, Mental Health Commission, toronto.ca, or other .gov/.ca/.org sources) and the image lives on the article's own domain or an allowlisted CDN.
+3. **Fallback — keyword-matched stock only.** If no source image exists, `ensurePostImage` picks from themed Unsplash pools keyed to the post title + description (housing, recovery, grief, connection, rest, routine, crisis-support). Never attach a generic unrelated filler; if the theme is unclear, the category decides the pool.
+4. `ensurePostImage` returns `{ path, origin }` — log the origin (`source`, `stock:<theme>`, `existing`) so it is auditable.
+5. Never invent clinic/shelter photos. Never hotlink third-party article images in production HTML — always save under `public/assets/blog/`.
+6. After attaching images, run `node scripts/blog-build.js` so `/blog` cards show the art.
 
 ## Commands
 
@@ -35,4 +36,4 @@ node scripts/blog-generate.js --topic=some-id
 
 ## Design note
 
-Blog index cards are WePresent-inspired: image-led masonry tiles, pastel section bands, bold serif titles (Fraunces), sans meta (DM Sans). Keep brand greens; avoid purple gradients.
+Blog layout is WePresent-inspired (polaroid cards with inset images + centered captions, white section containers, asymmetric two-up rows, tinted story pages) but **all colors come from the Liam's Call brand kit**: green-dark `#0f4a3a`, green-send `#1f6b52`, beige-main `#e8dfd3`, beige-widget `#ddd2c4`. Card/band/story tints are sage, mint, moss, sand, cream, and clay tints of those (see `--pl-*`, `--band-*`, `--story-*` in `scripts/lib/blog-utils.js`). Fonts: Fraunces (display) + DM Sans (body). Never introduce off-brand hues (no purples, corals, or saturated blues/yellows).

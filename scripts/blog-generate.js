@@ -124,7 +124,7 @@ function extractJson(text) {
   return JSON.parse(raw);
 }
 
-function writeMarkdown({ title, description, slug, category, risk, body, date, image, region }) {
+function writeMarkdown({ title, description, slug, category, risk, body, date, image, region, sourceUrl }) {
   const lines = [
     '---',
     `title: ${JSON.stringify(title)}`,
@@ -135,6 +135,7 @@ function writeMarkdown({ title, description, slug, category, risk, body, date, i
     `description: ${JSON.stringify(description)}`,
     `risk: ${risk}`,
   ];
+  if (sourceUrl) lines.push(`source_url: ${JSON.stringify(sourceUrl)}`);
   if (image) lines.push(`image: ${JSON.stringify(image)}`);
   lines.push('---', '', body.trim(), '');
   return lines.join('\n');
@@ -156,14 +157,18 @@ async function main() {
   const body = parsed.body;
   if (!body || body.length < 200) throw new Error('Generated body too short.');
 
+  const sourceUrl = topic.source_url || topic.url || '';
   let image = '';
   try {
-    image = await ensurePostImage({
+    const result = await ensurePostImage({
       slug,
       category: topic.category || 'Caregiving',
       title,
-      sourceUrl: topic.source_url || topic.url || '',
+      description,
+      sourceUrl,
     });
+    image = result.path;
+    console.log(`Image attached (${result.origin}): ${image}`);
   } catch (err) {
     console.warn(`Image attach skipped: ${err.message || err}`);
   }
@@ -177,6 +182,7 @@ async function main() {
     body,
     date: todayIso(),
     image,
+    sourceUrl,
   });
 
   // Validate via temp parse

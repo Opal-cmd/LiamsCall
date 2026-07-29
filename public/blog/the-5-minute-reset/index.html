@@ -169,9 +169,23 @@
       --line: rgba(18, 18, 18, 0.12);
       --paper: #f9f9f9;
       --paper-warm: #f6f1ea;
-      --sky: #e6f0ff;
-      --mint: #f2ffe0;
-      --rose: #fff0f0;
+      --page-gray: #efece6;
+      /* Polaroid frame tones — all tints of the Liam's Call brand kit
+         (green-dark #0f4a3a, green-send #1f6b52, beige-main #e8dfd3, beige-widget #ddd2c4) */
+      --pl-sage: #d9e6dc;
+      --pl-mint: #cbe0d1;
+      --pl-moss: #e2ead2;
+      --pl-sand: #e8dfd3;
+      --pl-cream: #f2ece1;
+      --pl-clay: #ddd2c4;
+      /* Section band tints */
+      --band-fern: #dfe9d4;
+      --band-sage: #d5e3d8;
+      /* Story page tints */
+      --story-sage: #dbe7de;
+      --story-moss: #e3e9cf;
+      --story-sand: #e7dbc8;
+      --story-cream: #f0e9dc;
       --sidebar-w: 15.5rem;
       --font-display: "Fraunces", Georgia, "Times New Roman", serif;
       --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
@@ -254,14 +268,15 @@
     .blog-crumb a { color: var(--muted); text-decoration: none; }
     .blog-crumb a:hover { color: var(--green-dark); }
 
+    main.blog-main.is-index { background: var(--page-gray); }
     .blog-hero {
       max-width: 72rem;
       margin: 0 auto;
-      padding: 2.5rem 1.5rem 1.75rem;
+      padding: 3.25rem 1.5rem 2rem;
       text-align: center;
     }
     .blog-kicker {
-      margin: 0 0 0.85rem;
+      margin: 0 0 1rem;
       font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.16em;
@@ -269,22 +284,88 @@
       color: var(--green-dark);
     }
     .blog-hero h1 {
-      margin: 0 0 0.85rem;
+      margin: 0 0 1.1rem;
       font-family: var(--font-display);
-      font-size: clamp(2.6rem, 7vw, 4.8rem);
-      font-weight: 650;
-      line-height: 0.98;
-      letter-spacing: -0.035em;
+      font-size: clamp(3rem, 8.5vw, 5.75rem);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
       color: var(--ink);
     }
     .blog-hero-lead {
       margin: 0 auto;
-      max-width: 34rem;
-      font-size: 1.05rem;
+      max-width: 36rem;
+      font-size: 1.08rem;
       line-height: 1.55;
-      color: var(--muted);
+      color: var(--ink);
     }
 
+    /* ---- Polaroid card (WePresent-style pastel frame) ---- */
+    .polaroid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      padding: 0.8rem 0.8rem 1.1rem;
+      border-radius: 1.35rem;
+      background: var(--pl-cream);
+      text-decoration: none;
+      color: var(--ink);
+      min-width: 0;
+      transition: transform 260ms ease, box-shadow 260ms ease;
+    }
+    .polaroid:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 36px rgba(18, 18, 18, 0.1);
+    }
+    .polaroid.is-hidden { display: none; }
+    .polaroid.pl-sage { background: var(--pl-sage); }
+    .polaroid.pl-mint { background: var(--pl-mint); }
+    .polaroid.pl-moss { background: var(--pl-moss); }
+    .polaroid.pl-sand { background: var(--pl-sand); }
+    .polaroid.pl-cream { background: var(--pl-cream); }
+    .polaroid.pl-clay { background: var(--pl-clay); }
+    .polaroid-media {
+      position: relative;
+      display: block;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 0.8rem;
+      aspect-ratio: 3 / 2;
+      background: rgba(18, 18, 18, 0.06);
+      flex-shrink: 0;
+    }
+    .polaroid-media img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 520ms ease;
+      pointer-events: none;
+    }
+    .polaroid:hover .polaroid-media img { transform: scale(1.05); }
+    .polaroid-media.is-placeholder {
+      background: linear-gradient(135deg, #dfe8e4, #c5d4ce);
+    }
+    .polaroid-caption {
+      display: block;
+      text-align: center;
+      margin: 0 auto;
+      max-width: 26rem;
+      padding: 0 0.6rem;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--ink);
+    }
+    .polaroid-caption .t {
+      font-family: var(--font-display);
+      font-weight: 650;
+      font-size: 1.02em;
+    }
+
+    /* ---- Top story carousel ---- */
     .story-strip-wrap {
       max-width: none;
       margin: 0 0 0.75rem;
@@ -295,290 +376,132 @@
       overflow: hidden;
       padding: 1.25rem 0 2rem;
     }
-    .story-carousel .swiper-wrapper {
-      align-items: stretch;
-    }
+    .story-carousel .swiper-wrapper { align-items: stretch; }
     .story-carousel .swiper-slide {
-      width: 260px;
+      width: 280px;
       height: auto;
       margin: 0;
       transition: transform 300ms ease;
-      transform: scale(0.825);
+      transform: scale(0.84);
       transform-origin: center center;
     }
     .story-carousel .swiper-slide-active {
       transform: scale(1);
       z-index: 2;
     }
-    .zoom-card {
-      --page-color: #fff;
-      --page-text-color: var(--ink);
-      background: var(--page-color);
-      color: var(--page-text-color);
-      border-radius: 1.5rem;
-      padding: 0.75rem 0.75rem 1rem;
-      width: 100%;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
+    .polaroid.is-slide {
+      height: 100%;
       box-shadow: 0 10px 28px rgba(18, 18, 18, 0.08);
-      height: 100%;
-      min-height: 22.5rem;
     }
-    .zoom-card.is-sky { --page-color: var(--sky); }
-    .zoom-card.is-mint { --page-color: var(--mint); }
-    .zoom-card.is-rose { --page-color: var(--rose); }
-    .zoom-card.is-paper { --page-color: #fff; border: 1px solid var(--line); }
-    .zoom-card-media {
-      position: relative;
-      display: block;
-      width: 100%;
-      height: 16rem;
-      border-radius: 1.1rem;
-      overflow: hidden;
-      background: color-mix(in srgb, var(--ink) 8%, transparent);
-      flex: 0 0 16rem;
-    }
-    .zoom-card-media img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      display: block;
-      pointer-events: none;
-    }
-    .zoom-card-content {
-      text-align: center;
-      padding: 0 0.25rem;
-      min-height: 3.6rem;
-    }
-    .zoom-card-link {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-    .zoom-card-title {
-      margin: 0;
-      font-family: var(--font-body);
-      font-size: 0.78rem;
-      line-height: 1.35;
-      font-weight: 500;
-      color: var(--page-text-color);
+    .polaroid.is-slide .polaroid-media { aspect-ratio: 4 / 5; }
+    .polaroid.is-slide .polaroid-caption {
+      font-size: 0.8rem;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 4;
       -webkit-box-orient: vertical;
       overflow: hidden;
-    }
-    .zoom-card-title .t {
-      font-family: var(--font-display);
-      font-weight: 650;
     }
 
     .blog-toolbar {
       max-width: 72rem;
       margin: 0 auto;
-      padding: 0 1.5rem 1.25rem;
+      padding: 0 1.5rem 1.5rem;
+      text-align: center;
     }
-    .blog-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.65rem; }
+    .blog-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0 0 0.65rem; }
     .blog-filter {
-      appearance: none; border: 1px solid var(--line); background: #fff; color: var(--ink);
-      border-radius: 999px; padding: 0.4rem 0.85rem; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      appearance: none; border: 1px solid rgba(18, 18, 18, 0.35); background: transparent; color: var(--ink);
+      border-radius: 999px; padding: 0.45rem 1rem; font-size: 0.8rem; font-weight: 600; cursor: pointer;
       font-family: inherit;
+      transition: background 180ms ease, color 180ms ease;
     }
-    .blog-filter:hover { border-color: var(--green-dark); color: var(--green-dark); }
+    .blog-filter:hover { background: rgba(18, 18, 18, 0.07); }
     .blog-filter.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
     .blog-filter-meta { font-size: 0.75rem; color: var(--muted); margin: 0; }
 
-    .masonry-feed,
-    .magazine-feed { display: flex; flex-direction: column; gap: 0; }
-    .masonry-band,
-    .magazine-band { padding: 2.5rem 0 3rem; }
-    .masonry-band.is-empty,
-    .magazine-band.is-empty { display: none; }
-    .tone-paper { background: var(--paper); }
-    .tone-sky { background: var(--sky); }
-    .tone-mint { background: var(--mint); }
-    .tone-rose { background: var(--rose); }
-    .masonry-band-inner,
-    .magazine-band-inner {
-      max-width: 72rem;
-      margin: 0 auto;
-      padding: 0 1.5rem;
-    }
-    .blog-section-label {
-      margin: 0 0 1.15rem;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-align: center;
-    }
-    .selects-head .blog-section-label,
-    .newsletter-copy .blog-section-label,
-    .feature-hero-copy .blog-section-label { text-align: left; }
-
-    .editorial-grid { display: flex; flex-direction: column; gap: 1.35rem; }
-    .editorial-row {
-      display: grid;
-      gap: 1.15rem;
-      align-items: stretch;
-    }
-    .editorial-row.is-split-wide { grid-template-columns: 1.7fr 1fr; }
-    .editorial-row.is-split-narrow { grid-template-columns: 1fr 1.7fr; }
-    .editorial-row.is-trio { grid-template-columns: repeat(3, 1fr); }
-
-    .post-card,
-    .select-card,
-    .feature-hero {
-      text-decoration: none;
-      color: inherit;
+    /* ---- White section containers on gray page (WePresent structure) ---- */
+    .magazine-feed {
       display: flex;
       flex-direction: column;
-      min-width: 0;
-    }
-    .post-card,
-    .select-card {
-      background: #fff;
-      transition: transform 220ms ease;
-    }
-    .post-card.tone-sky,
-    .select-card.tone-sky { background: color-mix(in srgb, var(--sky) 70%, #fff); }
-    .post-card.tone-mint,
-    .select-card.tone-mint { background: color-mix(in srgb, var(--mint) 70%, #fff); }
-    .post-card.tone-rose,
-    .select-card.tone-rose { background: color-mix(in srgb, var(--rose) 70%, #fff); }
-    .post-card.tone-paper,
-    .select-card.tone-paper { background: color-mix(in srgb, var(--paper) 55%, #fff); }
-    .post-card:hover,
-    .select-card:hover { transform: translateY(-3px); }
-    .post-card.is-hidden,
-    .select-card.is-hidden,
-    .feature-hero.is-hidden { display: none; }
-
-    .card-media {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      background: #ddd;
-      aspect-ratio: 4 / 3;
-    }
-    .size-feature .card-media { aspect-ratio: 16 / 10; }
-    .size-portrait .card-media { aspect-ratio: 4 / 5; }
-    .size-tall .card-media { aspect-ratio: 3 / 4; }
-    .size-std .card-media { aspect-ratio: 4 / 3; }
-    .card-media.is-placeholder {
-      background: linear-gradient(135deg, #dfe8e4, #c5d4ce);
-      min-height: 12rem;
-    }
-    .card-media img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 480ms ease;
-    }
-    .card-media-veil {
-      position: absolute;
-      inset: 0;
-      background: rgba(18, 18, 18, 0.0);
-      transition: background 280ms ease;
-      pointer-events: none;
-    }
-    .post-card:hover .card-media img,
-    .select-card:hover .card-media img,
-    .feature-hero:hover .card-media img { transform: scale(1.05); }
-    .post-card:hover .card-media-veil,
-    .select-card:hover .card-media-veil,
-    .feature-hero:hover .card-media-veil { background: rgba(18, 18, 18, 0.08); }
-
-    .card-copy { padding: 0.95rem 1rem 1.15rem; }
-    .post-card .cat,
-    .select-card .cat,
-    .feature-hero .cat {
-      display: block;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.45rem;
-    }
-    .post-card h2,
-    .select-card h2 {
-      margin: 0;
-      font-family: var(--font-display);
-      font-size: clamp(1.15rem, 2vw, 1.55rem);
-      font-weight: 650;
-      line-height: 1.12;
-      letter-spacing: -0.025em;
-      color: var(--ink);
-    }
-    .size-feature h2 {
-      font-size: clamp(1.45rem, 2.8vw, 2.15rem);
-    }
-    .post-card p {
-      margin: 0.55rem 0 0;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      color: var(--muted);
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .feature-hero {
-      display: grid;
-      grid-template-columns: 1.35fr 1fr;
       gap: 1.5rem;
-      align-items: center;
-      background: transparent;
+      padding: 0 1.25rem;
+      max-width: 72rem;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
     }
-    .feature-hero-media .card-media { aspect-ratio: 16 / 11; min-height: 18rem; }
-    .feature-hero-copy h2 {
-      margin: 0 0 0.75rem;
+    .section-card,
+    .feature-band,
+    .newsletter-band {
+      border-radius: 1.25rem;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 3.25rem clamp(1.25rem, 5vw, 4.5rem) 3.75rem;
+    }
+    .section-card { background: #fff; }
+    .feature-band { background: var(--band-sage); }
+    .section-card.is-empty,
+    .feature-band.is-empty { display: none; }
+    .section-title {
+      margin: 0 0 2rem;
       font-family: var(--font-display);
-      font-size: clamp(1.85rem, 4vw, 3rem);
+      font-size: clamp(1.55rem, 3vw, 2.1rem);
       font-weight: 650;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
+      text-align: center;
       color: var(--ink);
     }
-    .feature-hero-copy p {
-      margin: 0 0 1.15rem;
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.55;
-      max-width: 28rem;
-    }
-    .feature-hero-cta {
-      display: inline-block;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--green-dark);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    .selects-lead {
-      margin: -0.35rem 0 1.25rem;
-      max-width: 34rem;
+    .section-lead {
+      margin: -1.5rem auto 2rem;
+      max-width: 30rem;
+      text-align: center;
       color: var(--muted);
       font-size: 0.95rem;
       line-height: 1.5;
     }
+
+    .polaroid-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 54rem;
+      margin: 0 auto;
+    }
+    .polaroid-row {
+      display: grid;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .polaroid-row.is-wide-narrow { grid-template-columns: 1.72fr 1fr; }
+    .polaroid-row.is-narrow-wide { grid-template-columns: 1fr 1.72fr; }
+    .polaroid-row.is-solo { grid-template-columns: minmax(0, 1fr); max-width: 34rem; margin: 0 auto; width: 100%; }
+    .polaroid-row.is-empty { display: none; }
+    .polaroid.is-wide .polaroid-media { aspect-ratio: 16 / 10; }
+    .polaroid.is-narrow .polaroid-media { aspect-ratio: 5 / 4; }
+    .polaroid.is-narrow .polaroid-caption {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Featured story band */
+    .feature-band-inner { max-width: 50rem; margin: 0 auto; }
+    .polaroid.is-hero { padding: 1rem 1rem 1.35rem; }
+    .polaroid.is-hero .polaroid-media { aspect-ratio: 16 / 9; }
+    .polaroid.is-hero .polaroid-caption {
+      max-width: 34rem;
+      font-size: 1rem;
+    }
+
+    /* Selects rail */
     .selects-rail {
       display: flex;
       align-items: stretch;
-      gap: 1rem;
+      gap: 1.15rem;
       overflow-x: auto;
       overflow-y: hidden;
-      height: 24rem;
-      padding-bottom: 0.35rem;
+      padding: 0.25rem 0.25rem 0.85rem;
       scroll-snap-type: x mandatory;
       scrollbar-width: none;
       cursor: grab;
@@ -588,60 +511,45 @@
     }
     .selects-rail.is-dragging { cursor: grabbing; scroll-snap-type: none; }
     .selects-rail::-webkit-scrollbar { display: none; }
-    .select-card {
-      flex: 0 0 15rem;
-      width: 15rem;
-      min-width: 15rem;
-      max-width: 15rem;
-      height: 22.5rem;
-      min-height: 22.5rem;
-      max-height: 22.5rem;
+    .polaroid.is-select {
+      flex: 0 0 15.5rem;
+      width: 15.5rem;
       scroll-snap-align: start;
-      overflow: hidden;
-      box-sizing: border-box;
     }
-    .select-card .card-media {
-      width: 100%;
-      height: 15rem;
-      min-height: 15rem;
-      max-height: 15rem;
-      aspect-ratio: auto;
-      flex: 0 0 15rem;
-    }
-    .select-card .card-copy {
-      height: 7.5rem;
-      max-height: 7.5rem;
-      overflow: hidden;
-    }
-    .select-card h2 {
-      font-size: 1.05rem;
+    .polaroid.is-select .polaroid-media { aspect-ratio: 4 / 5; }
+    .polaroid.is-select .polaroid-caption {
+      font-size: 0.82rem;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 4;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
-    .newsletter-band { padding: 3rem 0; }
+    /* Newsletter band (soft fern green, brand-tinted "Join the club") */
+    .newsletter-band { background: var(--band-fern); }
     .newsletter-layout {
       display: grid;
       grid-template-columns: 1.4fr 1fr;
-      gap: 1.5rem;
-      align-items: stretch;
+      gap: 3rem;
+      align-items: center;
+      max-width: 56rem;
+      margin: 0 auto;
     }
-    .newsletter-copy h2 {
-      margin: 0 0 0.65rem;
+    .newsletter-kicker {
+      margin: 0 0 1.1rem;
       font-family: var(--font-display);
-      font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+      font-size: 1.05rem;
       font-weight: 650;
-      line-height: 1.08;
-      letter-spacing: -0.03em;
       color: var(--ink);
     }
-    .newsletter-copy > p {
-      margin: 0 0 1.15rem;
-      color: var(--muted);
-      max-width: 28rem;
-      line-height: 1.5;
+    .newsletter-copy h2 {
+      margin: 0 0 1.35rem;
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+      font-weight: 650;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: var(--ink);
     }
     .newsletter-form {
       display: flex;
@@ -650,28 +558,41 @@
       max-width: 28rem;
     }
     .newsletter-form input {
-      flex: 1 1 12rem;
+      flex: 1 1 13rem;
       min-width: 0;
-      border: 1px solid var(--line);
-      background: #fff;
+      border: 1px solid rgba(18, 18, 18, 0.45);
+      border-radius: 999px;
+      background: transparent;
       color: var(--ink);
       font: inherit;
-      padding: 0.7rem 0.9rem;
+      font-size: 0.88rem;
+      padding: 0.7rem 1.15rem;
     }
+    .newsletter-form input::placeholder { color: rgba(18, 18, 18, 0.55); }
     .newsletter-form input:focus {
       outline: 2px solid var(--green-dark);
       outline-offset: 1px;
+      background: #fff;
+    }
+    .newsletter-form .pill-dark { border: none; cursor: pointer; font-family: inherit; }
+    .newsletter-small {
+      margin: 0.9rem 0 0;
+      font-size: 0.8rem;
+      color: rgba(18, 18, 18, 0.6);
     }
     .newsletter-note {
       margin: 0.75rem 0 0;
       font-size: 0.85rem;
       color: var(--green-dark);
     }
-    .newsletter-aside {
-      min-height: 14rem;
-      background:
-        linear-gradient(160deg, color-mix(in srgb, var(--sky) 55%, transparent), transparent 60%),
-        linear-gradient(20deg, color-mix(in srgb, var(--mint) 45%, transparent), var(--rose));
+    .newsletter-aside .polaroid { box-shadow: 0 14px 32px rgba(18, 18, 18, 0.1); }
+    .newsletter-aside .polaroid .polaroid-media { aspect-ratio: 4 / 5; }
+    .newsletter-aside .polaroid .polaroid-caption {
+      font-size: 0.82rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     .sr-only {
       position: absolute;
@@ -686,45 +607,137 @@
     }
     .empty-feed { padding: 2rem 1.5rem; color: var(--muted); }
 
-    .blog-back {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      font-size: 0.82rem; font-weight: 600; color: var(--green-dark);
-      text-decoration: none; margin-bottom: 1.35rem;
+    /* ---- Story page (WePresent article: tinted page, white card) ---- */
+    main.blog-main.is-article {
+      max-width: none;
+      margin: 0;
+      padding: 0 0 4rem;
+      background: var(--story-cream);
     }
-    .blog-back:hover { text-decoration: underline; text-underline-offset: 3px; }
-    .blog-back-wrap { margin: 2rem 0 0; }
-    .blog-meta {
-      margin: 0 0 1rem;
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
+    main.blog-main.story-tone-sage { background: var(--story-sage); }
+    main.blog-main.story-tone-moss { background: var(--story-moss); }
+    main.blog-main.story-tone-sand { background: var(--story-sand); }
+    main.blog-main.story-tone-cream { background: var(--story-cream); }
+    main.blog-main.is-article .blog-crumb {
+      margin: 0;
+      padding: 1.25rem 1.5rem 0;
+      max-width: 72rem;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+    .story-head {
+      max-width: 46rem;
+      margin: 0 auto;
+      padding: 2.75rem 1.5rem 2.25rem;
+      text-align: center;
+    }
+    .story-kicker {
+      margin: 0 0 1.1rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--green-dark);
+      color: var(--ink);
+      opacity: 0.65;
     }
-    .article-title {
-      margin: 0 0 1rem;
+    .story-title {
+      margin: 0 0 0.9rem;
       font-family: var(--font-display);
-      font-size: clamp(2.2rem, 6vw, 3.75rem);
+      font-size: clamp(2.1rem, 5.5vw, 3.6rem);
       font-weight: 650;
       line-height: 1.02;
       letter-spacing: -0.03em;
       color: var(--ink);
     }
-    .speakable-summary {
-      margin: 0 0 1.75rem;
-      font-size: 1.15rem;
-      line-height: 1.55;
-      color: var(--muted);
-      max-width: 36rem;
+    .story-dek {
+      margin: 0 auto;
+      max-width: 38rem;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      line-height: 1.4;
+      color: var(--ink);
     }
-    .blog-figure { margin: 0 0 1.75rem; }
-    .blog-img { display: block; width: 100%; max-width: 100%; height: auto; }
+    .story-hero-media {
+      margin: 0 auto;
+      max-width: 72rem;
+      padding: 0 1.25rem;
+      box-sizing: border-box;
+    }
+    .story-hero-media img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 40rem;
+      object-fit: cover;
+      border-radius: 1rem;
+    }
+    .story-card {
+      background: #fff;
+      border-radius: 1.25rem;
+      max-width: 72rem;
+      width: calc(100% - 2.5rem);
+      margin: 1.5rem auto 0;
+      padding: clamp(2.25rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3.5rem);
+      box-sizing: border-box;
+    }
+    .story-grid {
+      display: grid;
+      grid-template-columns: 11rem minmax(0, 40rem);
+      gap: clamp(1.5rem, 4vw, 4rem);
+      justify-content: center;
+    }
+    .story-meta { font-size: 0.82rem; color: var(--muted); }
+    .story-meta-label {
+      margin: 0 0 0.3rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .story-meta-date { margin: 0 0 1.25rem; font-weight: 600; color: var(--ink); }
+    .story-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--green-dark);
+      text-decoration: none;
+    }
+    .story-back:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .story-related {
+      max-width: 72rem;
+      width: calc(100% - 2.5rem);
+      margin: 2.25rem auto 0;
+      box-sizing: border-box;
+    }
+    .story-related .polaroid-grid { max-width: 54rem; }
+    .cta-alt-link { font-size: 0.85rem; font-weight: 600; }
+    .blog-figure { margin: 1.75rem 0; }
+    .blog-img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 0.8rem; }
     .blog-body {
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       line-height: 1.75;
       color: #2a2a2a;
     }
     .blog-body p { margin: 0 0 1.15rem; }
+    .blog-body > p:first-child {
+      font-family: var(--font-display);
+      font-size: 1.32rem;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+    .blog-body blockquote {
+      margin: 2rem 0;
+      padding: 0;
+      border: none;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      line-height: 1.35;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .blog-body blockquote p { margin: 0; }
     .blog-body h2 {
       font-family: var(--font-display);
       font-size: 1.55rem;
@@ -770,51 +783,50 @@
     .blog-disclaimer { margin-top: 1.5rem; font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
 
     @media (max-width: 1000px) {
-      .editorial-row.is-split-wide,
-      .editorial-row.is-split-narrow,
-      .editorial-row.is-trio { grid-template-columns: 1fr 1fr; }
-      .feature-hero,
-      .newsletter-layout { grid-template-columns: 1fr; }
-      .newsletter-aside { min-height: 10rem; }
-      .feature-hero-media .card-media { min-height: 14rem; }
+      .newsletter-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .newsletter-aside { max-width: 22rem; }
+      .story-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .story-meta {
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--line);
+      }
+      .story-meta-label { margin: 0; }
+      .story-meta-date { margin: 0; }
+      .story-meta .story-back { margin-left: auto; }
     }
     @media (max-width: 700px) {
-      .editorial-row.is-split-wide,
-      .editorial-row.is-split-narrow,
-      .editorial-row.is-trio { grid-template-columns: 1fr; }
-      .size-feature .card-media,
-      .size-portrait .card-media,
-      .size-tall .card-media,
-      .size-std .card-media,
-      .feature-hero-media .card-media { aspect-ratio: 16 / 10; min-height: 0; }
-      .blog-hero h1 { font-size: clamp(2.1rem, 11vw, 3.2rem); }
-      .feature-hero-copy h2 { font-size: clamp(1.55rem, 7vw, 2.2rem); }
-      .newsletter-copy h2 { font-size: clamp(1.4rem, 6.5vw, 1.9rem); }
+      .blog-hero { padding-top: 2.25rem; }
+      .blog-hero h1 { font-size: clamp(2.4rem, 12vw, 3.4rem); }
+      .magazine-feed { padding: 0 0.75rem; gap: 1rem; }
+      .section-card,
+      .feature-band,
+      .newsletter-band { padding: 2.25rem 1.15rem 2.5rem; border-radius: 1rem; }
+      .polaroid-row.is-wide-narrow,
+      .polaroid-row.is-narrow-wide { grid-template-columns: 1fr; }
+      .polaroid.is-wide .polaroid-media,
+      .polaroid.is-narrow .polaroid-media { aspect-ratio: 16 / 10; }
+      .polaroid.is-narrow .polaroid-caption { -webkit-line-clamp: 3; }
+      .polaroid-caption { font-size: 0.85rem; }
+      .newsletter-copy h2 { font-size: clamp(1.45rem, 6.5vw, 1.9rem); }
       .newsletter-form { flex-direction: column; align-items: stretch; }
       .newsletter-form .pill-dark { width: 100%; text-align: center; }
-      .story-carousel .swiper-slide { width: min(78vw, 280px); }
-      .zoom-card { min-height: 20.5rem; }
-      .zoom-card-media { height: 14rem; flex-basis: 14rem; }
-      .selects-rail { height: 21.5rem; }
-      .select-card {
-        flex-basis: 13rem;
-        width: 13rem;
-        min-width: 13rem;
-        max-width: 13rem;
-        height: 20rem;
-        min-height: 20rem;
-        max-height: 20rem;
-      }
-      .select-card .card-media {
-        height: 13rem;
-        min-height: 13rem;
-        max-height: 13rem;
-        flex-basis: 13rem;
-      }
-      .select-card .card-copy { height: 7rem; max-height: 7rem; }
-      .article-title { font-size: clamp(1.85rem, 9vw, 2.6rem); }
-      .speakable-summary { font-size: 1.02rem; }
-      .blog-body { font-size: 1rem; }
+      .story-carousel .swiper-slide { width: min(74vw, 270px); }
+      .polaroid.is-select { flex-basis: 13.5rem; width: 13.5rem; }
+      .story-title { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+      .story-dek { font-size: 1.05rem; }
+      .story-card,
+      .story-related { width: calc(100% - 1.5rem); }
+      .story-card { padding: 1.75rem 1.15rem; }
+      .story-hero-media { padding: 0 0.75rem; }
+      .story-hero-media img { aspect-ratio: 4 / 3; }
+      .blog-body { font-size: 0.98rem; }
+      .blog-body > p:first-child { font-size: 1.18rem; }
+      .blog-body blockquote { font-size: 1.28rem; }
     }
     @media (max-width: 767px) {
       .site-sidebar {
@@ -839,16 +851,11 @@
       .mobile-top-brand { display: flex; align-items: center; gap: 0.5rem; margin: 0 auto; text-decoration: none; }
       .mobile-top-brand img { height: 1.35rem; width: auto; }
       .mobile-top-brand span { font-family: var(--font-display); font-size: 0.95rem; font-weight: 650; color: var(--green-dark); }
-      main.blog-main.is-article { padding: 1.5rem 1.1rem 3.5rem; }
-      .blog-hero { padding: 1.5rem 1.1rem 1rem; }
-      .blog-toolbar { padding-top: 0.25rem; }
+      .blog-hero { padding-left: 1.1rem; padding-right: 1.1rem; }
+      .blog-toolbar { padding: 0 1.1rem 1.25rem; }
       .blog-filters { gap: 0.35rem; }
       .blog-filter { padding: 0.35rem 0.7rem; font-size: 0.74rem; }
-      .magazine-band { padding: 1.75rem 0 2rem; }
-      .story-strip-wrap, .blog-toolbar, .masonry-band-inner, .magazine-band-inner, .blog-cta.band-cta { padding-left: 0; padding-right: 0; }
-      .blog-toolbar, .magazine-band-inner, .masonry-band-inner, .blog-cta.band-cta { padding-left: 1.1rem; padding-right: 1.1rem; }
-      .blog-crumb { margin-left: 1.1rem; margin-right: 1.1rem; }
-      .newsletter-aside { display: none; }
+      .blog-cta.band-cta { padding-left: 1.1rem; padding-right: 1.1rem; }
     }
   </style>
 </head>
@@ -898,22 +905,31 @@
           <span>Liam's Call</span>
         </a>
       </div>
-      <main class="blog-main is-article">
+      <main class="blog-main is-article story-tone-cream">
         <nav class="blog-crumb" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>The 5-Minute Reset: Micro-breaks That Actually Work</span></nav>
         
-    <a class="blog-back" href="/blog">&larr; Back to stories</a>
-    <p class="blog-meta"><span>Care Giver Tips</span> · <time datetime="2026-07-03">July 3, 2026</time></p>
-    <h1 class="article-title">The 5-Minute Reset: Micro-breaks That Actually Work</h1>
-    <p class="speakable-summary">When a full break feels impossible, five-minute resets can still help. Breathing, grounding, and other micro-breaks caregivers actually use.</p>
-    <figure class="blog-figure"><img class="blog-img" src="/assets/blog/the-5-minute-reset.jpg" alt=""></figure>
-    <article class="blog-body">
-      <p>When caregiving is your day, the idea of a vacation, a spa day, or even an hour to yourself can feel absurd. But waiting for large blocks of free time before you recover is a strategy that rarely works — and it is not necessary. Brief, intentional pauses scattered through the day can meaningfully reset your nervous system, even when they last only five minutes.</p>
+    <header class="story-head">
+      <p class="story-kicker">Care Giver Tips</p>
+      <h1 class="story-title">The 5-Minute Reset: Micro-breaks That Actually Work</h1>
+      <p class="story-dek speakable-summary">When a full break feels impossible, five-minute resets can still help. Breathing, grounding, and other micro-breaks caregivers actually use.</p>
+    </header>
+    <figure class="story-hero-media"><img src="/assets/blog/the-5-minute-reset.jpg" alt="" fetchpriority="high"></figure>
+    <div class="story-card">
+      <div class="story-grid">
+        <aside class="story-meta">
+          <p class="story-meta-label">Published</p>
+          <p class="story-meta-date"><time datetime="2026-07-03">July 3, 2026</time></p>
+          <a class="story-back" href="/blog">&larr; All stories</a>
+        </aside>
+        <div class="story-body-col">
+          <article class="blog-body">
+            <p>When caregiving is your day, the idea of a vacation, a spa day, or even an hour to yourself can feel absurd. But waiting for large blocks of free time before you recover is a strategy that rarely works — and it is not necessary. Brief, intentional pauses scattered through the day can meaningfully reset your nervous system, even when they last only five minutes.</p>
 <p>The science supports this. Cortisol — the body's primary stress hormone — responds to deliberate slow breathing within two to three minutes. When you activate the parasympathetic nervous system through slow exhalations (breathing in for four counts, out for six), your heart rate slows and the stress response begins to dampen. You do not need silence, a yoga mat, or even privacy. A bathroom break counts.</p>
 <p>Five techniques caregivers have found genuinely usable: (1) <strong>4-6 breathing</strong> — four counts in, six counts out, for two minutes. (2) <strong>Sensory grounding</strong> — name five things you can see right now, four you can touch, three you can hear. This pulls attention out of anxious thought loops. (3) <strong>A brief walk outside</strong> — even to the end of the driveway and back. Natural light and movement shift cortisol within minutes. (4) <strong>One cup of something warm</strong> — held with both hands, drunk slowly, without a screen. (5) <strong>Stretching your neck and shoulders</strong> — caregivers carry tension here chronically; thirty seconds of gentle movement releases it.</p>
 <p>The key is making these automatic rather than aspirational. Link them to existing moments: the first coffee of the morning, the transition between tasks, or the five minutes after the person you care for falls asleep. Habits that attach to existing anchors are the ones that stick.</p>
 <p>None of this replaces real rest — sustained sleep, social connection, and time that belongs entirely to you. But micro-breaks create a floor of stability that makes everything else slightly more manageable. They are not a cure. They are maintenance.</p>
-    </article>
-    
+          </article>
+          
     <section class="howto-block" aria-label="Step-by-step guide">
       <h2>Quick steps</h2>
       <ol class="howto-steps">
@@ -924,16 +940,50 @@
 <li><strong>Release neck and shoulder tension</strong> — Gently stretch for about thirty seconds.</li>
       </ol>
     </section>
-    <p class="blog-back-wrap"><a class="blog-back" href="/blog">&larr; Back to stories</a></p>
-    <div class="blog-cta">
-      <p>If this resonates, you can keep going in a private chat. No account required.</p>
-      <a class="pill-dark" href="/">Talk with Liam's Call AI</a>
-      &nbsp;&nbsp;<a href="/resources" style="font-size:0.85rem;font-weight:600;">Crisis resources</a>
+          <div class="blog-cta">
+            <p>If this resonates, you can keep going in a private chat. No account required.</p>
+            <a class="pill-dark" href="/">Talk with Liam's Call AI</a>
+            &nbsp;&nbsp;<a href="/resources" class="cta-alt-link">Crisis resources</a>
+          </div>
+          <p class="blog-disclaimer">
+            Liam's Call is an informational tool, not a medical professional or crisis service.
+            In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.
+          </p>
+        </div>
+      </div>
     </div>
-    <p class="blog-disclaimer">
-      Liam's Call is an informational tool, not a medical professional or crisis service.
-      In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.
-    </p>
+    
+    <section class="story-related" aria-label="More stories">
+      <h2 class="section-title">More stories</h2>
+      <div class="polaroid-grid">
+        
+        <div class="polaroid-row is-wide-narrow">
+          
+    <a class="polaroid pl-sand is-wide" href="/blog/building-a-care-routine-that-has-room-for-you" data-category="Care Giver Tips">
+      <span class="polaroid-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" loading="eager" decoding="async"></span>
+      <span class="polaroid-caption"><span class="t">Building a Care Routine That Has Room for You</span> — A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</span>
+    </a>
+          
+    <a class="polaroid pl-mint is-narrow" href="/blog/how-to-ask-for-help-without-feeling-guilty" data-category="Care Giver Tips">
+      <span class="polaroid-media"><img src="/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg" alt="" loading="lazy" decoding="async"></span>
+      <span class="polaroid-caption"><span class="t">How to Ask for Help Without Feeling Guilty</span> — Why caregivers avoid asking for help, how to break the guilt loop, and how to make requests specific enough that people can say yes.</span>
+    </a>
+        </div>
+
+        <div class="polaroid-row is-narrow-wide">
+          
+    <a class="polaroid pl-cream is-narrow" href="/blog/you-cant-pour-from-an-empty-cup" data-category="Care Giver Tips">
+      <span class="polaroid-media"><img src="/assets/blog/you-cant-pour-from-an-empty-cup.jpg" alt="" loading="lazy" decoding="async"></span>
+      <span class="polaroid-caption"><span class="t">You Can't Pour From an Empty Cup</span> — Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support.</span>
+    </a>
+          
+    <a class="polaroid pl-moss is-wide" href="/blog/finding-toronto-shelter-help" data-category="Homelessness">
+      <span class="polaroid-media"><img src="/assets/blog/finding-toronto-shelter-help.jpg" alt="" loading="lazy" decoding="async"></span>
+      <span class="polaroid-caption"><span class="t">Finding Toronto Shelter Help Without Guessing Phone Numbers</span> — Searching for a Toronto shelter? Use Central Intake, 311, and 211 Ontario instead of outdated clinic lists — verified numbers for caregivers and people in crisis.</span>
+    </a>
+        </div>
+      </div>
+    </section>
   
       </main>
     </div>

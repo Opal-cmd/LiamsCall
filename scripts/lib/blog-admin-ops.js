@@ -99,7 +99,7 @@ function getDraft(slug) {
   };
 }
 
-function writeMarkdown({ title, slug, date, category, region, description, risk, body, image }) {
+function writeMarkdown({ title, slug, date, category, region, description, risk, body, image, sourceUrl }) {
   const lines = [
     '---',
     `title: ${JSON.stringify(title)}`,
@@ -110,19 +110,22 @@ function writeMarkdown({ title, slug, date, category, region, description, risk,
     `description: ${JSON.stringify(description || '')}`,
     `risk: ${(risk || 'review').toLowerCase()}`,
   ];
+  if (sourceUrl) lines.push(`source_url: ${JSON.stringify(sourceUrl)}`);
   if (image) lines.push(`image: ${JSON.stringify(image)}`);
   lines.push('---', '', String(body || '').trim(), '');
   return lines.join('\n');
 }
 
-async function attachImageToMarkdown(md, { slug, title, category, sourceUrl }) {
+async function attachImageToMarkdown(md, { slug, title, category, description, sourceUrl }) {
   try {
-    const image = await ensurePostImage({
+    const { path: image, origin } = await ensurePostImage({
       slug,
       title,
       category,
+      description: description || '',
       sourceUrl: sourceUrl || '',
     });
+    console.log(`Blog image attached for ${slug} (${origin}): ${image}`);
     return setFrontmatterImage(md, image);
   } catch (err) {
     console.warn(`Blog image attach skipped for ${slug}: ${err.message || err}`);
@@ -136,16 +139,19 @@ async function saveDraft(slug, updates = {}) {
   const nextSlug = toSlug(updates.slug || current.slug);
   const title = updates.title ?? current.title;
   const category = updates.category ?? current.category;
+  const description = updates.description ?? current.description;
+  const sourceUrl = updates.source_url ?? updates.sourceUrl ?? current.sourceUrl ?? '';
   let md = writeMarkdown({
     title,
     slug: nextSlug,
     date: updates.date ?? current.date,
     category,
     region: updates.region ?? current.region ?? 'Canada',
-    description: updates.description ?? current.description,
+    description,
     risk: updates.risk ?? current.risk ?? 'review',
     body: updates.body ?? current.body,
     image: updates.image ?? current.image ?? '',
+    sourceUrl,
   });
 
   // Soft validate
@@ -165,7 +171,8 @@ async function saveDraft(slug, updates = {}) {
       slug: nextSlug,
       title,
       category,
-      sourceUrl: updates.source_url || updates.sourceUrl || '',
+      description,
+      sourceUrl,
     });
   }
 
@@ -200,6 +207,8 @@ async function approveDraft(slug) {
       slug: post.slug,
       title: post.title,
       category: post.category,
+      description: post.description,
+      sourceUrl: post.sourceUrl || '',
     });
   }
 
