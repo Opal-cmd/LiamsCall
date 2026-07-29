@@ -118,10 +118,25 @@
     ]
 }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <style>
+    /* Self-hosted Inter — same brand font as the rest of liamscall.com */
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url('/assets/fonts/inter-latin-ext-wght-normal.woff2') format('woff2');
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url('/assets/fonts/inter-latin-wght-normal.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
     :root {
       --green-dark: #0f4a3a;
       --green-mid: #1f6b52;
@@ -148,8 +163,10 @@
       --story-sand: #e7dbc8;
       --story-cream: #f0e9dc;
       --sidebar-w: 15.5rem;
-      --font-display: "Fraunces", Georgia, "Times New Roman", serif;
-      --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+      /* Brand fonts: Inter everywhere, bold + tight tracking for display
+         (matches .font-serif-brand on the main app). */
+      --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
     body {
@@ -187,7 +204,7 @@
     }
     .sidebar-home-btn span {
       font-family: var(--font-display);
-      font-size: 1.05rem; font-weight: 650; color: var(--green-dark); letter-spacing: -0.02em;
+      font-size: 1.05rem; font-weight: 700; color: var(--green-dark); letter-spacing: -0.02em;
     }
     .side-nav { display: flex; flex-direction: column; gap: 1.05rem; }
     .side-link { font-size: 0.92rem; color: var(--ink); text-decoration: none; font-weight: 500; }
@@ -322,7 +339,7 @@
     }
     .polaroid-caption .t {
       font-family: var(--font-display);
-      font-weight: 650;
+      font-weight: 700;
       font-size: 1.02em;
     }
 
@@ -407,7 +424,7 @@
       margin: 0 0 2rem;
       font-family: var(--font-display);
       font-size: clamp(1.55rem, 3vw, 2.1rem);
-      font-weight: 650;
+      font-weight: 700;
       letter-spacing: -0.02em;
       text-align: center;
       color: var(--ink);
@@ -500,14 +517,14 @@
       margin: 0 0 1.1rem;
       font-family: var(--font-display);
       font-size: 1.05rem;
-      font-weight: 650;
+      font-weight: 700;
       color: var(--ink);
     }
     .newsletter-copy h2 {
       margin: 0 0 1.35rem;
       font-family: var(--font-display);
       font-size: clamp(1.6rem, 3.4vw, 2.4rem);
-      font-weight: 650;
+      font-weight: 700;
       line-height: 1.12;
       letter-spacing: -0.02em;
       color: var(--ink);
@@ -605,7 +622,7 @@
       margin: 0 0 0.9rem;
       font-family: var(--font-display);
       font-size: clamp(2.1rem, 5.5vw, 3.6rem);
-      font-weight: 650;
+      font-weight: 700;
       line-height: 1.02;
       letter-spacing: -0.03em;
       color: var(--ink);
@@ -694,7 +711,7 @@
       font-family: var(--font-display);
       font-size: 1.5rem;
       line-height: 1.35;
-      font-weight: 650;
+      font-weight: 700;
       letter-spacing: -0.01em;
       color: var(--ink);
     }
@@ -702,7 +719,7 @@
     .blog-body h2 {
       font-family: var(--font-display);
       font-size: 1.55rem;
-      font-weight: 650;
+      font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--ink);
       margin: 2.2rem 0 0.75rem;
@@ -710,7 +727,7 @@
     .blog-body h3 {
       font-family: var(--font-display);
       font-size: 1.25rem;
-      font-weight: 650;
+      font-weight: 700;
       color: var(--ink);
       margin: 1.75rem 0 0.55rem;
     }
@@ -811,7 +828,7 @@
       .mobile-menu-toggle svg { width: 1.05rem; height: 1.05rem; stroke: currentColor; }
       .mobile-top-brand { display: flex; align-items: center; gap: 0.5rem; margin: 0 auto; text-decoration: none; }
       .mobile-top-brand img { height: 1.35rem; width: auto; }
-      .mobile-top-brand span { font-family: var(--font-display); font-size: 0.95rem; font-weight: 650; color: var(--green-dark); }
+      .mobile-top-brand span { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--green-dark); }
       .blog-hero { padding-left: 1.1rem; padding-right: 1.1rem; }
       .blog-toolbar { padding: 0 1.1rem 1.25rem; }
       .blog-filters { gap: 0.35rem; }
