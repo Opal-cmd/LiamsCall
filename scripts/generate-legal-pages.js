@@ -97,6 +97,10 @@ function shell(title, description, active, body, extras = {}) {
         </div>
       </div>
     </aside>
+    <button type="button" id="sidebar-collapse-toggle" class="sidebar-collapse-toggle" aria-label="Collapse sidebar" aria-expanded="true" aria-controls="site-sidebar">
+      <svg class="icon-collapse" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      <svg class="icon-expand" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
 
     <div class="site-main">
       <div class="mobile-topbar">
@@ -151,6 +155,7 @@ function shell(title, description, active, body, extras = {}) {
       });
     })();
   </script>
+  <script src="/assets/sidebar.js" defer></script>
 </body>
 </html>
 `;

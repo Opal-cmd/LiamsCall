@@ -87,6 +87,86 @@
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  transition:
+    width 220ms ease,
+    min-width 220ms ease,
+    padding 220ms ease,
+    opacity 180ms ease,
+    border-color 180ms ease;
+}
+
+.sidebar-collapse-toggle {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .sidebar-collapse-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    position: sticky;
+    top: 1.35rem;
+    z-index: 45;
+    width: 1.7rem;
+    height: 1.7rem;
+    margin: 1.35rem 0 0 -0.85rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: var(--green-dark);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(15, 74, 58, 0.12);
+    transition: background 160ms ease, color 160ms ease, margin 220ms ease;
+  }
+
+  .sidebar-collapse-toggle:hover {
+    background: var(--green-dark);
+    color: #fff;
+  }
+
+  .sidebar-collapse-toggle:focus-visible {
+    outline: 2px solid var(--green-dark);
+    outline-offset: 2px;
+  }
+
+  .sidebar-collapse-toggle svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .sidebar-collapse-toggle .icon-expand {
+    display: none;
+  }
+
+  .page-shell.is-sidebar-collapsed .site-sidebar {
+    width: 0;
+    min-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    opacity: 0;
+    border-right-color: transparent;
+    pointer-events: none;
+  }
+
+  .page-shell.is-sidebar-collapsed .sidebar-collapse-toggle {
+    margin-left: 0.85rem;
+  }
+
+  .page-shell.is-sidebar-collapsed .sidebar-collapse-toggle .icon-collapse {
+    display: none;
+  }
+
+  .page-shell.is-sidebar-collapsed .sidebar-collapse-toggle .icon-expand {
+    display: block;
+  }
 }
 
 .sidebar-home-btn {

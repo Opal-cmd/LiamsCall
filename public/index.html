@@ -493,6 +493,74 @@
             opacity: 1;
         }
 
+        #sidebar-collapse-toggle {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            #chat-shell.is-expanded #sidebar-collapse-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                align-self: flex-start;
+                position: sticky;
+                top: 1.35rem;
+                z-index: 45;
+                width: 1.7rem;
+                height: 1.7rem;
+                margin: 1.35rem 0 0 -0.85rem;
+                flex-shrink: 0;
+                border-radius: 999px;
+                border: 1px solid #e5e7eb;
+                background: #fff;
+                color: var(--green-dark);
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(15, 74, 58, 0.12);
+                transition: background 160ms ease, color 160ms ease, margin 220ms ease;
+            }
+
+            #chat-shell.is-expanded #sidebar-collapse-toggle:hover {
+                background: var(--green-dark);
+                color: #fff;
+            }
+
+            #chat-shell.is-expanded #sidebar-collapse-toggle svg {
+                width: 0.95rem;
+                height: 0.95rem;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 2.2;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+            #chat-shell.is-expanded #sidebar-collapse-toggle .icon-expand {
+                display: none;
+            }
+
+            #chat-shell.is-expanded.is-sidebar-collapsed #chat-sidebar {
+                width: 0;
+                min-width: 0;
+                opacity: 0;
+                padding-left: 0;
+                padding-right: 0;
+                border-right-color: transparent;
+                pointer-events: none;
+            }
+
+            #chat-shell.is-expanded.is-sidebar-collapsed #sidebar-collapse-toggle {
+                margin-left: 0.85rem;
+            }
+
+            #chat-shell.is-expanded.is-sidebar-collapsed #sidebar-collapse-toggle .icon-collapse {
+                display: none;
+            }
+
+            #chat-shell.is-expanded.is-sidebar-collapsed #sidebar-collapse-toggle .icon-expand {
+                display: block;
+            }
+        }
+
         /* Disclaimer only fits in the expanded layout */
         #chat-shell.is-docked #chat-disclaimer { display: none; }
 
@@ -521,8 +589,8 @@
             flex: 0 0 auto;
         }
 
-        @media (min-width: 1024px) {
-            #chat-shell.is-expanded #chat-sidebar {
+            @media (min-width: 1024px) {
+            #chat-shell.is-expanded:not(.is-sidebar-collapsed) #chat-sidebar {
                 width: 15rem;
                 min-width: 15rem;
             }
@@ -1391,7 +1459,7 @@
                 width: min(42rem, calc(100vw - 2.5rem));
             }
 
-            #chat-shell.is-expanded #chat-sidebar {
+            #chat-shell.is-expanded:not(.is-sidebar-collapsed) #chat-sidebar {
                 width: 14rem;
                 min-width: 14rem;
             }
@@ -1754,6 +1822,10 @@
                 </div>
             </div>
         </aside>
+        <button type="button" id="sidebar-collapse-toggle" class="sidebar-collapse-toggle" aria-label="Collapse sidebar" aria-expanded="true" aria-controls="chat-sidebar">
+            <svg class="icon-collapse" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            <svg class="icon-expand" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
 
         <div id="chat-body">
             <!-- Mobile top bar: in-flow, so messages sit naturally below it -->
@@ -3909,6 +3981,7 @@
 
         initLandingArt();
     </script>
+    <script src="/assets/sidebar.js" defer></script>
 
 </body>
 </html>
