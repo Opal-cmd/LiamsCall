@@ -572,16 +572,18 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
         : `${SITE}/assets/logo-icon.svg`;
   const twitterCard = shareImage.includes('logo-icon') ? 'summary' : 'summary_large_image';
   const isIndex = variant === 'index';
-  const swiperAssets = isIndex
-    ? `
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  const abrilFont = `
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">`
-    : '';
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">`;
+  const swiperAssets = isIndex
+    ? `
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">${abrilFont}`
+    : abrilFont;
   const fontDisplay = isIndex
     ? '"Abril Fatface", Georgia, "Times New Roman", serif'
     : '"Inter", ui-sans-serif, system-ui, sans-serif';
+  const fontStoryTitle = '"Abril Fatface", Georgia, "Times New Roman", serif';
   const swiperScript = isIndex
     ? `
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -681,8 +683,9 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
       --story-moss: #e3e9cf;
       --story-sand: #e7dbc8;
       --story-cream: #f0e9dc;
-      /* Brand fonts: Inter body; Abril Fatface display on index only. */
+      /* Brand fonts: Inter body; Abril Fatface for index display + story titles. */
       --font-display: ${fontDisplay};
+      --font-story-title: ${fontStoryTitle};
       --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
@@ -1073,11 +1076,11 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
     }
     .story-title {
       margin: 0 0 0.9rem;
-      font-family: var(--font-display);
+      font-family: var(--font-story-title);
       font-size: clamp(2.1rem, 5.5vw, 3.6rem);
-      font-weight: 700;
-      line-height: 1.02;
-      letter-spacing: -0.03em;
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: 0.01em;
       color: var(--ink);
     }
     .story-dek {

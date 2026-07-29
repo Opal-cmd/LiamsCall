@@ -78,8 +78,9 @@
       --story-moss: #e3e9cf;
       --story-sand: #e7dbc8;
       --story-cream: #f0e9dc;
-      /* Brand fonts: Inter body; Abril Fatface display on index only. */
+      /* Brand fonts: Inter body; Abril Fatface for index display + story titles. */
       --font-display: "Abril Fatface", Georgia, "Times New Roman", serif;
+      --font-story-title: "Abril Fatface", Georgia, "Times New Roman", serif;
       --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
@@ -470,11 +471,11 @@
     }
     .story-title {
       margin: 0 0 0.9rem;
-      font-family: var(--font-display);
+      font-family: var(--font-story-title);
       font-size: clamp(2.1rem, 5.5vw, 3.6rem);
-      font-weight: 700;
-      line-height: 1.02;
-      letter-spacing: -0.03em;
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: 0.01em;
       color: var(--ink);
     }
     .story-dek {
@@ -846,14 +847,14 @@
               <p class="section-lead">A few caregiver favorites — practical, calm, and specific pieces worth sitting with.</p>
               <div class="selects-rail" aria-label="Featured selects">
                 
-    <a class="polaroid pl-cream is-select" href="/blog/building-a-care-routine-that-has-room-for-you" data-category="Care Giver Tips">
-      <span class="polaroid-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" loading="lazy" decoding="async"></span>
-      <span class="polaroid-caption"><span class="t">Building a Care Routine That Has Room for You</span> — A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</span>
-    </a>
-
-    <a class="polaroid pl-moss is-select" href="/blog/you-cant-pour-from-an-empty-cup" data-category="Care Giver Tips">
+    <a class="polaroid pl-cream is-select" href="/blog/you-cant-pour-from-an-empty-cup" data-category="Care Giver Tips">
       <span class="polaroid-media"><img src="/assets/blog/you-cant-pour-from-an-empty-cup.jpg" alt="" loading="lazy" decoding="async"></span>
       <span class="polaroid-caption"><span class="t">You Can't Pour From an Empty Cup</span> — Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support.</span>
+    </a>
+
+    <a class="polaroid pl-moss is-select" href="/blog/building-a-care-routine-that-has-room-for-you" data-category="Care Giver Tips">
+      <span class="polaroid-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" loading="lazy" decoding="async"></span>
+      <span class="polaroid-caption"><span class="t">Building a Care Routine That Has Room for You</span> — A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</span>
     </a>
 
     <a class="polaroid pl-clay is-select" href="/blog/the-5-minute-reset" data-category="Care Giver Tips">
