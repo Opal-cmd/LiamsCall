@@ -5,7 +5,7 @@
   <url>
     <!-- title: Liam's Call -->
     <loc>https://liamscall.com/</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -30,38 +30,129 @@
     </image:image>
   </url>
   <url>
+    <!-- title: Stories forcaregivers -->
+    <loc>https://liamscall.com/blog</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <!-- title: Crisis & Support Resources -->
     <loc>https://liamscall.com/resources</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <!-- title: About Us -->
     <loc>https://liamscall.com/about</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <!-- title: Sitemap -->
     <loc>https://liamscall.com/sitemap</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <!-- title: Privacy Policy -->
     <loc>https://liamscall.com/privacy</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <!-- title: Terms of Use -->
     <loc>https://liamscall.com/terms</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
+  </url>
+  <url>
+    <!-- title: Finding Toronto Shelter Help Without Guessing Phone Numbers -->
+    <loc>https://liamscall.com/blog/finding-toronto-shelter-help</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/finding-toronto-shelter-help.jpg</image:loc>
+      <image:title>Finding Toronto Shelter Help Without Guessing Phone Numbers</image:title>
+      <image:caption>Searching for a Toronto shelter? Use Central Intake, 311, and 211 Ontario instead of outdated clinic lists — verified numbers for caregivers and people in crisis.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <!-- title: Ontario Detox Near Me: How to Find Help That Is Actually Open -->
+    <loc>https://liamscall.com/blog/ontario-detox-near-me</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/ontario-detox-near-me.jpg</image:loc>
+      <image:title>Ontario Detox Near Me: How to Find Help That Is Actually Open</image:title>
+      <image:caption>Searching Ontario detox near me? ConnexOntario matches people to current withdrawal management and addiction treatment — safer than outdated Google clinic lists.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <!-- title: Building a Care Routine That Has Room for You -->
+    <loc>https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/building-a-care-routine-that-has-room-for-you.jpg</image:loc>
+      <image:title>Building a Care Routine That Has Room for You</image:title>
+      <image:caption>A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <!-- title: Grief While They're Still Here: Understanding Anticipatory Loss -->
+    <loc>https://liamscall.com/blog/grief-while-theyre-still-here</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/grief-while-theyre-still-here.jpg</image:loc>
+      <image:title>Grief While They're Still Here: Understanding Anticipatory Loss</image:title>
+      <image:caption>Anticipatory grief has no public ritual. What it feels like for caregivers, why it's normal, and gentle ways to let it have somewhere to go.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <!-- title: How to Ask for Help Without Feeling Guilty -->
+    <loc>https://liamscall.com/blog/how-to-ask-for-help-without-feeling-guilty</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg</image:loc>
+      <image:title>How to Ask for Help Without Feeling Guilty</image:title>
+      <image:caption>Why caregivers avoid asking for help, how to break the guilt loop, and how to make requests specific enough that people can say yes.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <!-- title: The 5-Minute Reset: Micro-breaks That Actually Work -->
+    <loc>https://liamscall.com/blog/the-5-minute-reset</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/the-5-minute-reset.jpg</image:loc>
+      <image:title>The 5-Minute Reset: Micro-breaks That Actually Work</image:title>
+      <image:caption>When a full break feels impossible, five-minute resets can still help. Breathing, grounding, and other micro-breaks caregivers actually use.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <!-- title: You Can't Pour From an Empty Cup -->
+    <loc>https://liamscall.com/blog/you-cant-pour-from-an-empty-cup</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/you-cant-pour-from-an-empty-cup.jpg</image:loc>
+      <image:title>You Can't Pour From an Empty Cup</image:title>
+      <image:caption>Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support.</image:caption>
+    </image:image>
   </url>
 </urlset>
