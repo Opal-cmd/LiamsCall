@@ -291,6 +291,25 @@ function getTopics() {
   return loadTopics();
 }
 
+function normalizeDeskCategory(value) {
+  const raw = String(value || '').trim();
+  const allowed = ['Mental health', 'Addiction', 'Homelessness', 'Care Giver Tips'];
+  if (!raw) return 'Care Giver Tips';
+  const exact = allowed.find((c) => c.toLowerCase() === raw.toLowerCase());
+  if (exact) return exact;
+  const legacy = {
+    caregiving: 'Care Giver Tips',
+    'care giver tips': 'Care Giver Tips',
+    'caregiver wellbeing': 'Care Giver Tips',
+    'caregiver tips': 'Care Giver Tips',
+    routines: 'Care Giver Tips',
+    communication: 'Care Giver Tips',
+    'practical tips': 'Care Giver Tips',
+    housing: 'Homelessness',
+  };
+  return legacy[raw.toLowerCase()] || 'Care Giver Tips';
+}
+
 function slugifyTopicId(value) {
   return String(value || '')
     .toLowerCase()
@@ -320,7 +339,7 @@ function updateTopics(payload = {}) {
       return {
         id,
         title,
-        category: String(t.category || 'Caregiving').trim(),
+        category: normalizeDeskCategory(t.category),
         risk: String(t.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
         used: Boolean(t.used),
         angle: String(t.angle || '').trim(),

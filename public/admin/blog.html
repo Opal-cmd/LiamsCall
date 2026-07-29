@@ -881,6 +881,36 @@
       });
     }
 
+    const TOPIC_CATEGORIES = ['Mental health', 'Addiction', 'Homelessness', 'Care Giver Tips'];
+    const LEGACY_TOPIC_CATEGORY = {
+      caregiving: 'Care Giver Tips',
+      'care giver tips': 'Care Giver Tips',
+      'caregiver wellbeing': 'Care Giver Tips',
+      'caregiver tips': 'Care Giver Tips',
+      routines: 'Care Giver Tips',
+      communication: 'Care Giver Tips',
+      'practical tips': 'Care Giver Tips',
+      housing: 'Homelessness',
+      'mental health': 'Mental health',
+      addiction: 'Addiction',
+      homelessness: 'Homelessness',
+    };
+
+    function normalizeTopicCategory(value) {
+      const raw = String(value || '').trim();
+      if (!raw) return 'Care Giver Tips';
+      const exact = TOPIC_CATEGORIES.find((c) => c.toLowerCase() === raw.toLowerCase());
+      if (exact) return exact;
+      return LEGACY_TOPIC_CATEGORY[raw.toLowerCase()] || 'Care Giver Tips';
+    }
+
+    function categoryOptionsHtml(selected) {
+      const current = normalizeTopicCategory(selected);
+      return TOPIC_CATEGORIES.map(
+        (c) => `<option value="${escapeHtml(c)}"${c === current ? ' selected' : ''}>${escapeHtml(c)}</option>`,
+      ).join('');
+    }
+
     function slugifyTopicId(value) {
       return String(value || '')
         .toLowerCase()
@@ -917,7 +947,9 @@
             <input data-topic-field="id" data-topic-idx="${idx}" value="${escapeHtml(t.id || '')}" placeholder="id-slug (auto from title if blank)">
             <textarea data-topic-field="angle" data-topic-idx="${idx}" style="min-height:70px;" placeholder="Angle / writing note">${escapeHtml(t.angle || '')}</textarea>
             <div class="row" style="display:grid;grid-template-columns:1fr 1fr auto auto;gap:0.45rem;">
-              <input data-topic-field="category" data-topic-idx="${idx}" value="${escapeHtml(t.category || '')}" placeholder="Category">
+              <select data-topic-field="category" data-topic-idx="${idx}" aria-label="Category">
+                ${categoryOptionsHtml(t.category)}
+              </select>
               <select data-topic-field="risk" data-topic-idx="${idx}">
                 <option value="safe"${t.risk === 'safe' ? ' selected' : ''}>safe</option>
                 <option value="review"${t.risk !== 'safe' ? ' selected' : ''}>review</option>
@@ -937,6 +969,9 @@
           const field = el.getAttribute('data-topic-field');
           if (!state.topics[i]) return;
           state.topics[i][field] = el.type === 'checkbox' ? el.checked : el.value;
+          if (field === 'category') {
+            state.topics[i].category = normalizeTopicCategory(el.value);
+          }
           if (field === 'title' && !String(state.topics[i].id || '').trim()) {
             const nextId = ensureUniqueTopicId(slugifyTopicId(el.value), i);
             state.topics[i].id = nextId;
@@ -974,7 +1009,12 @@
         const title = String(t.title || '').trim();
         let id = String(t.id || '').trim();
         if (!id && title) id = ensureUniqueTopicId(slugifyTopicId(title), i);
-        return { ...t, title, id };
+        return {
+          ...t,
+          title,
+          id,
+          category: normalizeTopicCategory(t.category),
+        };
       });
       const incomplete = prepared.find((t) => t.title && !t.id);
       if (incomplete) {
