@@ -87,14 +87,12 @@ function buildFilterScript() {
       var cards = Array.prototype.slice.call(document.querySelectorAll('.post-card'));
       var meta = document.getElementById('filter-meta');
       var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter-type]'));
-      var state = { category: 'all', region: 'all' };
+      var state = { category: 'all' };
 
       function apply() {
         var shown = 0;
         cards.forEach(function (card) {
-          var catOk = state.category === 'all' || card.getAttribute('data-category') === state.category;
-          var regionOk = state.region === 'all' || card.getAttribute('data-region') === state.region;
-          var ok = catOk && regionOk;
+          var ok = state.category === 'all' || card.getAttribute('data-category') === state.category;
           card.classList.toggle('is-hidden', !ok);
           if (ok) shown += 1;
         });
@@ -103,12 +101,9 @@ function buildFilterScript() {
           band.classList.toggle('is-empty', !any);
         });
         if (meta) {
-          var bits = [];
-          if (state.category !== 'all') bits.push(state.category);
-          if (state.region !== 'all') bits.push(state.region);
-          meta.textContent = bits.length
-            ? ('Showing ' + shown + ' post' + (shown === 1 ? '' : 's') + ' · ' + bits.join(' · '))
-            : ('Showing all ' + shown + ' posts');
+          meta.textContent = state.category === 'all'
+            ? ('Showing all ' + shown + ' posts')
+            : ('Showing ' + shown + ' post' + (shown === 1 ? '' : 's') + ' · ' + state.category);
         }
       }
 
@@ -141,7 +136,7 @@ function renderPostCard(p, idx) {
     ? `<div class="card-media"><img src="${escapeHtml(p.image)}" alt="" loading="${idx < 3 ? 'eager' : 'lazy'}" decoding="async"></div>`
     : `<div class="card-media is-placeholder" aria-hidden="true"></div>`;
   return `
-    <a class="post-card ${cardSizeClass(idx)}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(p.category)}" data-region="${escapeHtml(p.region || 'Canada')}">
+    <a class="post-card ${cardSizeClass(idx)}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(p.category)}">
       ${img}
       <div class="card-copy">
         <span class="cat">${escapeHtml(p.category)} · ${escapeHtml(formatDateDisplay(p.date))}</span>
@@ -153,21 +148,12 @@ function renderPostCard(p, idx) {
 
 function buildIndex(posts) {
   const categories = uniqueSorted(posts.map((p) => p.category));
-  const regions = uniqueSorted(posts.map((p) => p.region || 'Canada'));
 
   const catButtons = [
     '<button type="button" class="blog-filter is-active" data-filter-type="category" data-filter-value="all">All topics</button>',
     ...categories.map(
       (c) =>
         `<button type="button" class="blog-filter" data-filter-type="category" data-filter-value="${escapeHtml(c)}">${escapeHtml(c)}</button>`,
-    ),
-  ].join('\n');
-
-  const regionButtons = [
-    '<button type="button" class="blog-filter is-active" data-filter-type="region" data-filter-value="all">All regions</button>',
-    ...regions.map(
-      (r) =>
-        `<button type="button" class="blog-filter" data-filter-type="region" data-filter-value="${escapeHtml(r)}">${escapeHtml(r)}</button>`,
     ),
   ].join('\n');
 
@@ -223,7 +209,6 @@ function buildIndex(posts) {
     }
     <div class="blog-toolbar">
       <div class="blog-filters" role="group" aria-label="Filter by topic">${catButtons}</div>
-      <div class="blog-filters" role="group" aria-label="Filter by region">${regionButtons}</div>
       <p id="filter-meta" class="blog-filter-meta">Showing all ${posts.length} posts</p>
     </div>
     <div id="post-list" class="masonry-feed">

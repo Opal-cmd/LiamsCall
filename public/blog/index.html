@@ -531,9 +531,6 @@
 <button type="button" class="blog-filter" data-filter-type="category" data-filter-value="Mental Health">Mental Health</button>
 <button type="button" class="blog-filter" data-filter-type="category" data-filter-value="Practical Tips">Practical Tips</button>
 <button type="button" class="blog-filter" data-filter-type="category" data-filter-value="Routines">Routines</button></div>
-      <div class="blog-filters" role="group" aria-label="Filter by region"><button type="button" class="blog-filter is-active" data-filter-type="region" data-filter-value="all">All regions</button>
-<button type="button" class="blog-filter" data-filter-type="region" data-filter-value="Canada">Canada</button>
-<button type="button" class="blog-filter" data-filter-type="region" data-filter-value="Ontario">Ontario</button></div>
       <p id="filter-meta" class="blog-filter-meta">Showing all 7 posts</p>
     </div>
     <div id="post-list" class="masonry-feed">
@@ -542,7 +539,7 @@
         <div class="masonry-band-inner">
           <p class="blog-section-label">Latest stories</p>
           <div class="masonry-grid">
-    <a class="post-card size-wide" href="/blog/finding-toronto-shelter-help" data-category="Housing" data-region="Ontario">
+    <a class="post-card size-wide" href="/blog/finding-toronto-shelter-help" data-category="Housing">
       <div class="card-media"><img src="/assets/blog/finding-toronto-shelter-help.jpg" alt="" loading="eager" decoding="async"></div>
       <div class="card-copy">
         <span class="cat">Housing · July 15, 2026</span>
@@ -551,7 +548,7 @@
       </div>
     </a>
 
-    <a class="post-card size-tall" href="/blog/ontario-detox-near-me" data-category="Mental Health" data-region="Ontario">
+    <a class="post-card size-tall" href="/blog/ontario-detox-near-me" data-category="Mental Health">
       <div class="card-media"><img src="/assets/blog/ontario-detox-near-me.jpg" alt="" loading="eager" decoding="async"></div>
       <div class="card-copy">
         <span class="cat">Mental Health · July 15, 2026</span>
@@ -560,7 +557,7 @@
       </div>
     </a>
 
-    <a class="post-card size-std" href="/blog/building-a-care-routine-that-has-room-for-you" data-category="Routines" data-region="Ontario">
+    <a class="post-card size-std" href="/blog/building-a-care-routine-that-has-room-for-you" data-category="Routines">
       <div class="card-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" loading="eager" decoding="async"></div>
       <div class="card-copy">
         <span class="cat">Routines · July 9, 2026</span>
@@ -575,7 +572,7 @@
         <div class="masonry-band-inner">
           <p class="blog-section-label">Worth sitting with</p>
           <div class="masonry-grid">
-    <a class="post-card size-std" href="/blog/grief-while-theyre-still-here" data-category="Mental Health" data-region="Canada">
+    <a class="post-card size-std" href="/blog/grief-while-theyre-still-here" data-category="Mental Health">
       <div class="card-media"><img src="/assets/blog/grief-while-theyre-still-here.jpg" alt="" loading="lazy" decoding="async"></div>
       <div class="card-copy">
         <span class="cat">Mental Health · July 7, 2026</span>
@@ -584,7 +581,7 @@
       </div>
     </a>
 
-    <a class="post-card size-wide" href="/blog/how-to-ask-for-help-without-feeling-guilty" data-category="Communication" data-region="Canada">
+    <a class="post-card size-wide" href="/blog/how-to-ask-for-help-without-feeling-guilty" data-category="Communication">
       <div class="card-media"><img src="/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg" alt="" loading="lazy" decoding="async"></div>
       <div class="card-copy">
         <span class="cat">Communication · July 5, 2026</span>
@@ -599,7 +596,7 @@
         <div class="masonry-band-inner">
           <p class="blog-section-label">Practical support</p>
           <div class="masonry-grid">
-    <a class="post-card size-std" href="/blog/the-5-minute-reset" data-category="Practical Tips" data-region="Canada">
+    <a class="post-card size-std" href="/blog/the-5-minute-reset" data-category="Practical Tips">
       <div class="card-media"><img src="/assets/blog/the-5-minute-reset.jpg" alt="" loading="lazy" decoding="async"></div>
       <div class="card-copy">
         <span class="cat">Practical Tips · July 3, 2026</span>
@@ -608,7 +605,7 @@
       </div>
     </a>
 
-    <a class="post-card size-tall" href="/blog/you-cant-pour-from-an-empty-cup" data-category="Caregiver Wellbeing" data-region="Canada">
+    <a class="post-card size-tall" href="/blog/you-cant-pour-from-an-empty-cup" data-category="Caregiver Wellbeing">
       <div class="card-media"><img src="/assets/blog/you-cant-pour-from-an-empty-cup.jpg" alt="" loading="lazy" decoding="async"></div>
       <div class="card-copy">
         <span class="cat">Caregiver Wellbeing · July 1, 2026</span>
@@ -630,14 +627,12 @@
       var cards = Array.prototype.slice.call(document.querySelectorAll('.post-card'));
       var meta = document.getElementById('filter-meta');
       var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter-type]'));
-      var state = { category: 'all', region: 'all' };
+      var state = { category: 'all' };
 
       function apply() {
         var shown = 0;
         cards.forEach(function (card) {
-          var catOk = state.category === 'all' || card.getAttribute('data-category') === state.category;
-          var regionOk = state.region === 'all' || card.getAttribute('data-region') === state.region;
-          var ok = catOk && regionOk;
+          var ok = state.category === 'all' || card.getAttribute('data-category') === state.category;
           card.classList.toggle('is-hidden', !ok);
           if (ok) shown += 1;
         });
@@ -646,12 +641,9 @@
           band.classList.toggle('is-empty', !any);
         });
         if (meta) {
-          var bits = [];
-          if (state.category !== 'all') bits.push(state.category);
-          if (state.region !== 'all') bits.push(state.region);
-          meta.textContent = bits.length
-            ? ('Showing ' + shown + ' post' + (shown === 1 ? '' : 's') + ' · ' + bits.join(' · '))
-            : ('Showing all ' + shown + ' posts');
+          meta.textContent = state.category === 'all'
+            ? ('Showing all ' + shown + ' posts')
+            : ('Showing ' + shown + ' post' + (shown === 1 ? '' : 's') + ' · ' + state.category);
         }
       }
 
