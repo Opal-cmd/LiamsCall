@@ -2,8 +2,8 @@
 'use strict';
 
 /**
- * Production sitemap builder (main branch).
- * No /blog — the full blog lives on the staging branch only.
+ * Production sitemap builder.
+ * Keeps the main-site HTML/XSL sitemap design and adds /blog when posts exist.
  */
 
 const fs = require('fs');
@@ -164,6 +164,14 @@ function main() {
       ],
     },
     {
+      route: '/blog',
+      file: path.join('blog', 'index.html'),
+      label: 'Blog',
+      blurb: 'Stories and practical guides for caregivers and families.',
+      priority: '0.9',
+      changefreq: 'daily',
+    },
+    {
       route: '/resources',
       file: 'resources.html',
       label: 'Crisis & Support Resources',
@@ -206,10 +214,40 @@ function main() {
     },
   ];
 
-  // Write HTML sitemap first so /sitemap exists for the XML entry.
-  writeHtmlSitemap(pages.filter((p) => p.route !== '/sitemap').concat(pages.filter((p) => p.route === '/sitemap')));
+  let blogPosts = [];
+  try {
+    blogPosts = require('./lib/blog-utils').loadPublishedPosts();
+  } catch {
+    blogPosts = [];
+  }
+  const blogPages = blogPosts.map((p) => ({
+    route: `/blog/${p.slug}`,
+    file: path.join('blog', p.slug, 'index.html'),
+    label: p.title,
+    blurb: p.description || '',
+    priority: '0.75',
+    changefreq: 'weekly',
+    images: p.image
+      ? [
+          {
+            loc: p.image.startsWith('http') ? p.image : `${SITE}${p.image}`,
+            title: p.title,
+            caption: p.description || p.title,
+          },
+        ]
+      : [],
+  }));
 
-  const entries = pages
+  const htmlPages = [
+    ...pages.filter((p) => p.route !== '/sitemap' && (p.route !== '/blog' || fs.existsSync(path.join(PUBLIC_DIR, p.file)))),
+    ...blogPages.filter((p) => fs.existsSync(path.join(PUBLIC_DIR, p.file))),
+    ...pages.filter((p) => p.route === '/sitemap'),
+  ];
+
+  // Write HTML sitemap first so /sitemap exists for the XML entry.
+  writeHtmlSitemap(htmlPages);
+
+  const entries = [...pages, ...blogPages]
     .filter((p) => fs.existsSync(path.join(PUBLIC_DIR, p.file)) || p.route === '/sitemap')
     .map((p) => {
       const loc = `${SITE}${p.route}`;
@@ -256,7 +294,7 @@ ${entries.map(renderUrl).join('\n')}
           url: `${SITE}/sitemap.xml`,
           html: `${SITE}/sitemap`,
           extensions: ['image'],
-          notes: 'Production sitemap lists core site pages only. Blog remains on the staging branch.',
+          notes: 'Production sitemap lists core site pages plus published blog posts.',
         },
         brand: {
           url: `${SITE}/.well-known/brand.json`,

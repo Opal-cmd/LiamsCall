@@ -71,7 +71,7 @@
     "extensions": [
       "image"
     ],
-    "notes": "Production sitemap lists core site pages only. Blog remains on the staging branch."
+    "notes": "Production sitemap lists core site pages plus published blog posts."
   },
   "brand": {
     "url": "https://liamscall.com/.well-known/brand.json",
