@@ -29,6 +29,7 @@
     }
 }
   </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
@@ -157,48 +158,96 @@
       color: var(--muted);
     }
 
-    .story-strip {
-      display: flex;
-      gap: 1rem;
-      overflow-x: auto;
-      padding: 0.25rem 1.5rem 1.5rem;
-      max-width: 72rem;
-      margin: 0 auto;
-      scrollbar-width: thin;
+    .story-strip-wrap {
+      max-width: none;
+      margin: 0 0 0.75rem;
+      width: 100%;
     }
-    .story-chip {
-      flex: 0 0 7.5rem;
-      width: 7.5rem;
-      text-decoration: none;
-      color: inherit;
-      transition: transform 200ms ease;
-    }
-    .story-chip:hover { transform: translateY(-3px); }
-    .story-chip-thumb {
-      display: block;
-      width: 7.5rem;
-      height: 7.5rem;
+    .story-carousel.swiper {
+      width: 100%;
       overflow: hidden;
-      background: #e8e8e8;
-      margin-bottom: 0.45rem;
+      padding: 1.25rem 0 2rem;
     }
-    .story-chip-thumb img {
+    .story-carousel .swiper-wrapper {
+      align-items: stretch;
+    }
+    .story-carousel .swiper-slide {
+      width: 260px;
+      height: auto;
+      margin: 0;
+      transition: transform 300ms ease;
+      transform: scale(0.825);
+      transform-origin: center center;
+    }
+    .story-carousel .swiper-slide-active {
+      transform: scale(1);
+      z-index: 2;
+    }
+    .zoom-card {
+      --page-color: #fff;
+      --page-text-color: var(--ink);
+      background: var(--page-color);
+      color: var(--page-text-color);
+      border-radius: 1.5rem;
+      padding: 0.75rem 0.75rem 1rem;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 10px 28px rgba(18, 18, 18, 0.08);
+      height: 100%;
+      min-height: 22.5rem;
+    }
+    .zoom-card.is-sky { --page-color: var(--sky); }
+    .zoom-card.is-mint { --page-color: var(--mint); }
+    .zoom-card.is-rose { --page-color: var(--rose); }
+    .zoom-card.is-paper { --page-color: #fff; border: 1px solid var(--line); }
+    .zoom-card-media {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 16rem;
+      border-radius: 1.1rem;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--ink) 8%, transparent);
+      flex: 0 0 16rem;
+    }
+    .zoom-card-media img {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       display: block;
-      transition: transform 320ms ease;
+      pointer-events: none;
     }
-    .story-chip:hover .story-chip-thumb img { transform: scale(1.06); }
-    .story-chip-label {
+    .zoom-card-content {
+      text-align: center;
+      padding: 0 0.25rem;
+      min-height: 3.6rem;
+    }
+    .zoom-card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .zoom-card-title {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      font-weight: 500;
+      color: var(--page-text-color);
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      font-size: 0.72rem;
-      line-height: 1.35;
-      font-weight: 600;
-      color: var(--ink);
+    }
+    .zoom-card-title .t {
+      font-family: var(--font-display);
+      font-weight: 650;
     }
 
     .blog-toolbar {
@@ -216,14 +265,18 @@
     .blog-filter.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
     .blog-filter-meta { font-size: 0.75rem; color: var(--muted); margin: 0; }
 
-    .masonry-feed { display: flex; flex-direction: column; gap: 0; }
-    .masonry-band { padding: 2.25rem 0 2.75rem; }
-    .masonry-band.is-empty { display: none; }
-    .masonry-band.tone-paper { background: var(--paper); }
-    .masonry-band.tone-sky { background: var(--sky); }
-    .masonry-band.tone-mint { background: var(--mint); }
-    .masonry-band.tone-rose { background: var(--rose); }
-    .masonry-band-inner {
+    .masonry-feed,
+    .magazine-feed { display: flex; flex-direction: column; gap: 0; }
+    .masonry-band,
+    .magazine-band { padding: 2.5rem 0 3rem; }
+    .masonry-band.is-empty,
+    .magazine-band.is-empty { display: none; }
+    .tone-paper { background: var(--paper); }
+    .tone-sky { background: var(--sky); }
+    .tone-mint { background: var(--mint); }
+    .tone-rose { background: var(--rose); }
+    .masonry-band-inner,
+    .magazine-band-inner {
       max-width: 72rem;
       margin: 0 auto;
       padding: 0 1.5rem;
@@ -237,46 +290,88 @@
       color: var(--muted);
       text-align: center;
     }
-    .masonry-grid {
+    .selects-head .blog-section-label,
+    .newsletter-copy .blog-section-label,
+    .feature-hero-copy .blog-section-label { text-align: left; }
+
+    .editorial-grid { display: flex; flex-direction: column; gap: 1.35rem; }
+    .editorial-row {
       display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 1.25rem 1.15rem;
-      align-items: start;
+      gap: 1.15rem;
+      align-items: stretch;
     }
-    .post-card {
-      grid-column: span 4;
+    .editorial-row.is-split-wide { grid-template-columns: 1.7fr 1fr; }
+    .editorial-row.is-split-narrow { grid-template-columns: 1fr 1.7fr; }
+    .editorial-row.is-trio { grid-template-columns: repeat(3, 1fr); }
+
+    .post-card,
+    .select-card,
+    .feature-hero {
       text-decoration: none;
       color: inherit;
       display: flex;
       flex-direction: column;
-      gap: 0.85rem;
+      min-width: 0;
+    }
+    .post-card,
+    .select-card {
+      background: #fff;
       transition: transform 220ms ease;
     }
-    .post-card:hover { transform: translateY(-4px); }
-    .post-card.size-wide { grid-column: span 8; }
-    .post-card.size-tall .card-media { aspect-ratio: 3 / 4; }
-    .post-card.size-wide .card-media { aspect-ratio: 16 / 10; }
-    .post-card.size-std .card-media { aspect-ratio: 4 / 3; }
-    .post-card.is-hidden { display: none; }
+    .post-card.tone-sky,
+    .select-card.tone-sky { background: color-mix(in srgb, var(--sky) 70%, #fff); }
+    .post-card.tone-mint,
+    .select-card.tone-mint { background: color-mix(in srgb, var(--mint) 70%, #fff); }
+    .post-card.tone-rose,
+    .select-card.tone-rose { background: color-mix(in srgb, var(--rose) 70%, #fff); }
+    .post-card.tone-paper,
+    .select-card.tone-paper { background: color-mix(in srgb, var(--paper) 55%, #fff); }
+    .post-card:hover,
+    .select-card:hover { transform: translateY(-3px); }
+    .post-card.is-hidden,
+    .select-card.is-hidden,
+    .feature-hero.is-hidden { display: none; }
+
     .card-media {
+      position: relative;
       width: 100%;
       overflow: hidden;
       background: #ddd;
       aspect-ratio: 4 / 3;
     }
+    .size-feature .card-media { aspect-ratio: 16 / 10; }
+    .size-portrait .card-media { aspect-ratio: 4 / 5; }
+    .size-tall .card-media { aspect-ratio: 3 / 4; }
+    .size-std .card-media { aspect-ratio: 4 / 3; }
     .card-media.is-placeholder {
       background: linear-gradient(135deg, #dfe8e4, #c5d4ce);
+      min-height: 12rem;
     }
     .card-media img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 420ms ease;
+      transition: transform 480ms ease;
     }
-    .post-card:hover .card-media img { transform: scale(1.04); }
-    .card-copy { padding: 0 0.1rem 0.35rem; }
-    .post-card .cat {
+    .card-media-veil {
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 18, 18, 0.0);
+      transition: background 280ms ease;
+      pointer-events: none;
+    }
+    .post-card:hover .card-media img,
+    .select-card:hover .card-media img,
+    .feature-hero:hover .card-media img { transform: scale(1.05); }
+    .post-card:hover .card-media-veil,
+    .select-card:hover .card-media-veil,
+    .feature-hero:hover .card-media-veil { background: rgba(18, 18, 18, 0.08); }
+
+    .card-copy { padding: 0.95rem 1rem 1.15rem; }
+    .post-card .cat,
+    .select-card .cat,
+    .feature-hero .cat {
       display: block;
       font-size: 0.68rem;
       font-weight: 700;
@@ -285,17 +380,18 @@
       color: var(--muted);
       margin-bottom: 0.45rem;
     }
-    .post-card h2 {
+    .post-card h2,
+    .select-card h2 {
       margin: 0;
       font-family: var(--font-display);
-      font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+      font-size: clamp(1.15rem, 2vw, 1.55rem);
       font-weight: 650;
       line-height: 1.12;
       letter-spacing: -0.025em;
       color: var(--ink);
     }
-    .post-card.size-wide h2 {
-      font-size: clamp(1.55rem, 3vw, 2.35rem);
+    .size-feature h2 {
+      font-size: clamp(1.45rem, 2.8vw, 2.15rem);
     }
     .post-card p {
       margin: 0.55rem 0 0;
@@ -306,6 +402,160 @@
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+
+    .feature-hero {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 1.5rem;
+      align-items: center;
+      background: transparent;
+    }
+    .feature-hero-media .card-media { aspect-ratio: 16 / 11; min-height: 18rem; }
+    .feature-hero-copy h2 {
+      margin: 0 0 0.75rem;
+      font-family: var(--font-display);
+      font-size: clamp(1.85rem, 4vw, 3rem);
+      font-weight: 650;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+    .feature-hero-copy p {
+      margin: 0 0 1.15rem;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.55;
+      max-width: 28rem;
+    }
+    .feature-hero-cta {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .selects-lead {
+      margin: -0.35rem 0 1.25rem;
+      max-width: 34rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .selects-rail {
+      display: flex;
+      align-items: stretch;
+      gap: 1rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      height: 24rem;
+      padding-bottom: 0.35rem;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: pan-x;
+    }
+    .selects-rail.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+    .selects-rail::-webkit-scrollbar { display: none; }
+    .select-card {
+      flex: 0 0 15rem;
+      width: 15rem;
+      min-width: 15rem;
+      max-width: 15rem;
+      height: 22.5rem;
+      min-height: 22.5rem;
+      max-height: 22.5rem;
+      scroll-snap-align: start;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+    .select-card .card-media {
+      width: 100%;
+      height: 15rem;
+      min-height: 15rem;
+      max-height: 15rem;
+      aspect-ratio: auto;
+      flex: 0 0 15rem;
+    }
+    .select-card .card-copy {
+      height: 7.5rem;
+      max-height: 7.5rem;
+      overflow: hidden;
+    }
+    .select-card h2 {
+      font-size: 1.05rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .newsletter-band { padding: 3rem 0; }
+    .newsletter-layout {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+    .newsletter-copy h2 {
+      margin: 0 0 0.65rem;
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+      font-weight: 650;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+    .newsletter-copy > p {
+      margin: 0 0 1.15rem;
+      color: var(--muted);
+      max-width: 28rem;
+      line-height: 1.5;
+    }
+    .newsletter-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      max-width: 28rem;
+    }
+    .newsletter-form input {
+      flex: 1 1 12rem;
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      padding: 0.7rem 0.9rem;
+    }
+    .newsletter-form input:focus {
+      outline: 2px solid var(--green-dark);
+      outline-offset: 1px;
+    }
+    .newsletter-note {
+      margin: 0.75rem 0 0;
+      font-size: 0.85rem;
+      color: var(--green-dark);
+    }
+    .newsletter-aside {
+      min-height: 14rem;
+      background:
+        linear-gradient(160deg, color-mix(in srgb, var(--sky) 55%, transparent), transparent 60%),
+        linear-gradient(20deg, color-mix(in srgb, var(--mint) 45%, transparent), var(--rose));
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
     .empty-feed { padding: 2rem 1.5rem; color: var(--muted); }
 
@@ -393,14 +643,51 @@
     .blog-disclaimer { margin-top: 1.5rem; font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
 
     @media (max-width: 1000px) {
-      .post-card, .post-card.size-wide { grid-column: span 6; }
+      .editorial-row.is-split-wide,
+      .editorial-row.is-split-narrow,
+      .editorial-row.is-trio { grid-template-columns: 1fr 1fr; }
+      .feature-hero,
+      .newsletter-layout { grid-template-columns: 1fr; }
+      .newsletter-aside { min-height: 10rem; }
+      .feature-hero-media .card-media { min-height: 14rem; }
     }
     @media (max-width: 700px) {
-      .masonry-grid { grid-template-columns: 1fr; }
-      .post-card, .post-card.size-wide, .post-card.size-tall { grid-column: span 1; }
-      .post-card.size-tall .card-media,
-      .post-card.size-wide .card-media,
-      .post-card.size-std .card-media { aspect-ratio: 16 / 10; }
+      .editorial-row.is-split-wide,
+      .editorial-row.is-split-narrow,
+      .editorial-row.is-trio { grid-template-columns: 1fr; }
+      .size-feature .card-media,
+      .size-portrait .card-media,
+      .size-tall .card-media,
+      .size-std .card-media,
+      .feature-hero-media .card-media { aspect-ratio: 16 / 10; min-height: 0; }
+      .blog-hero h1 { font-size: clamp(2.1rem, 11vw, 3.2rem); }
+      .feature-hero-copy h2 { font-size: clamp(1.55rem, 7vw, 2.2rem); }
+      .newsletter-copy h2 { font-size: clamp(1.4rem, 6.5vw, 1.9rem); }
+      .newsletter-form { flex-direction: column; align-items: stretch; }
+      .newsletter-form .pill-dark { width: 100%; text-align: center; }
+      .story-carousel .swiper-slide { width: min(78vw, 280px); }
+      .zoom-card { min-height: 20.5rem; }
+      .zoom-card-media { height: 14rem; flex-basis: 14rem; }
+      .selects-rail { height: 21.5rem; }
+      .select-card {
+        flex-basis: 13rem;
+        width: 13rem;
+        min-width: 13rem;
+        max-width: 13rem;
+        height: 20rem;
+        min-height: 20rem;
+        max-height: 20rem;
+      }
+      .select-card .card-media {
+        height: 13rem;
+        min-height: 13rem;
+        max-height: 13rem;
+        flex-basis: 13rem;
+      }
+      .select-card .card-copy { height: 7rem; max-height: 7rem; }
+      .article-title { font-size: clamp(1.85rem, 9vw, 2.6rem); }
+      .speakable-summary { font-size: 1.02rem; }
+      .blog-body { font-size: 1rem; }
     }
     @media (max-width: 767px) {
       .site-sidebar {
@@ -426,9 +713,15 @@
       .mobile-top-brand img { height: 1.35rem; width: auto; }
       .mobile-top-brand span { font-family: var(--font-display); font-size: 0.95rem; font-weight: 650; color: var(--green-dark); }
       main.blog-main.is-article { padding: 1.5rem 1.1rem 3.5rem; }
-      .blog-hero { padding: 1.75rem 1.1rem 1.25rem; }
-      .story-strip, .blog-toolbar, .masonry-band-inner, .blog-cta.band-cta { padding-left: 1.1rem; padding-right: 1.1rem; }
+      .blog-hero { padding: 1.5rem 1.1rem 1rem; }
+      .blog-toolbar { padding-top: 0.25rem; }
+      .blog-filters { gap: 0.35rem; }
+      .blog-filter { padding: 0.35rem 0.7rem; font-size: 0.74rem; }
+      .magazine-band { padding: 1.75rem 0 2rem; }
+      .story-strip-wrap, .blog-toolbar, .masonry-band-inner, .magazine-band-inner, .blog-cta.band-cta { padding-left: 0; padding-right: 0; }
+      .blog-toolbar, .magazine-band-inner, .masonry-band-inner, .blog-cta.band-cta { padding-left: 1.1rem; padding-right: 1.1rem; }
       .blog-crumb { margin-left: 1.1rem; margin-right: 1.1rem; }
+      .newsletter-aside { display: none; }
     }
   </style>
 </head>
@@ -488,41 +781,89 @@
         Grounded pieces on wellbeing, communication, and supporting someone through mental health, addiction, or housing challenges.
       </p>
     </header>
-    <div class="story-strip" aria-label="Recent stories">
-      <a class="story-chip" href="/blog/finding-toronto-shelter-help">
-        <span class="story-chip-thumb"><img src="/assets/blog/finding-toronto-shelter-help.jpg" alt="" loading="lazy" decoding="async"></span>
-        <span class="story-chip-label">Finding Toronto Shelter Help Without Guessing Phone Numbers</span>
-      </a>
+    <div class="story-strip-wrap">
+      <div class="swiper story-carousel" id="story-carousel" aria-label="Recent stories">
+        <div class="swiper-wrapper">
+          
+      <div class="swiper-slide">
+        <article class="zoom-card is-paper">
+          <span class="zoom-card-media"><img src="/assets/blog/finding-toronto-shelter-help.jpg" alt="Finding Toronto Shelter Help Without Guessing Phone Numbers" loading="lazy" decoding="async"></span>
+          <div class="zoom-card-content">
+            <a class="zoom-card-link" href="/blog/finding-toronto-shelter-help">
+              <h3 class="zoom-card-title"><span class="t">Finding Toronto Shelter Help Without Guessing Phone Numbers</span> — Homelessness</h3>
+            </a>
+          </div>
+        </article>
+      </div>
 
-      <a class="story-chip" href="/blog/ontario-detox-near-me">
-        <span class="story-chip-thumb"><img src="/assets/blog/ontario-detox-near-me.jpg" alt="" loading="lazy" decoding="async"></span>
-        <span class="story-chip-label">Ontario Detox Near Me: How to Find Help That Is Actually Open</span>
-      </a>
+      <div class="swiper-slide">
+        <article class="zoom-card is-sky">
+          <span class="zoom-card-media"><img src="/assets/blog/ontario-detox-near-me.jpg" alt="Ontario Detox Near Me: How to Find Help That Is Actually Open" loading="lazy" decoding="async"></span>
+          <div class="zoom-card-content">
+            <a class="zoom-card-link" href="/blog/ontario-detox-near-me">
+              <h3 class="zoom-card-title"><span class="t">Ontario Detox Near Me: How to Find Help That Is Actually Open</span> — Addiction</h3>
+            </a>
+          </div>
+        </article>
+      </div>
 
-      <a class="story-chip" href="/blog/building-a-care-routine-that-has-room-for-you">
-        <span class="story-chip-thumb"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" loading="lazy" decoding="async"></span>
-        <span class="story-chip-label">Building a Care Routine That Has Room for You</span>
-      </a>
+      <div class="swiper-slide">
+        <article class="zoom-card is-mint">
+          <span class="zoom-card-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="Building a Care Routine That Has Room for You" loading="lazy" decoding="async"></span>
+          <div class="zoom-card-content">
+            <a class="zoom-card-link" href="/blog/building-a-care-routine-that-has-room-for-you">
+              <h3 class="zoom-card-title"><span class="t">Building a Care Routine That Has Room for You</span> — Care Giver Tips</h3>
+            </a>
+          </div>
+        </article>
+      </div>
 
-      <a class="story-chip" href="/blog/grief-while-theyre-still-here">
-        <span class="story-chip-thumb"><img src="/assets/blog/grief-while-theyre-still-here.jpg" alt="" loading="lazy" decoding="async"></span>
-        <span class="story-chip-label">Grief While They're Still Here: Understanding Anticipatory Loss</span>
-      </a>
+      <div class="swiper-slide">
+        <article class="zoom-card is-rose">
+          <span class="zoom-card-media"><img src="/assets/blog/grief-while-theyre-still-here.jpg" alt="Grief While They're Still Here: Understanding Anticipatory Loss" loading="lazy" decoding="async"></span>
+          <div class="zoom-card-content">
+            <a class="zoom-card-link" href="/blog/grief-while-theyre-still-here">
+              <h3 class="zoom-card-title"><span class="t">Grief While They're Still Here: Understanding Anticipatory Loss</span> — Mental health</h3>
+            </a>
+          </div>
+        </article>
+      </div>
 
-      <a class="story-chip" href="/blog/how-to-ask-for-help-without-feeling-guilty">
-        <span class="story-chip-thumb"><img src="/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg" alt="" loading="lazy" decoding="async"></span>
-        <span class="story-chip-label">How to Ask for Help Without Feeling Guilty</span>
-      </a>
+      <div class="swiper-slide">
+        <article class="zoom-card is-paper">
+          <span class="zoom-card-media"><img src="/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg" alt="How to Ask for Help Without Feeling Guilty" loading="lazy" decoding="async"></span>
+          <div class="zoom-card-content">
+            <a class="zoom-card-link" href="/blog/how-to-ask-for-help-without-feeling-guilty">
+              <h3 class="zoom-card-title"><span class="t">How to Ask for Help Without Feeling Guilty</span> — Care Giver Tips</h3>
+            </a>
+          </div>
+        </article>
+      </div>
 
-      <a class="story-chip" href="/blog/the-5-minute-reset">
-        <span class="story-chip-thumb"><img src="/assets/blog/the-5-minute-reset.jpg" alt="" loading="lazy" decoding="async"></span>
-        <span class="story-chip-label">The 5-Minute Reset: Micro-breaks That Actually Work</span>
-      </a>
+      <div class="swiper-slide">
+        <article class="zoom-card is-sky">
+          <span class="zoom-card-media"><img src="/assets/blog/the-5-minute-reset.jpg" alt="The 5-Minute Reset: Micro-breaks That Actually Work" loading="lazy" decoding="async"></span>
+          <div class="zoom-card-content">
+            <a class="zoom-card-link" href="/blog/the-5-minute-reset">
+              <h3 class="zoom-card-title"><span class="t">The 5-Minute Reset: Micro-breaks That Actually Work</span> — Care Giver Tips</h3>
+            </a>
+          </div>
+        </article>
+      </div>
 
-      <a class="story-chip" href="/blog/you-cant-pour-from-an-empty-cup">
-        <span class="story-chip-thumb"><img src="/assets/blog/you-cant-pour-from-an-empty-cup.jpg" alt="" loading="lazy" decoding="async"></span>
-        <span class="story-chip-label">You Can't Pour From an Empty Cup</span>
-      </a></div>
+      <div class="swiper-slide">
+        <article class="zoom-card is-mint">
+          <span class="zoom-card-media"><img src="/assets/blog/you-cant-pour-from-an-empty-cup.jpg" alt="You Can't Pour From an Empty Cup" loading="lazy" decoding="async"></span>
+          <div class="zoom-card-content">
+            <a class="zoom-card-link" href="/blog/you-cant-pour-from-an-empty-cup">
+              <h3 class="zoom-card-title"><span class="t">You Can't Pour From an Empty Cup</span> — Care Giver Tips</h3>
+            </a>
+          </div>
+        </article>
+      </div>
+        </div>
+      </div>
+    </div>
     <div class="blog-toolbar">
       <div class="blog-filters" role="group" aria-label="Filter by topic"><button type="button" class="blog-filter is-active" data-filter-type="category" data-filter-value="all">All topics</button>
 <button type="button" class="blog-filter" data-filter-type="category" data-filter-value="Mental health">Mental health</button>
@@ -531,90 +872,182 @@
 <button type="button" class="blog-filter" data-filter-type="category" data-filter-value="Care Giver Tips">Care Giver Tips</button></div>
       <p id="filter-meta" class="blog-filter-meta">Showing all 7 posts</p>
     </div>
-    <div id="post-list" class="masonry-feed">
-      
-      <section class="masonry-band tone-paper">
-        <div class="masonry-band-inner">
-          <p class="blog-section-label">Latest stories</p>
-          <div class="masonry-grid">
-    <a class="post-card size-wide" href="/blog/finding-toronto-shelter-help" data-category="Homelessness">
-      <div class="card-media"><img src="/assets/blog/finding-toronto-shelter-help.jpg" alt="" loading="eager" decoding="async"></div>
-      <div class="card-copy">
+
+    <div id="post-list" class="magazine-feed">
+      <section class="magazine-band tone-sky" data-filter-band>
+              <div class="magazine-band-inner">
+                
+    <a class="feature-hero" href="/blog/finding-toronto-shelter-help" data-category="Homelessness">
+      <div class="feature-hero-media">
+        <div class="card-media"><img src="/assets/blog/finding-toronto-shelter-help.jpg" alt="" loading="eager" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
+      </div>
+      <div class="feature-hero-copy">
+        <p class="blog-section-label">Featured story</p>
         <span class="cat">Homelessness · July 15, 2026</span>
         <h2>Finding Toronto Shelter Help Without Guessing Phone Numbers</h2>
         <p>Searching for a Toronto shelter? Use Central Intake, 311, and 211 Ontario instead of outdated clinic lists — verified numbers for caregivers and people in crisis.</p>
+        <span class="feature-hero-cta">Read story</span>
       </div>
     </a>
+              </div>
+            </section>
 
-    <a class="post-card size-tall" href="/blog/ontario-detox-near-me" data-category="Addiction">
-      <div class="card-media"><img src="/assets/blog/ontario-detox-near-me.jpg" alt="" loading="eager" decoding="async"></div>
+      <section class="magazine-band tone-paper" data-filter-band>
+              <div class="magazine-band-inner">
+                <p class="blog-section-label">Latest stories</p>
+                <div class="editorial-grid">
+                  
+        <div class="editorial-row is-split-wide">
+          
+    <a class="post-card size-feature tone-sky" href="/blog/ontario-detox-near-me" data-category="Addiction">
+      <div class="card-media"><img src="/assets/blog/ontario-detox-near-me.jpg" alt="" loading="eager" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
       <div class="card-copy">
-        <span class="cat">Addiction · July 15, 2026</span>
+        <span class="cat">Addiction</span>
         <h2>Ontario Detox Near Me: How to Find Help That Is Actually Open</h2>
         <p>Searching Ontario detox near me? ConnexOntario matches people to current withdrawal management and addiction treatment — safer than outdated Google clinic lists.</p>
       </div>
     </a>
-
-    <a class="post-card size-std" href="/blog/building-a-care-routine-that-has-room-for-you" data-category="Care Giver Tips">
-      <div class="card-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" loading="eager" decoding="async"></div>
+          
+    <a class="post-card size-portrait tone-mint" href="/blog/building-a-care-routine-that-has-room-for-you" data-category="Care Giver Tips">
+      <div class="card-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
       <div class="card-copy">
-        <span class="cat">Care Giver Tips · July 9, 2026</span>
+        <span class="cat">Care Giver Tips</span>
         <h2>Building a Care Routine That Has Room for You</h2>
         <p>A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</p>
       </div>
-    </a></div>
+    </a>
         </div>
-      </section>
 
-      <section class="masonry-band tone-sky">
-        <div class="masonry-band-inner">
-          <p class="blog-section-label">Worth sitting with</p>
-          <div class="masonry-grid">
-    <a class="post-card size-std" href="/blog/grief-while-theyre-still-here" data-category="Mental health">
-      <div class="card-media"><img src="/assets/blog/grief-while-theyre-still-here.jpg" alt="" loading="lazy" decoding="async"></div>
+        <div class="editorial-row is-split-narrow">
+          
+    <a class="post-card size-portrait tone-rose" href="/blog/grief-while-theyre-still-here" data-category="Mental health">
+      <div class="card-media"><img src="/assets/blog/grief-while-theyre-still-here.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
       <div class="card-copy">
-        <span class="cat">Mental health · July 7, 2026</span>
+        <span class="cat">Mental health</span>
         <h2>Grief While They're Still Here: Understanding Anticipatory Loss</h2>
         <p>Anticipatory grief has no public ritual. What it feels like for caregivers, why it's normal, and gentle ways to let it have somewhere to go.</p>
       </div>
     </a>
-
-    <a class="post-card size-wide" href="/blog/how-to-ask-for-help-without-feeling-guilty" data-category="Care Giver Tips">
-      <div class="card-media"><img src="/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg" alt="" loading="lazy" decoding="async"></div>
+          
+    <a class="post-card size-feature tone-paper" href="/blog/how-to-ask-for-help-without-feeling-guilty" data-category="Care Giver Tips">
+      <div class="card-media"><img src="/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
       <div class="card-copy">
-        <span class="cat">Care Giver Tips · July 5, 2026</span>
+        <span class="cat">Care Giver Tips</span>
         <h2>How to Ask for Help Without Feeling Guilty</h2>
         <p>Why caregivers avoid asking for help, how to break the guilt loop, and how to make requests specific enough that people can say yes.</p>
       </div>
-    </a></div>
+    </a>
+        </div>
+                </div>
+              </div>
+            </section>
+
+      <section class="magazine-band tone-mint" data-filter-band>
+              <div class="magazine-band-inner">
+                <div class="selects-head">
+                  <p class="blog-section-label">Featured selects</p>
+                  <p class="selects-lead">A short row of pieces worth sitting with — practical, calm, and specific.</p>
+                </div>
+                <div class="selects-rail" aria-label="Featured selects">
+                  
+    <a class="select-card tone-paper" href="/blog/finding-toronto-shelter-help" data-category="Homelessness">
+      <div class="card-media"><img src="/assets/blog/finding-toronto-shelter-help.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
+      <div class="card-copy">
+        <span class="cat">Homelessness</span>
+        <h2>Finding Toronto Shelter Help Without Guessing Phone Numbers</h2>
+      </div>
+    </a>
+
+    <a class="select-card tone-sky" href="/blog/ontario-detox-near-me" data-category="Addiction">
+      <div class="card-media"><img src="/assets/blog/ontario-detox-near-me.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
+      <div class="card-copy">
+        <span class="cat">Addiction</span>
+        <h2>Ontario Detox Near Me: How to Find Help That Is Actually Open</h2>
+      </div>
+    </a>
+
+    <a class="select-card tone-mint" href="/blog/building-a-care-routine-that-has-room-for-you" data-category="Care Giver Tips">
+      <div class="card-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
+      <div class="card-copy">
+        <span class="cat">Care Giver Tips</span>
+        <h2>Building a Care Routine That Has Room for You</h2>
+      </div>
+    </a>
+
+    <a class="select-card tone-rose" href="/blog/grief-while-theyre-still-here" data-category="Mental health">
+      <div class="card-media"><img src="/assets/blog/grief-while-theyre-still-here.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
+      <div class="card-copy">
+        <span class="cat">Mental health</span>
+        <h2>Grief While They're Still Here: Understanding Anticipatory Loss</h2>
+      </div>
+    </a>
+
+    <a class="select-card tone-paper" href="/blog/how-to-ask-for-help-without-feeling-guilty" data-category="Care Giver Tips">
+      <div class="card-media"><img src="/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
+      <div class="card-copy">
+        <span class="cat">Care Giver Tips</span>
+        <h2>How to Ask for Help Without Feeling Guilty</h2>
+      </div>
+    </a>
+
+    <a class="select-card tone-sky" href="/blog/the-5-minute-reset" data-category="Care Giver Tips">
+      <div class="card-media"><img src="/assets/blog/the-5-minute-reset.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
+      <div class="card-copy">
+        <span class="cat">Care Giver Tips</span>
+        <h2>The 5-Minute Reset: Micro-breaks That Actually Work</h2>
+      </div>
+    </a>
+                </div>
+              </div>
+            </section>
+
+      <section class="magazine-band tone-rose newsletter-band">
+        <div class="magazine-band-inner newsletter-layout">
+          <div class="newsletter-copy">
+            <p class="blog-section-label">Join the list</p>
+            <h2>Like these stories? Get the quiet ones in your inbox.</h2>
+            <p>Occasional caregiver notes — no noise, no hard sell.</p>
+            <form id="blog-newsletter" class="newsletter-form" action="#" method="post">
+              <label class="sr-only" for="newsletter-email">Email</label>
+              <input id="newsletter-email" name="email" type="email" required placeholder="you@example.com" autocomplete="email">
+              <button type="submit" class="pill-dark">Join</button>
+            </form>
+            <p id="newsletter-note" class="newsletter-note" hidden></p>
+          </div>
+          <div class="newsletter-aside" aria-hidden="true"></div>
         </div>
       </section>
 
-      <section class="masonry-band tone-mint">
-        <div class="masonry-band-inner">
-          <p class="blog-section-label">Practical support</p>
-          <div class="masonry-grid">
-    <a class="post-card size-std" href="/blog/the-5-minute-reset" data-category="Care Giver Tips">
-      <div class="card-media"><img src="/assets/blog/the-5-minute-reset.jpg" alt="" loading="lazy" decoding="async"></div>
+      <section class="magazine-band tone-paper" data-filter-band>
+              <div class="magazine-band-inner">
+                <p class="blog-section-label">More from the desk</p>
+                <div class="editorial-grid">
+                  
+        <div class="editorial-row is-split-wide">
+          
+    <a class="post-card size-feature tone-sky" href="/blog/the-5-minute-reset" data-category="Care Giver Tips">
+      <div class="card-media"><img src="/assets/blog/the-5-minute-reset.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
       <div class="card-copy">
-        <span class="cat">Care Giver Tips · July 3, 2026</span>
+        <span class="cat">Care Giver Tips</span>
         <h2>The 5-Minute Reset: Micro-breaks That Actually Work</h2>
         <p>When a full break feels impossible, five-minute resets can still help. Breathing, grounding, and other micro-breaks caregivers actually use.</p>
       </div>
     </a>
-
-    <a class="post-card size-tall" href="/blog/you-cant-pour-from-an-empty-cup" data-category="Care Giver Tips">
-      <div class="card-media"><img src="/assets/blog/you-cant-pour-from-an-empty-cup.jpg" alt="" loading="lazy" decoding="async"></div>
+          
+    <a class="post-card size-portrait tone-mint" href="/blog/you-cant-pour-from-an-empty-cup" data-category="Care Giver Tips">
+      <div class="card-media"><img src="/assets/blog/you-cant-pour-from-an-empty-cup.jpg" alt="" loading="lazy" decoding="async"><span class="card-media-veil" aria-hidden="true"></span></div>
       <div class="card-copy">
-        <span class="cat">Care Giver Tips · July 1, 2026</span>
+        <span class="cat">Care Giver Tips</span>
         <h2>You Can't Pour From an Empty Cup</h2>
         <p>Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support.</p>
       </div>
-    </a></div>
+    </a>
         </div>
-      </section>
-
+                </div>
+              </div>
+            </section>
     </div>
+
     <div class="blog-cta band-cta">
       <p>Want to talk something through in the moment?</p>
       <a class="pill-dark" href="/">Open Liam's Call chat</a>
@@ -622,20 +1055,27 @@
     
   <script>
     (function () {
-      var cards = Array.prototype.slice.call(document.querySelectorAll('.post-card'));
+      var cards = Array.prototype.slice.call(document.querySelectorAll('[data-category].post-card, [data-category].feature-hero, [data-category].select-card'));
       var meta = document.getElementById('filter-meta');
       var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-filter-type]'));
       var state = { category: 'all' };
 
       function apply() {
         var shown = 0;
+        var seen = {};
         cards.forEach(function (card) {
           var ok = state.category === 'all' || card.getAttribute('data-category') === state.category;
           card.classList.toggle('is-hidden', !ok);
-          if (ok) shown += 1;
+          if (ok) {
+            var href = card.getAttribute('href') || '';
+            if (!seen[href]) {
+              seen[href] = true;
+              shown += 1;
+            }
+          }
         });
-        document.querySelectorAll('.masonry-band').forEach(function (band) {
-          var any = band.querySelectorAll('.post-card:not(.is-hidden)').length > 0;
+        document.querySelectorAll('[data-filter-band]').forEach(function (band) {
+          var any = band.querySelectorAll('[data-category]:not(.is-hidden)').length > 0;
           band.classList.toggle('is-empty', !any);
         });
         if (meta) {
@@ -658,6 +1098,62 @@
           apply();
         });
       });
+
+      var form = document.getElementById('blog-newsletter');
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var note = document.getElementById('newsletter-note');
+          if (note) {
+            note.hidden = false;
+            note.textContent = 'Thanks — we will keep this simple when the list opens.';
+          }
+          form.reset();
+        });
+      }
+
+      function enableDragScroll(el) {
+        if (!el) return;
+        var down = false;
+        var startX = 0;
+        var startLeft = 0;
+        var moved = false;
+        el.addEventListener('pointerdown', function (e) {
+          if (e.pointerType === 'touch') return;
+          down = true;
+          moved = false;
+          startX = e.clientX;
+          startLeft = el.scrollLeft;
+          el.classList.add('is-dragging');
+          try { el.setPointerCapture(e.pointerId); } catch (err) {}
+        });
+        el.addEventListener('pointermove', function (e) {
+          if (!down) return;
+          var dx = e.clientX - startX;
+          if (Math.abs(dx) > 4) moved = true;
+          el.scrollLeft = startLeft - dx;
+        });
+        function endDrag() {
+          if (!down) return;
+          down = false;
+          el.classList.remove('is-dragging');
+          if (moved) {
+            el.dataset.dragBlock = '1';
+            window.setTimeout(function () { delete el.dataset.dragBlock; }, 80);
+          }
+        }
+        el.addEventListener('pointerup', endDrag);
+        el.addEventListener('pointercancel', endDrag);
+        el.addEventListener('click', function (e) {
+          if (el.dataset.dragBlock === '1') {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }, true);
+      }
+
+      enableDragScroll(document.querySelector('.selects-rail'));
+
       apply();
     })();
   </script>
@@ -689,6 +1185,26 @@
       overlay.addEventListener('click', closeMenu);
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeMenu();
+      });
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    (function () {
+      var root = document.getElementById('story-carousel');
+      if (!root || typeof Swiper === 'undefined') return;
+      var count = root.querySelectorAll('.swiper-slide').length;
+      if (!count) return;
+      new Swiper(root, {
+        slidesPerView: 'auto',
+        centeredSlides: true,
+        spaceBetween: 28,
+        loop: count > 2,
+        grabCursor: true,
+        speed: 450,
+        watchSlidesProgress: true,
+        resistanceRatio: 0.65,
+        initialSlide: Math.min(Math.floor(count / 2), count - 1),
       });
     })();
   </script>
