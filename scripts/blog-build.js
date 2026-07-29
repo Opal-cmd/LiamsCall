@@ -150,12 +150,14 @@ function buildIndex(posts) {
 
   const cards = posts
     .map(
-      (p) => `
+      (p, idx) => `
       <li>
-        <a class="post-card" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(p.category)}" data-region="${escapeHtml(p.region || 'Canada')}">
-          <span class="cat">${escapeHtml(p.category)}${p.region ? ` · ${escapeHtml(p.region)}` : ''}</span>
-          <h2>${escapeHtml(p.title)}</h2>
-          <p>${escapeHtml(p.description)}</p>
+        <a class="post-card${idx === 0 ? ' is-featured' : ''}" href="/blog/${escapeHtml(p.slug)}" data-category="${escapeHtml(p.category)}" data-region="${escapeHtml(p.region || 'Canada')}">
+          <div>
+            <span class="cat">${escapeHtml(p.category)}${p.region ? ` · ${escapeHtml(p.region)}` : ''}</span>
+            <h2>${escapeHtml(p.title)}</h2>
+            <p>${escapeHtml(p.description)}</p>
+          </div>
           <span class="date">${escapeHtml(formatDateDisplay(p.date))}</span>
         </a>
       </li>`,
@@ -163,11 +165,14 @@ function buildIndex(posts) {
     .join('\n');
 
   const bodyHtml = `
-    <p class="blog-meta">Practical reads for caregivers and families</p>
-    <h1>Blog</h1>
-    <p style="margin:0 0 1.5rem;color:#6b7280;font-size:0.92rem;line-height:1.55;">
-      Short, grounded articles on caregiver wellbeing, communication, and supporting a loved one through mental health, addiction, or housing challenges.
-    </p>
+    <header class="blog-hero">
+      <p class="blog-kicker">Liam's Call stories</p>
+      <h1>Stories for caregivers. Read on.</h1>
+      <p class="blog-hero-lead">
+        Unexpected, grounded pieces on caregiver wellbeing, communication, and supporting a loved one through mental health, addiction, or housing challenges.
+      </p>
+    </header>
+    <p class="blog-section-label">Latest stories</p>
     <div class="blog-filters" role="group" aria-label="Filter by topic">${catButtons}</div>
     <div class="blog-filters" role="group" aria-label="Filter by region">${regionButtons}</div>
     <p id="filter-meta" class="blog-filter-meta">Showing all ${posts.length} posts</p>
@@ -185,6 +190,7 @@ function buildIndex(posts) {
       "Articles from Liam's Call for caregivers and families - burnout, asking for help, grief, routines, and practical support for mental health, addiction, and housing challenges.",
     canonical: `${SITE}/blog`,
     active: 'blog',
+    variant: 'index',
     schema: {
       '@context': 'https://schema.org',
       '@type': 'Blog',
@@ -209,23 +215,20 @@ function buildPost(post) {
   const howto = HOWTO_BY_SLUG[post.slug];
   const howtoHtml = renderHowToBlock(howto);
   const bodyHtml = `
-    <a class="blog-back" href="/blog">&larr; Back to blog</a>
+    <a class="blog-back" href="/blog">&larr; Back to stories</a>
     <p class="blog-meta"><span>${escapeHtml(post.category)}</span>${post.region ? ` · <span>${escapeHtml(post.region)}</span>` : ''} · <time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDateDisplay(post.date))}</time></p>
-    <h1>${escapeHtml(post.title)}</h1>
+    <h1 class="article-title">${escapeHtml(post.title)}</h1>
     <p class="speakable-summary">${escapeHtml(post.description)}</p>
     ${hero}
     <article class="blog-body">
       ${post.html}
     </article>
     ${howtoHtml}
-    <div class="ad-slot-article">
-      ${renderAdSlot('article', { label: 'In-article ad' })}
-    </div>
-    <p class="blog-back-wrap"><a class="blog-back" href="/blog">&larr; Back to blog</a></p>
+    <p class="blog-back-wrap"><a class="blog-back" href="/blog">&larr; Back to stories</a></p>
     <div class="blog-cta">
-      <p>If this resonates, you can keep going in a private chat - no account required.</p>
+      <p>If this resonates, you can keep going in a private chat. No account required.</p>
       <a class="pill-dark" href="/">Talk with Liam's Call AI</a>
-      &nbsp;&nbsp;<a href="/resources" style="font-size:0.82rem;">Crisis resources</a>
+      &nbsp;&nbsp;<a href="/resources" style="font-size:0.85rem;font-weight:600;">Crisis resources</a>
     </div>
     <p class="blog-disclaimer">
       Liam's Call is an informational tool, not a medical professional or crisis service.
@@ -262,6 +265,7 @@ function buildPost(post) {
     description: post.description,
     canonical: postUrl,
     active: 'blog',
+    variant: 'article',
     breadcrumb: `<a href="/blog">Blog</a> <span aria-hidden="true">/</span> <span>${escapeHtml(post.title)}</span>`,
     schema: {
       '@context': 'https://schema.org',

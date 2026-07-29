@@ -315,7 +315,12 @@
           <div class="row" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.75rem;">
             <div class="field">
               <label for="category">Category</label>
-              <input id="category" type="text">
+              <select id="category">
+                <option value="Mental health">Mental health</option>
+                <option value="Addiction">Addiction</option>
+                <option value="Homelessness">Homelessness</option>
+                <option value="Care Giver Tips">Care Giver Tips</option>
+              </select>
             </div>
             <div class="field">
               <label for="region">Region</label>
@@ -699,7 +704,17 @@
       const draft = await api('/api/blog-admin/drafts/' + encodeURIComponent(slug));
       state.currentSlug = draft.slug;
       $('title').value = draft.title || '';
-      $('category').value = draft.category || '';
+      $('category').value = (() => {
+        const cat = draft.category || 'Care Giver Tips';
+        const sel = $('category');
+        if (![...sel.options].some((o) => o.value === cat)) {
+          const opt = document.createElement('option');
+          opt.value = cat;
+          opt.textContent = cat;
+          sel.appendChild(opt);
+        }
+        return cat;
+      })();
       $('region').value = draft.region || 'Canada';
       $('date').value = draft.date || '';
       $('risk').value = draft.risk === 'safe' ? 'safe' : 'review';
