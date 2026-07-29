@@ -575,10 +575,12 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
   const swiperAssets = isIndex
     ? `
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-  <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/itc-bauhaus">`
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">`
     : '';
   const fontDisplay = isIndex
-    ? '"ITC Bauhaus", "Bauhaus 93", ui-sans-serif, system-ui, sans-serif'
+    ? '"Abril Fatface", Georgia, "Times New Roman", serif'
     : '"Inter", ui-sans-serif, system-ui, sans-serif';
   const swiperScript = isIndex
     ? `
@@ -679,7 +681,7 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
       --story-moss: #e3e9cf;
       --story-sand: #e7dbc8;
       --story-cream: #f0e9dc;
-      /* Brand fonts: Inter body; ITC Bauhaus display on index only. */
+      /* Brand fonts: Inter body; Abril Fatface display on index only. */
       --font-display: ${fontDisplay};
       --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
     }
@@ -748,6 +750,11 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
       line-height: 0.95;
       letter-spacing: 0.01em;
       color: var(--ink);
+    }
+    main.blog-main.is-index .blog-hero h1,
+    main.blog-main.is-index .section-title,
+    main.blog-main.is-index .polaroid-caption .t {
+      font-weight: 400; /* Abril Fatface is a single-weight face */
     }
     .blog-hero-lead {
       margin: 0 auto;

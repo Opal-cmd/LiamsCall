@@ -30,7 +30,9 @@
 }
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-  <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/itc-bauhaus">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <style>
@@ -76,8 +78,8 @@
       --story-moss: #e3e9cf;
       --story-sand: #e7dbc8;
       --story-cream: #f0e9dc;
-      /* Brand fonts: Inter body; ITC Bauhaus display on index only. */
-      --font-display: "ITC Bauhaus", "Bauhaus 93", ui-sans-serif, system-ui, sans-serif;
+      /* Brand fonts: Inter body; Abril Fatface display on index only. */
+      --font-display: "Abril Fatface", Georgia, "Times New Roman", serif;
       --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
@@ -145,6 +147,11 @@
       line-height: 0.95;
       letter-spacing: 0.01em;
       color: var(--ink);
+    }
+    main.blog-main.is-index .blog-hero h1,
+    main.blog-main.is-index .section-title,
+    main.blog-main.is-index .polaroid-caption .t {
+      font-weight: 400; /* Abril Fatface is a single-weight face */
     }
     .blog-hero-lead {
       margin: 0 auto;
@@ -839,9 +846,9 @@
               <p class="section-lead">A few caregiver favorites — practical, calm, and specific pieces worth sitting with.</p>
               <div class="selects-rail" aria-label="Featured selects">
                 
-    <a class="polaroid pl-cream is-select" href="/blog/how-to-ask-for-help-without-feeling-guilty" data-category="Care Giver Tips">
-      <span class="polaroid-media"><img src="/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg" alt="" loading="lazy" decoding="async"></span>
-      <span class="polaroid-caption"><span class="t">How to Ask for Help Without Feeling Guilty</span> — Why caregivers avoid asking for help, how to break the guilt loop, and how to make requests specific enough that people can say yes.</span>
+    <a class="polaroid pl-cream is-select" href="/blog/building-a-care-routine-that-has-room-for-you" data-category="Care Giver Tips">
+      <span class="polaroid-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" loading="lazy" decoding="async"></span>
+      <span class="polaroid-caption"><span class="t">Building a Care Routine That Has Room for You</span> — A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</span>
     </a>
 
     <a class="polaroid pl-moss is-select" href="/blog/you-cant-pour-from-an-empty-cup" data-category="Care Giver Tips">
