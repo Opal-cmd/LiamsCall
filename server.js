@@ -1079,7 +1079,7 @@ app.get('/resources', (_req, res) => {
 // Public health check: intentionally minimal so internal configuration
 // (models, rate limits, auth setup) is not disclosed.
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, providers: PROVIDER_CHAIN, jwst: Boolean(JWST_API_KEY) });
+  res.json({ ok: true });
 });
 
 app.get('/api/config', (req, res) => {
@@ -1172,7 +1172,7 @@ app.post('/api/chat', async (req, res) => {
     if (offTopic.blocked) {
       writeSse(res, 'token', { text: offTopic.reply });
       writeSse(res, 'done', { ok: true, provider: 'filter', model: 'off-topic-guard' });
-      logInfo(req, 'blocked_off_topic', { snippet: messages[messages.length - 1]?.content?.slice(0, 80) });
+      logInfo(req, 'blocked_off_topic');
       return;
     }
 
