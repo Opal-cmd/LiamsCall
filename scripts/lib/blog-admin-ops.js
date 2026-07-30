@@ -212,6 +212,17 @@ async function approveDraft(slug) {
     });
   }
 
+  const finalPost = parseFrontmatter(raw);
+  assertPostGuards(
+    {
+      slug: post.slug,
+      title: finalPost.meta.title || post.title,
+      body: finalPost.body,
+      risk: (finalPost.meta.risk || 'safe').toLowerCase(),
+    },
+    { strictSafe: true },
+  );
+
   fs.writeFileSync(dest, raw, 'utf8');
   fs.unlinkSync(filePath);
 
