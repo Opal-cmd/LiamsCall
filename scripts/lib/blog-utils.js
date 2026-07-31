@@ -369,6 +369,10 @@ function saveTopics(topics) {
   fs.writeFileSync(TOPICS_PATH, serializeTopics(topics), 'utf8');
 }
 
+function escapeRegExp(input) {
+  return String(input || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function appendTopics(newTopics) {
   const existing = loadTopics();
   const ids = new Set(existing.map((t) => t.id));
@@ -531,8 +535,9 @@ function markTopicUsed(topicId) {
   let raw = fs.readFileSync(TOPICS_PATH, 'utf8');
   const lines = raw.split(/\r?\n/);
   let inTopic = false;
+  const idPattern = escapeRegExp(topicId);
   for (let i = 0; i < lines.length; i += 1) {
-    if (lines[i].match(new RegExp(`^\\s+-\\s+id:\\s*${topicId}\\s*$`))) {
+    if (lines[i].match(new RegExp(`^\\s+-\\s+id:\\s*${idPattern}\\s*$`))) {
       inTopic = true;
       continue;
     }

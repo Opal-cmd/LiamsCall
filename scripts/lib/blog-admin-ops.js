@@ -328,7 +328,7 @@ function updateTopics(payload = {}) {
     .map((t) => {
       if (!t) return null;
       const title = String(t.title || '').trim();
-      let id = String(t.id || '').trim() || slugifyTopicId(title);
+      let id = slugifyTopicId(t.id) || slugifyTopicId(title);
       if (!title || !id) return null;
       if (usedIds.has(id)) {
         let n = 2;
