@@ -925,7 +925,7 @@
       let id = base || 'topic';
       const used = new Set(
         state.topics
-          .map((t, i) => (i === skipIdx ? '' : String(t.id || '').trim()))
+          .map((t, i) => (i === skipIdx ? '' : slugifyTopicId(t.id)))
           .filter(Boolean),
       );
       if (!used.has(id)) return id;
@@ -1007,8 +1007,9 @@
       hideBanner();
       const prepared = state.topics.map((t, i) => {
         const title = String(t.title || '').trim();
-        let id = String(t.id || '').trim();
-        if (!id && title) id = ensureUniqueTopicId(slugifyTopicId(title), i);
+        let id = slugifyTopicId(t.id);
+        if (!id && title) id = slugifyTopicId(title);
+        if (id) id = ensureUniqueTopicId(id, i);
         return {
           ...t,
           title,
