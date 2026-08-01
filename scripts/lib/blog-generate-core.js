@@ -16,6 +16,8 @@ const {
   markTopicUsed,
   assertPostGuards,
   loadPost,
+  resolveSourceForTopic,
+  saveTopics,
 } = require('./blog-utils');
 const { ensurePostImage } = require('./blog-images');
 
@@ -155,6 +157,18 @@ async function generateTopic(opts = {}) {
   let risk = (topic.risk || 'safe').toLowerCase();
   if (forceDraft) risk = 'review';
 
+  const resolved = resolveSourceForTopic(topic);
+  if (resolved.source_url && !topic.source_url) {
+    topic.source_url = resolved.source_url;
+    topic.source_name = topic.source_name || resolved.source_name;
+    // Persist so the desk queue keeps the seed link after generate.
+    const idx = topics.findIndex((t) => t.id === topic.id);
+    if (idx >= 0) {
+      topics[idx] = { ...topics[idx], source_url: topic.source_url, source_name: topic.source_name };
+      saveTopics(topics);
+    }
+  }
+
   const model = getModel();
   const content = await callOpenAI(buildUserPrompt(topic));
   const parsed = extractJson(content);
@@ -165,7 +179,7 @@ async function generateTopic(opts = {}) {
   let body = parsed.body;
   if (!body || body.length < 200) throw new Error('Generated body too short.');
 
-  const sourceUrl = String(topic.source_url || topic.url || '').trim();
+  const sourceUrl = String(topic.source_url || topic.url || resolved.source_url || '').trim();
   let image = '';
   try {
     const result = await ensurePostImage({

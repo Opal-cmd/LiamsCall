@@ -463,6 +463,63 @@ function loadSources() {
   return parseSourcesYaml(fs.readFileSync(p, 'utf8'));
 }
 
+/**
+ * Pick a seed/inspiration URL for a topic when source_url is missing.
+ * Prefer keyword hits in title/angle, then category defaults from curated seeds.
+ */
+function resolveSourceForTopic(topic = {}) {
+  const existing = String(topic.source_url || topic.url || '').trim();
+  if (existing) {
+    return {
+      source_url: existing,
+      source_name: String(topic.source_name || '').trim(),
+    };
+  }
+
+  const { seeds } = loadSources();
+  if (!seeds.length) {
+    return { source_url: '', source_name: '' };
+  }
+
+  const hay = `${topic.title || ''} ${topic.angle || ''} ${topic.category || ''}`.toLowerCase();
+  let best = null;
+  let bestScore = 0;
+  for (const seed of seeds) {
+    const title = String(seed.title || '').toLowerCase();
+    const url = String(seed.url || '').toLowerCase();
+    let score = 0;
+    const tokens = title.split(/[^a-z0-9]+/).filter((w) => w.length > 3);
+    for (const tok of tokens) {
+      if (hay.includes(tok)) score += 1;
+    }
+    if (/988|crisis|suicid/.test(hay) && /988/.test(`${title} ${url}`)) score += 5;
+    if (/shelter|homeless|housing|211/.test(hay) && /211/.test(`${title} ${url}`)) score += 5;
+    if (/detox|addiction|substance|treatment|connex/.test(hay) && /connexontario|samhsa|helpline/.test(`${title} ${url}`)) score += 5;
+    if (/caregiver|boundary|burnout|sleep|guilt|identity/.test(hay) && /ontariocaregiver|caregiver/.test(`${title} ${url}`)) score += 4;
+    if (/kid|child|youth|teen/.test(hay) && /kidshelpphone|kids help/.test(`${title} ${url}`)) score += 5;
+    if (/mental health|anxiety|depression/.test(hay) && /mentalhealthcommission|connexontario/.test(`${title} ${url}`)) score += 3;
+    if (score > bestScore) {
+      best = seed;
+      bestScore = score;
+    }
+  }
+
+  if (!best || bestScore < 2) {
+    const cat = String(topic.category || '').toLowerCase();
+    const byCat = (re) => seeds.find((s) => re.test(`${s.title} ${s.url} ${s.category}`));
+    if (/crisis/.test(cat)) best = byCat(/988/) || best;
+    else if (/homeless|housing/.test(cat)) best = byCat(/211/) || best;
+    else if (/addiction/.test(cat)) best = byCat(/samhsa|connexontario/) || best;
+    else if (/mental/.test(cat)) best = byCat(/mentalhealthcommission|connexontario/) || best;
+    else best = byCat(/ontariocaregiver/) || seeds[0];
+  }
+
+  return {
+    source_url: String(best?.url || '').trim(),
+    source_name: String(best?.title || '').trim(),
+  };
+}
+
 function serializeSources({ feeds = [], seeds = [] } = {}) {
   const feedBlocks = feeds.map((f) => {
     const lines = [
@@ -1787,6 +1844,7 @@ module.exports = {
   saveTopics,
   appendTopics,
   loadSources,
+  resolveSourceForTopic,
   saveSources,
   serializeSources,
   markTopicUsed,

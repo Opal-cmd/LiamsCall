@@ -271,7 +271,7 @@
         <div id="sources-view" class="card hidden stack">
           <div>
             <strong>Idea sources &amp; topic queue</strong>
-            <p class="help" style="margin:0.35rem 0 0;">Edit inspiration seeds and the writing queue. RSS feeds are listed for reference — keep only trusted orgs. Never republish full articles.</p>
+            <p class="help" style="margin:0.35rem 0 0;">Edit inspiration seeds and the writing queue. RSS feeds are listed for reference — keep only trusted orgs. Never republish full articles. Tip: after editing seeds/topics on the live site, also save a copy into git (or edit locally and deploy) — Render disk resets on redeploy.</p>
           </div>
           <div class="field">
             <label>RSS feeds (read-only name + URL)</label>
@@ -865,12 +865,14 @@
         </div>
       `).join('');
       box.querySelectorAll('[data-seed-field]').forEach((el) => {
-        el.addEventListener('change', () => {
+        const sync = () => {
           const i = Number(el.getAttribute('data-seed-idx'));
           const field = el.getAttribute('data-seed-field');
           if (!state.sources.seeds[i]) return;
           state.sources.seeds[i][field] = el.value;
-        });
+        };
+        el.addEventListener('change', sync);
+        el.addEventListener('input', sync);
       });
       box.querySelectorAll('[data-remove-seed]').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -945,6 +947,7 @@
           <div class="stack" style="gap:0.4rem;">
             <input data-topic-field="title" data-topic-idx="${idx}" value="${escapeHtml(t.title || '')}" placeholder="Topic title">
             <input data-topic-field="id" data-topic-idx="${idx}" value="${escapeHtml(t.id || '')}" placeholder="id-slug (auto from title if blank)">
+            <input data-topic-field="source_url" data-topic-idx="${idx}" value="${escapeHtml(t.source_url || '')}" placeholder="Source link (https://...) — used in the article">
             <textarea data-topic-field="angle" data-topic-idx="${idx}" style="min-height:70px;" placeholder="Angle / writing note">${escapeHtml(t.angle || '')}</textarea>
             <div class="row" style="gap:0.45rem;">
               <select data-topic-field="category" data-topic-idx="${idx}" aria-label="Category" style="flex:1;min-width:9rem;">
@@ -1080,6 +1083,8 @@
           title,
           id,
           category: normalizeTopicCategory(t.category),
+          source_url: String(t.source_url || '').trim(),
+          source_name: String(t.source_name || '').trim(),
         };
       });
       const incomplete = prepared.find((t) => t.title && !t.id);
