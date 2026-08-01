@@ -29,12 +29,16 @@ function parseArgs(argv) {
   };
 }
 
-function sourceUrlForPost(post, topics) {
-  const match = (topics || []).find(
+function topicForPost(post, topics) {
+  return (topics || []).find(
     (t) =>
       toLoose(t.title) === toLoose(post.title) ||
       (t.id && toLoose(t.id) === toLoose(post.slug)),
-  );
+  ) || null;
+}
+
+function sourceUrlForPost(post, topics) {
+  const match = topicForPost(post, topics);
   return (match && (match.source_url || match.url)) || '';
 }
 
@@ -54,11 +58,13 @@ async function attachFile(filePath, { force, topics, usedStockUrls }) {
     }
   }
 
+  const topic = topicForPost(post, topics);
   const sourceUrl = post.sourceUrl || sourceUrlForPost(post, topics);
   const { path: image, origin } = await ensurePostImage({
     slug: post.slug,
     category: post.category,
     title: post.title,
+    angle: (topic && topic.angle) || '',
     description: post.description,
     sourceUrl,
     force,

@@ -172,6 +172,7 @@ async function generateTopic(opts = {}) {
       slug,
       category: topic.category || 'Caregiving',
       title,
+      angle: topic.angle || '',
       description,
       sourceUrl,
     });

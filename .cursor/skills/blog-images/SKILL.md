@@ -12,8 +12,8 @@ description: >-
 ## Required behavior
 
 1. Every published/draft post must have frontmatter `image: "/assets/blog/{slug}.jpg"`.
-2. **First choice — the inspiration source's image.** Posts carry `source_url` in frontmatter (written by generate/discover). `ensurePostImage` fetches that page's `og:image` when the host is a curated source (SAMHSA, ConnexOntario, 988, 211, Ontario Caregiver, Kids Help Phone, Mental Health Commission, toronto.ca, or other .gov/.ca/.org sources) and the image lives on the article's own domain or an allowlisted CDN.
-3. **Fallback — keyword-matched stock only.** If no source image exists, `ensurePostImage` picks from themed Unsplash pools keyed to the post title + description (housing, recovery, grief, connection, rest, routine, crisis-support). Never attach a generic unrelated filler; if the theme is unclear, the category decides the pool.
+2. **First choice — topic-matched stock.** `ensurePostImage` scores Unsplash pools against title + angle + description + category (housing, recovery, grief, boundaries, sleep, siblings-family, identity, guilt-anger, connection, rest, routine, crisis-support, caregiving). Prefer human, calm scenes that match the post subject.
+3. **Fallback — inspiration source og:image.** If stock download fails, fetch `source_url`'s `og:image` when the host is curated (SAMHSA, ConnexOntario, 988, 211, Ontario Caregiver, Kids Help Phone, Mental Health Commission, toronto.ca, or other .gov/.ca/.org sources) and the image lives on the article's own domain or an allowlisted CDN.
 4. `ensurePostImage` returns `{ path, origin }` — log the origin (`source`, `stock:<theme>`, `existing`) so it is auditable.
 5. Never invent clinic/shelter photos. Never hotlink third-party article images in production HTML — always save under `public/assets/blog/`.
 6. After attaching images, run `node scripts/blog-build.js` so `/blog` cards show the art.
