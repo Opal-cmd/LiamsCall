@@ -231,7 +231,7 @@ async function main() {
   try {
     proposed = (await openaiPropose(inspirations, args.limit)) || [];
   } catch (err) {
-    console.warn(`Gemini propose failed, using heuristic: ${err.message}`);
+    console.warn(`OpenAI propose failed, using heuristic: ${err.message}`);
   }
   if (!proposed.length) proposed = heuristicTopics(inspirations, args.limit);
 
