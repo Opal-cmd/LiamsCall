@@ -277,13 +277,32 @@ function findDisallowedPhones(text) {
   return [...new Set(bad)];
 }
 
-function findDisallowedUrls(text) {
+function normalizeUrlForCompare(url) {
+  try {
+    const u = new URL(String(url || '').replace(/[.,;:!?)]+$/, ''));
+    u.hash = '';
+    const path = u.pathname.replace(/\/+$/, '') || '/';
+    return `${u.protocol}//${u.hostname.toLowerCase()}${path}${u.search}`.toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
+function findDisallowedUrls(text, { allowUrls = [] } = {}) {
+  const allowedExact = new Set(
+    (Array.isArray(allowUrls) ? allowUrls : [])
+      .map(normalizeUrlForCompare)
+      .filter(Boolean),
+  );
   const re = /https?:\/\/[^\s)\]>"']+/gi;
   const bad = [];
   for (const match of String(text || '').matchAll(re)) {
     try {
-      const host = new URL(match[0].replace(/[.,;:!?)]+$/, '')).hostname.toLowerCase();
-      if (!ALLOWED_HOSTS.has(host)) bad.push(match[0]);
+      const cleaned = match[0].replace(/[.,;:!?)]+$/, '');
+      const host = new URL(cleaned).hostname.toLowerCase();
+      if (ALLOWED_HOSTS.has(host)) continue;
+      if (allowedExact.has(normalizeUrlForCompare(cleaned))) continue;
+      bad.push(match[0]);
     } catch {
       bad.push(match[0]);
     }
@@ -291,9 +310,9 @@ function findDisallowedUrls(text) {
   return [...new Set(bad)];
 }
 
-function assertPostGuards(post, { strictSafe = false } = {}) {
+function assertPostGuards(post, { strictSafe = false, allowUrls = [] } = {}) {
   const badPhones = findDisallowedPhones(`${post.body}\n${post.title}`);
-  const badUrls = findDisallowedUrls(post.body);
+  const badUrls = findDisallowedUrls(post.body, { allowUrls });
   if (strictSafe || post.risk === 'safe') {
     if (badPhones.length) {
       throw new Error(`Disallowed phone number(s) in ${post.slug}: ${badPhones.join(', ')}`);
