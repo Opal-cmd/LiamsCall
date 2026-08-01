@@ -287,7 +287,7 @@
           </div>
           <div class="field">
             <label>Topic queue</label>
-            <p class="help" style="margin:0.25rem 0 0.5rem;">Add ideas for the writing queue. Each topic needs a title; the id is filled in automatically if you leave it blank. Use <strong>Generate</strong> to write an article with Gemini: <em>safe</em> publishes to the live blog, <em>review</em> opens a draft here for you to approve.</p>
+            <p class="help" style="margin:0.25rem 0 0.5rem;">Add ideas for the writing queue. Each topic needs a title; the id is filled in automatically if you leave it blank. Use <strong>Generate</strong> to write an article with OpenAI: <em>safe</em> publishes to the live blog, <em>review</em> opens a draft here for you to approve.</p>
             <div id="topics-list" class="list"></div>
             <div class="row" style="margin-top:0.5rem;">
               <button id="add-topic-btn" class="btn secondary" type="button">Add topic</button>
@@ -958,7 +958,7 @@
                 <input type="checkbox" data-topic-field="used" data-topic-idx="${idx}"${t.used ? ' checked' : ''}>
                 Already used
               </label>
-              <button class="btn" type="button" data-generate-topic="${idx}" title="Write this article with Gemini">Generate</button>
+              <button class="btn" type="button" data-generate-topic="${idx}" title="Write this article with OpenAI">Generate</button>
               <button class="btn danger" type="button" data-remove-topic="${idx}">Remove</button>
             </div>
           </div>

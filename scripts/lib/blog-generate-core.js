@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Shared Gemini blog generation used by CLI and Blog desk admin.
+ * Shared OpenAI blog generation used by CLI and Blog desk admin.
  */
 
 const fs = require('fs');
@@ -32,11 +32,11 @@ HARD RULES:
 - End with one gentle practical next step, not a hard sell.`;
 
 function getModel() {
-  return process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+  return process.env.OPENAI_MODEL || 'gpt-4o-mini';
 }
 
 function getApiKey() {
-  return process.env.GEMINI_API_KEY || '';
+  return process.env.OPENAI_API_KEY || '';
 }
 
 function pickTopic(topics, forcedId) {
@@ -73,12 +73,11 @@ Return ONLY valid JSON (no markdown fences) with keys:
 }`;
 }
 
-async function callGemini(userPrompt) {
+async function callOpenAI(userPrompt) {
   const apiKey = getApiKey();
-  if (!apiKey) throw new Error('Missing GEMINI_API_KEY. Add it to the server .env (or Render env), then try again.');
+  if (!apiKey) throw new Error('Missing OPENAI_API_KEY. Add it to the server .env (or Render env), then try again.');
   const model = getModel();
-  const url = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
-  const res = await fetch(url, {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -92,12 +91,12 @@ async function callGemini(userPrompt) {
       ],
       temperature: 0.7,
       max_tokens: 4096,
-      ...( /gemini-2\.5|gemini-3/i.test(model) ? { reasoning_effort: 'none' } : {}),
+      response_format: { type: 'json_object' },
     }),
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Gemini error ${res.status}: ${text.slice(0, 400)}`);
+    throw new Error(`OpenAI error ${res.status}: ${text.slice(0, 400)}`);
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content || '';
@@ -143,7 +142,7 @@ async function generateTopic(opts = {}) {
   if (forceDraft) risk = 'review';
 
   const model = getModel();
-  const content = await callGemini(buildUserPrompt(topic));
+  const content = await callOpenAI(buildUserPrompt(topic));
   const parsed = extractJson(content);
 
   const title = parsed.title || topic.title;
