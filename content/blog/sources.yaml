@@ -15,45 +15,150 @@ feeds:
     default_risk: review
     notes: "Only caregiver/family/behavioral-health education themes survive the relevance filter."
 
-# Curated inspiration links when RSS is thin or unavailable.
-# title + url only - discovery will invent a new angle, not rewrite the page.
+# Curated inspiration links — one distinct URL per topic where possible.
+# title + url only - discovery invents a new angle; never rewrite the page.
 seeds:
-  - title: "Ontario Caregiver Organization - support and peer groups"
+  - title: "Ontario Caregiver Organization - home"
     url: https://ontariocaregiver.ca
     category: Caregiver Wellbeing
     risk: safe
 
-  - title: "988 Suicide & Crisis Lifeline - how to help someone"
-    url: https://988lifeline.org
-    category: Crisis Resources
-    risk: review
+  - title: "Ontario Caregiver Organization - get support"
+    url: https://ontariocaregiver.ca/get-support/
+    category: Caregiver Wellbeing
+    risk: safe
 
-  - title: "Canada 9-8-8 - about the service"
+  - title: "Ontario Caregiver Organization - about"
+    url: https://ontariocaregiver.ca/about/
+    category: Caregiver Wellbeing
+    risk: safe
+
+  - title: "Canada 9-8-8"
     url: https://988.ca
     category: Crisis Resources
     risk: review
 
-  - title: "ConnexOntario - find mental health and addiction help"
+  - title: "988 Lifeline - home"
+    url: https://988lifeline.org
+    category: Crisis Resources
+    risk: review
+
+  - title: "988 Lifeline - help someone else"
+    url: https://988lifeline.org/help-someone-else/
+    category: Crisis Resources
+    risk: review
+
+  - title: "988 Lifeline - talk to someone"
+    url: https://988lifeline.org/talk-to-someone-now/
+    category: Crisis Resources
+    risk: review
+
+  - title: "ConnexOntario"
     url: https://connexontario.ca
     category: Mental Health
     risk: review
 
-  - title: "211 Canada - community and social services"
+  - title: "211 Canada"
     url: https://211.ca
     category: Housing
     risk: review
 
-  - title: "Kids Help Phone - for young people"
+  - title: "211 Ontario"
+    url: https://211ontario.ca
+    category: Housing
+    risk: review
+
+  - title: "211 United States"
+    url: https://www.211.org
+    category: Housing
+    risk: review
+
+  - title: "Kids Help Phone"
     url: https://kidshelpphone.ca
     category: Mental Health
     risk: review
 
-  - title: "SAMHSA National Helpline overview"
+  - title: "SAMHSA National Helpline"
     url: https://www.samhsa.gov/find-help/national-helpline
     category: Addiction
     risk: review
 
-  - title: "Mental Health Commission of Canada - resources"
+  - title: "SAMHSA helplines"
+    url: https://www.samhsa.gov/find-help/helplines
+    category: Addiction
+    risk: review
+
+  - title: "SAMHSA find treatment"
+    url: https://www.samhsa.gov/find-help/find-treatment
+    category: Addiction
+    risk: review
+
+  - title: "SAMHSA homelessness resources"
+    url: https://www.samhsa.gov/homelessness-programs-resources
+    category: Housing
+    risk: review
+
+  - title: "SAMHSA behavioral health treatment services"
+    url: https://www.samhsa.gov/find-help
+    category: Mental Health
+    risk: review
+
+  - title: "Mental Health Commission of Canada"
     url: https://mentalhealthcommission.ca
+    category: Mental Health
+    risk: safe
+
+  - title: "CAMH health info"
+    url: https://www.camh.ca/en/health-info
+    category: Mental Health
+    risk: review
+
+  - title: "CAMH home"
+    url: https://www.camh.ca
+    category: Mental Health
+    risk: review
+
+  - title: "CAMH getting help"
+    url: https://www.camh.ca/en/camh-news-and-stories
+    category: Mental Health
+    risk: review
+
+  - title: "NAMI family caregivers"
+    url: https://www.nami.org/Your-Journey/Family-Members-and-Caregivers
+    category: Caregiver Wellbeing
+    risk: safe
+
+  - title: "NAMI home"
+    url: https://www.nami.org
+    category: Mental Health
+    risk: safe
+
+  - title: "NAMI find support"
+    url: https://www.nami.org/support-education/
+    category: Caregiver Wellbeing
+    risk: safe
+
+  - title: "City of Toronto"
+    url: https://www.toronto.ca
+    category: Housing
+    risk: review
+
+  - title: "Toronto shelter support"
+    url: https://www.toronto.ca/community-people/housing-shelter/
+    category: Housing
+    risk: review
+
+  - title: "Hope for Wellness (Indigenous)"
+    url: https://www.hopeforwellness.ca
+    category: Mental Health
+    risk: review
+
+  - title: "Canada.ca mental health"
+    url: https://www.canada.ca/en/public-health/services/mental-health-services.html
+    category: Mental Health
+    risk: safe
+
+  - title: "Wellness Together Canada"
+    url: https://www.wellnesstogether.ca
     category: Mental Health
     risk: safe

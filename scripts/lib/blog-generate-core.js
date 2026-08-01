@@ -25,8 +25,8 @@ const SYSTEM = `You write calm, practical blog posts for Liam's Call (liamscall.
 
 HARD RULES:
 - Never invent phone numbers or local shelter/clinic contact details.
-- Only link to these hosts if you include a URL: ontariocaregiver.ca, connexontario.ca, 988.ca, 988lifeline.org, 211.ca, 211.org, toronto.ca, samhsa.gov, kidshelpphone.ca, mentalhealthcommission.ca, nami.org, camh.ca, liamscall.com — PLUS the single inspiration source URL provided in the user message (when present).
-- When an inspiration source URL is provided, you MUST include at least one Markdown hyperlink to that exact URL in the body (natural inline citation and/or a short "Further reading" line near the end). Do not invent a different source URL. Do not copy or closely paraphrase the source article.
+- Only link to these hosts if you include a URL: ontariocaregiver.ca, connexontario.ca, 988.ca, 988lifeline.org, 211.ca, 211ontario.ca, 211.org, toronto.ca, samhsa.gov, kidshelpphone.ca, mentalhealthcommission.ca, nami.org, camh.ca, hopeforwellness.ca, canada.ca, wellnesstogether.ca, liamscall.com — PLUS the inspiration source URL provided in the user message.
+- Every post MUST include at least one Markdown hyperlink to the exact inspiration source URL from the user message (natural inline citation and a short "Further reading" line near the end). Do not invent other URLs. Do not copy or closely paraphrase the source article.
 - Allowed phone/short codes only if relevant: 988, 911, 211, 311, 811, Ontario Caregiver Organization 1-833-227-3778, ConnexOntario 1-866-531-2600, Kids Help Phone 1-800-668-6868, Hope for Wellness 1-855-242-3310, SAMHSA 1-800-662-4357
 - Never diagnose, recommend medications, or give dosing advice.
 - Never use exclamation points.
@@ -66,9 +66,9 @@ function buildUserPrompt(topic) {
   if (sourceUrl) {
     sourceBlock = `Inspiration source (link to this; do NOT copy the article):
 URL: ${sourceUrl}${sourceName ? `\nName: ${sourceName}` : ''}
-Requirement: include at least one Markdown hyperlink using this exact URL, e.g. [Further reading](${sourceUrl}) or a natural inline link with a short label.`;
+Requirement: the body MUST include (1) one natural inline Markdown link to this exact URL and (2) a short final line like [Further reading](${sourceUrl}).`;
   } else {
-    sourceBlock = `No inspiration source URL was provided. Only link allowlisted hosts from the system rules when a link is genuinely helpful.`;
+    sourceBlock = `No inspiration source URL was provided. Still include at least one Markdown hyperlink to an allowlisted host that fits the topic (e.g. ontariocaregiver.ca, 211.ca, 988.ca).`;
   }
 
   return `Write one blog post.

@@ -70,6 +70,12 @@ const ALLOWED_HOSTS = new Set([
   'www.nami.org',
   'camh.ca',
   'www.camh.ca',
+  'hopeforwellness.ca',
+  'www.hopeforwellness.ca',
+  'canada.ca',
+  'www.canada.ca',
+  'wellnesstogether.ca',
+  'www.wellnesstogether.ca',
 ]);
 
 function ensureDir(dir) {
@@ -464,10 +470,11 @@ function loadSources() {
 }
 
 /**
- * Pick a seed/inspiration URL for a topic when source_url is missing.
- * Prefer keyword hits in title/angle, then category defaults from curated seeds.
+ * Resolve inspiration source for a topic.
+ * Prefer the topic's own source_url; otherwise pick the least-used matching seed
+ * so topics do not all collapse onto the same org homepage.
  */
-function resolveSourceForTopic(topic = {}) {
+function resolveSourceForTopic(topic = {}, { usedUrls = null } = {}) {
   const existing = String(topic.source_url || topic.url || '').trim();
   if (existing) {
     return {
@@ -482,9 +489,7 @@ function resolveSourceForTopic(topic = {}) {
   }
 
   const hay = `${topic.title || ''} ${topic.angle || ''} ${topic.category || ''}`.toLowerCase();
-  let best = null;
-  let bestScore = 0;
-  for (const seed of seeds) {
+  const scored = seeds.map((seed) => {
     const title = String(seed.title || '').toLowerCase();
     const url = String(seed.url || '').toLowerCase();
     let score = 0;
@@ -493,26 +498,19 @@ function resolveSourceForTopic(topic = {}) {
       if (hay.includes(tok)) score += 1;
     }
     if (/988|crisis|suicid/.test(hay) && /988/.test(`${title} ${url}`)) score += 5;
-    if (/shelter|homeless|housing|211/.test(hay) && /211/.test(`${title} ${url}`)) score += 5;
-    if (/detox|addiction|substance|treatment|connex/.test(hay) && /connexontario|samhsa|helpline/.test(`${title} ${url}`)) score += 5;
-    if (/caregiver|boundary|burnout|sleep|guilt|identity/.test(hay) && /ontariocaregiver|caregiver/.test(`${title} ${url}`)) score += 4;
+    if (/shelter|homeless|housing|211/.test(hay) && /211|toronto|homeless/.test(`${title} ${url}`)) score += 5;
+    if (/detox|addiction|substance|treatment|connex|recovery/.test(hay) && /connexontario|samhsa|helpline|treatment/.test(`${title} ${url}`)) score += 5;
+    if (/caregiver|boundary|burnout|sleep|guilt|identity|respite/.test(hay) && /ontariocaregiver|nami|caregiver/.test(`${title} ${url}`)) score += 4;
     if (/kid|child|youth|teen/.test(hay) && /kidshelpphone|kids help/.test(`${title} ${url}`)) score += 5;
-    if (/mental health|anxiety|depression/.test(hay) && /mentalhealthcommission|connexontario/.test(`${title} ${url}`)) score += 3;
-    if (score > bestScore) {
-      best = seed;
-      bestScore = score;
-    }
-  }
+    if (/mental health|anxiety|depression|psych|er visit/.test(hay) && /mentalhealthcommission|connexontario|camh|wellness|canada\.ca/.test(`${title} ${url}`)) score += 3;
+    if (/money|benefit|financial/.test(hay) && /211/.test(`${title} ${url}`)) score += 4;
+    // Prefer unused URLs so each topic gets a different source when possible.
+    if (usedUrls && usedUrls.has(String(seed.url || '').trim())) score -= 8;
+    return { seed, score };
+  });
 
-  if (!best || bestScore < 2) {
-    const cat = String(topic.category || '').toLowerCase();
-    const byCat = (re) => seeds.find((s) => re.test(`${s.title} ${s.url} ${s.category}`));
-    if (/crisis/.test(cat)) best = byCat(/988/) || best;
-    else if (/homeless|housing/.test(cat)) best = byCat(/211/) || best;
-    else if (/addiction/.test(cat)) best = byCat(/samhsa|connexontario/) || best;
-    else if (/mental/.test(cat)) best = byCat(/mentalhealthcommission|connexontario/) || best;
-    else best = byCat(/ontariocaregiver/) || seeds[0];
-  }
+  scored.sort((a, b) => b.score - a.score);
+  const best = scored[0]?.seed || seeds[0];
 
   return {
     source_url: String(best?.url || '').trim(),
