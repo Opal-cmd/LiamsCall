@@ -2,7 +2,7 @@
 'use strict';
 
 /**
- * Generate a blog post from content/blog/topics.yaml via Gemini.
+ * Generate a blog post from content/blog/topics.yaml via OpenAI.
  *
  * Usage:
  *   node scripts/blog-generate.js
@@ -10,8 +10,8 @@
  *   node scripts/blog-generate.js --dry-run
  *
  * Env:
- *   GEMINI_API_KEY (required)
- *   GEMINI_MODEL (optional, default gemini-2.0-flash)
+ *   OPENAI_API_KEY (required)
+ *   OPENAI_MODEL (optional, default gpt-4o-mini)
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });

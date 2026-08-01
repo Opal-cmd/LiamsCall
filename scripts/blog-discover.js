@@ -10,7 +10,7 @@
  *   node scripts/blog-discover.js --limit=5
  *   node scripts/blog-discover.js --dry-run
  *
- * Env: GEMINI_API_KEY (recommended), GEMINI_MODEL (optional)
+ * Env: OPENAI_API_KEY (recommended), OPENAI_MODEL (optional)
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
@@ -25,8 +25,8 @@ const {
   loadSources,
 } = require('./lib/blog-utils');
 
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-const API_KEY = process.env.GEMINI_API_KEY;
+const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+const API_KEY = process.env.OPENAI_API_KEY;
 
 function parseArgs(argv) {
   const out = { limit: 5, dryRun: false };
@@ -114,7 +114,7 @@ function heuristicTopics(inspirations, limit) {
   return out;
 }
 
-async function geminiPropose(inspirations, limit) {
+async function openaiPropose(inspirations, limit) {
   if (!API_KEY) return null;
   const payload = inspirations.slice(0, 12).map((s, i) => ({
     i,
@@ -132,7 +132,7 @@ Rules:
 - Propose at most ${limit} topics.
 - risk=review if crisis, shelters, treatment, diagnosis, or hotlines are central.`;
 
-  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${API_KEY}`,
@@ -142,6 +142,7 @@ Rules:
       model: MODEL,
       temperature: 0.6,
       max_tokens: 2500,
+      response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: system },
         {
@@ -149,10 +150,9 @@ Rules:
           content: `Create up to ${limit} original topic ideas from these inspirations:\n${JSON.stringify(payload, null, 2)}`,
         },
       ],
-      ...(/gemini-2\.5|gemini-3/i.test(MODEL) ? { reasoning_effort: 'none' } : {}),
     }),
   });
-  if (!res.ok) throw new Error(`Gemini discover failed: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new Error(`OpenAI discover failed: ${res.status} ${await res.text()}`);
   const data = await res.json();
   const text = data.choices?.[0]?.message?.content || '';
   const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -229,7 +229,7 @@ async function main() {
 
   let proposed = [];
   try {
-    proposed = (await geminiPropose(inspirations, args.limit)) || [];
+    proposed = (await openaiPropose(inspirations, args.limit)) || [];
   } catch (err) {
     console.warn(`Gemini propose failed, using heuristic: ${err.message}`);
   }

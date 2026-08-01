@@ -50,7 +50,7 @@ Crawlable Markdown → HTML blog for SEO.
 ```bash
 npm run blog:build                 # rebuild public/blog + sitemap
 npm run blog:discover              # pull idea angles from allowlisted RSS/seeds into topics.yaml
-npm run blog:generate              # next topic from topics.yaml (needs GEMINI_API_KEY)
+npm run blog:generate              # next topic from topics.yaml (needs OPENAI_API_KEY)
 npm run blog:approve -- my-slug    # publish a draft from content/blog/drafts/
 ```
 
@@ -61,7 +61,7 @@ npm run blog:approve -- my-slug    # publish a draft from content/blog/drafts/
 - **Blog desk (for non-coders):** open [http://localhost:3000/admin/blog](http://localhost:3000/admin/blog) (or `/admin/blog` on the live site). Set `BLOG_ADMIN_PASSWORD` in `.env` / Render. Log in → **Needs review** → edit if needed → **Approve & publish**. **Live on site** can move a post back to drafts. **Topics & sources** edits the discovery queue without coding.
 - Blog index filters by **category** and **region**. Ad placeholders use `data-ad-slot` (see [`docs/ad-slots.md`](docs/ad-slots.md)); enable Ads after approval via `ADSENSE_*` env vars at build time.
 - Agent mention rules: [`AGENTS.md`](AGENTS.md). Demo checklist: [`docs/supervisor-demo.md`](docs/supervisor-demo.md).
-- Cron: [`.github/workflows/blog-cron.yml`](.github/workflows/blog-cron.yml) (Mon/Thu generate) + [`.github/workflows/blog-discover.yml`](.github/workflows/blog-discover.yml) (weekly ideas) — set repo secret `GEMINI_API_KEY`
+- Cron: [`.github/workflows/blog-cron.yml`](.github/workflows/blog-cron.yml) (Mon/Thu generate) + [`.github/workflows/blog-discover.yml`](.github/workflows/blog-discover.yml) (weekly ideas) — set repo secret `OPENAI_API_KEY`
 
 ## Deploy (Render)
 
@@ -70,7 +70,7 @@ npm run blog:approve -- my-slug    # publish a draft from content/blog/drafts/
 2. On https://render.com create a **Web Service** from the repo (branch `main`):
    - Build command: `npm install && npm run blog:build`
    - Start command: `npm start`
-3. Add environment variables in the Render dashboard (`GEMINI_API_KEY`,
+3. Add environment variables in the Render dashboard (`OPENAI_API_KEY`,
    `BLOG_ADMIN_PASSWORD`, and `ALLOWED_ORIGIN=https://your-domain.com`).
 4. Attach a custom domain under Settings → Custom Domains. TLS is automatic.
 
