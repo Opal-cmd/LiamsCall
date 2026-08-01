@@ -551,11 +551,20 @@ function formatDateDisplay(iso) {
   return d.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 }
 
+function jsonForHtmlScript(value) {
+  return JSON.stringify(value, null, 4)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
 function blogShell({ title, description, canonical, schema, active, bodyHtml, breadcrumb, variant = 'index', ogImage, articleTone = '' }) {
   const navLink = (key, href, label) =>
     `<a class="side-link${active === key ? ' active' : ''}" href="${href}">${label}</a>`;
   const schemaBlock = schema
-    ? `\n  <script type="application/ld+json">\n${JSON.stringify(schema, null, 4)}\n  </script>`
+    ? `\n  <script type="application/ld+json">\n${jsonForHtmlScript(schema)}\n  </script>`
     : '';
   const crumb = breadcrumb
     ? `<nav class="blog-crumb" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> ${breadcrumb}</nav>`
@@ -1772,6 +1781,7 @@ module.exports = {
   serializeSources,
   markTopicUsed,
   formatDateDisplay,
+  jsonForHtmlScript,
   blogShell,
   writeSitemap,
   renderAdSlot,

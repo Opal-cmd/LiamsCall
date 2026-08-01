@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { jsonForHtmlScript } = require('./lib/blog-utils');
 const {
   organizationSchema,
   faqPageSchema,
@@ -36,7 +37,7 @@ function shell(title, description, active, body, extras = {}) {
   const ogTitle = extras.ogTitle || `${title} — Liam's Call`;
   const crumbLabel = extras.crumb || title;
   const schema = extras.schema
-    ? `\n  <script type="application/ld+json">\n${JSON.stringify(extras.schema, null, 4)}\n  </script>`
+    ? `\n  <script type="application/ld+json">\n${jsonForHtmlScript(extras.schema)}\n  </script>`
     : '';
 
   return `<!DOCTYPE html>
