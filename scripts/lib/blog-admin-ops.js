@@ -20,6 +20,7 @@ const {
   saveTopics,
 } = require('./blog-utils');
 const { ensurePostImage, setFrontmatterImage } = require('./blog-images');
+const { generateTopic } = require('./blog-generate-core');
 
 function rebuildBlog() {
   const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'blog-build.js')], {
@@ -352,6 +353,41 @@ function updateTopics(payload = {}) {
   return loadTopics();
 }
 
+/**
+ * Generate an article for a topic from the Blog desk.
+ * Safe topics publish + rebuild; review topics land in drafts.
+ * Pass forceDraft:true to always write a draft for human review.
+ */
+async function generateTopicArticle(topicId, options = {}) {
+  const id = String(topicId || '').trim();
+  if (!id) throw new Error('Topic id is required.');
+
+  const topics = loadTopics();
+  const topic = topics.find((t) => t.id === id);
+  if (!topic) throw new Error(`Topic not found: ${id}`);
+  if (topic.used && !options.allowUsed) {
+    throw new Error('This topic is already marked used. Uncheck “Already used”, save, then generate — or confirm regenerate.');
+  }
+
+  const summary = await generateTopic({
+    topicId: id,
+    forceDraft: Boolean(options.forceDraft),
+  });
+
+  let buildLog = '';
+  if (summary.mode === 'published') {
+    buildLog = rebuildBlog();
+  }
+
+  return {
+    ok: true,
+    ...summary,
+    url: summary.mode === 'published' ? `/blog/${summary.slug}` : null,
+    topics: loadTopics(),
+    buildLog,
+  };
+}
+
 module.exports = {
   listDrafts,
   listPublished,
@@ -366,4 +402,5 @@ module.exports = {
   updateSources,
   getTopics,
   updateTopics,
+  generateTopicArticle,
 };

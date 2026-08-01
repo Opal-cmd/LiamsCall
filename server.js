@@ -1319,6 +1319,24 @@ app.put('/api/blog-admin/topics', requireBlogAdmin, (req, res) => {
   }
 });
 
+app.post('/api/blog-admin/topics/:id/generate', requireBlogAdmin, async (req, res) => {
+  try {
+    const result = await blogAdminOps.generateTopicArticle(req.params.id, {
+      allowUsed: Boolean(req.body?.allowUsed),
+      forceDraft: Boolean(req.body?.forceDraft),
+    });
+    appendBlogAudit('topic_generate', {
+      ip: getClientIp(req),
+      topicId: result.topicId,
+      slug: result.slug,
+      mode: result.mode,
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not generate article.' });
+  }
+});
+
 // Public health check: intentionally minimal so internal configuration
 // (models, rate limits, auth setup) is not disclosed.
 app.get('/api/health', (_req, res) => {

@@ -287,7 +287,7 @@
           </div>
           <div class="field">
             <label>Topic queue</label>
-            <p class="help" style="margin:0.25rem 0 0.5rem;">Add ideas for the writing queue. Each topic needs a title; the id is filled in automatically if you leave it blank.</p>
+            <p class="help" style="margin:0.25rem 0 0.5rem;">Add ideas for the writing queue. Each topic needs a title; the id is filled in automatically if you leave it blank. Use <strong>Generate</strong> to write an article with Gemini: <em>safe</em> publishes to the live blog, <em>review</em> opens a draft here for you to approve.</p>
             <div id="topics-list" class="list"></div>
             <div class="row" style="margin-top:0.5rem;">
               <button id="add-topic-btn" class="btn secondary" type="button">Add topic</button>
@@ -946,18 +946,19 @@
             <input data-topic-field="title" data-topic-idx="${idx}" value="${escapeHtml(t.title || '')}" placeholder="Topic title">
             <input data-topic-field="id" data-topic-idx="${idx}" value="${escapeHtml(t.id || '')}" placeholder="id-slug (auto from title if blank)">
             <textarea data-topic-field="angle" data-topic-idx="${idx}" style="min-height:70px;" placeholder="Angle / writing note">${escapeHtml(t.angle || '')}</textarea>
-            <div class="row" style="display:grid;grid-template-columns:1fr 1fr auto auto;gap:0.45rem;">
-              <select data-topic-field="category" data-topic-idx="${idx}" aria-label="Category">
+            <div class="row" style="gap:0.45rem;">
+              <select data-topic-field="category" data-topic-idx="${idx}" aria-label="Category" style="flex:1;min-width:9rem;">
                 ${categoryOptionsHtml(t.category)}
               </select>
-              <select data-topic-field="risk" data-topic-idx="${idx}">
+              <select data-topic-field="risk" data-topic-idx="${idx}" style="flex:1;min-width:6rem;">
                 <option value="safe"${t.risk === 'safe' ? ' selected' : ''}>safe</option>
                 <option value="review"${t.risk !== 'safe' ? ' selected' : ''}>review</option>
               </select>
-              <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;">
+              <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;white-space:nowrap;">
                 <input type="checkbox" data-topic-field="used" data-topic-idx="${idx}"${t.used ? ' checked' : ''}>
                 Already used
               </label>
+              <button class="btn" type="button" data-generate-topic="${idx}" title="Write this article with Gemini">Generate</button>
               <button class="btn danger" type="button" data-remove-topic="${idx}">Remove</button>
             </div>
           </div>
@@ -989,6 +990,71 @@
           renderTopics();
         });
       });
+      box.querySelectorAll('[data-generate-topic]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const i = Number(btn.getAttribute('data-generate-topic'));
+          generateTopicArticle(i, btn).catch((e) => showBanner(e.message, 'err'));
+        });
+      });
+    }
+
+    async function generateTopicArticle(idx, btn) {
+      hideBanner();
+      const topic = state.topics[idx];
+      if (!topic) throw new Error('Topic not found.');
+      const title = String(topic.title || '').trim();
+      let id = String(topic.id || '').trim();
+      if (!id && title) id = ensureUniqueTopicId(slugifyTopicId(title), idx);
+      if (!title || !id) {
+        throw new Error('Save a title (and id) for this topic before generating.');
+      }
+      topic.id = id;
+
+      const risk = String(topic.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe';
+      const confirmMsg = risk === 'safe'
+        ? `Generate and publish “${title}” to the live blog? (Risk is safe.)`
+        : `Generate a draft for “${title}”? You can review it under Needs review before publishing.`;
+      if (!window.confirm(confirmMsg)) return;
+
+      let allowUsed = false;
+      if (topic.used) {
+        allowUsed = window.confirm('This topic is already marked used. Generate anyway? (Fails if a post with the same slug already exists.)');
+        if (!allowUsed) return;
+      }
+
+      await saveTopics();
+
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Generating…';
+      document.querySelectorAll('[data-generate-topic]').forEach((b) => { b.disabled = true; });
+
+      try {
+        const result = await api('/api/blog-admin/topics/' + encodeURIComponent(id) + '/generate', {
+          method: 'POST',
+          body: JSON.stringify({ allowUsed }),
+        });
+        state.topics = result.topics || state.topics;
+        renderTopics();
+        await refreshLists();
+
+        if (result.mode === 'published') {
+          showBanner(`Published “${result.title || title}”. Live at ${result.url}`, 'ok');
+          switchTab('live');
+        } else {
+          showBanner(`Draft ready: “${result.title || title}”. Open it under Needs review to edit and approve.`, 'ok');
+          switchTab('drafts');
+          if (result.slug) {
+            try { await openDraft(result.slug); } catch (_) { /* list is enough */ }
+          }
+        }
+      } finally {
+        document.querySelectorAll('[data-generate-topic]').forEach((b) => { b.disabled = false; });
+        if (btn.isConnected) {
+          btn.disabled = false;
+          btn.textContent = originalLabel;
+        }
+      }
     }
 
     async function saveSources() {
