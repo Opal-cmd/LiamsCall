@@ -142,6 +142,10 @@ async function saveDraft(slug, updates = {}) {
   const category = updates.category ?? current.category;
   const description = updates.description ?? current.description;
   const sourceUrl = updates.source_url ?? updates.sourceUrl ?? current.sourceUrl ?? '';
+  const dest = path.join(DRAFTS_DIR, `${nextSlug}.md`);
+  if (dest !== filePath && fs.existsSync(dest)) {
+    throw new Error('A draft with this name already exists. Rename or delete it first.');
+  }
   let md = writeMarkdown({
     title,
     slug: nextSlug,
@@ -177,7 +181,6 @@ async function saveDraft(slug, updates = {}) {
     });
   }
 
-  const dest = path.join(DRAFTS_DIR, `${nextSlug}.md`);
   fs.writeFileSync(dest, md, 'utf8');
   if (dest !== filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
   return getDraft(nextSlug);
