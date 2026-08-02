@@ -12,7 +12,8 @@
     "blog:generate": "node scripts/blog-generate.js",
     "blog:discover": "node scripts/blog-discover.js",
     "blog:approve": "node scripts/blog-approve.js",
-    "blog:images": "node scripts/blog-attach-images.js"
+    "blog:images": "node scripts/blog-attach-images.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=18.0.0"
