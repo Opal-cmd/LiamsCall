@@ -265,3 +265,48 @@ topics:
     angle: "A tiny shutdown ritual that helps the nervous system mark 'care shift over' even if you're still in the same house."
     source_url: "https://www.toronto.ca"
     source_name: "City of Toronto"
+
+  - id: mental-health-support-children
+    title: "Creating a Supportive Home Environment for Children's Mental Health"
+    category: "mental health"
+    risk: safe
+    used: false
+    angle: "Discuss practical strategies for parents to foster open communication, emotional safety, and resilience in children, particularly during challenging times."
+    source_url: "https://www.samhsa.gov/blog/expanding-mental-health-support-children-families-through-teleconsultation"
+    source_name: "SAMHSA Blog"
+
+  - id: menopause-substance-use
+    title: "Navigating Midlife: Understanding the Impact of Menopause on Mental Health and Substance Use"
+    category: "mental health"
+    risk: safe
+    used: false
+    angle: "Explore how hormonal changes during menopause can affect mood and coping mechanisms, and provide tips for women and caregivers on managing these transitions."
+    source_url: "https://www.samhsa.gov/blog/why-menopause-matters-substance-use-disorder-prevention-treatment-recovery"
+    source_name: "SAMHSA Blog"
+
+  - id: youth-mental-health-awareness
+    title: "Empowering Youth: How to Recognize Signs of Mental Health Struggles in Friends"
+    category: "mental health"
+    risk: safe
+    used: false
+    angle: "Provide guidance for parents and educators on how to teach children to identify and support peers who may be experiencing mental health challenges."
+    source_url: "https://www.samhsa.gov/blog/one-students-quick-thinking-shows-coordinated-action-through-samhsa-program-youth-mental-health-works"
+    source_name: "SAMHSA Blog"
+
+  - id: holiday-support
+    title: "Building Connections: Combatting Loneliness During the Holidays"
+    category: "mental health"
+    risk: safe
+    used: false
+    angle: "Offer practical tips for families and caregivers on how to create inclusive holiday traditions that foster connection and support for those feeling isolated."
+    source_url: "https://www.samhsa.gov/blog/feeling-lonely-you-are-not-alone-tips-and-resources-for-the-holiday-season"
+    source_name: "SAMHSA Blog"
+
+  - id: eating-disorders-support
+    title: "Supporting Loved Ones: Understanding the Intersection of Eating Disorders and Mental Health"
+    category: "mental health"
+    risk: review
+    used: false
+    angle: "Discuss how caregivers can provide support to individuals dealing with both eating disorders and mental health issues, emphasizing empathy and understanding without focusing on treatment."
+    source_url: "https://www.samhsa.gov/blog/how-to-support-people-with-both-eating-and-substance-use-disorders"
+    source_name: "SAMHSA Blog"
