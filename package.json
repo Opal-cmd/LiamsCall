@@ -7,6 +7,7 @@
     "start": "node server.js",
     "dev": "node server.js",
     "sitemap:write": "node scripts/write-sitemap.js",
+    "test": "node --test",
     "pages:legal": "node scripts/generate-legal-pages.js",
     "blog:build": "node scripts/blog-build.js",
     "blog:generate": "node scripts/blog-generate.js",

@@ -18,6 +18,7 @@ const {
   saveSources,
   loadTopics,
   saveTopics,
+  sanitizeSourceUrl,
 } = require('./blog-utils');
 const { ensurePostImage, setFrontmatterImage } = require('./blog-images');
 const { generateTopic } = require('./blog-generate-core');
@@ -269,21 +270,31 @@ function updateSources(payload = {}) {
   const seeds = Array.isArray(payload.seeds) ? payload.seeds : current.seeds;
   const cleanFeeds = feeds
     .filter((f) => f && f.id && f.url)
-    .map((f) => ({
-      id: String(f.id).trim(),
-      name: String(f.name || f.id).trim(),
-      url: String(f.url).trim(),
-      default_risk: String(f.default_risk || 'review').toLowerCase() === 'safe' ? 'safe' : 'review',
-      notes: String(f.notes || '').trim(),
-    }));
+    .map((f) => {
+      const url = sanitizeSourceUrl(f.url);
+      if (!url) return null;
+      return {
+        id: String(f.id).trim(),
+        name: String(f.name || f.id).trim(),
+        url,
+        default_risk: String(f.default_risk || 'review').toLowerCase() === 'safe' ? 'safe' : 'review',
+        notes: String(f.notes || '').trim(),
+      };
+    })
+    .filter(Boolean);
   const cleanSeeds = seeds
     .filter((s) => s && s.title && s.url)
-    .map((s) => ({
-      title: String(s.title).trim(),
-      url: String(s.url).trim(),
-      category: String(s.category || 'Caregiving').trim(),
-      risk: String(s.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
-    }));
+    .map((s) => {
+      const url = sanitizeSourceUrl(s.url);
+      if (!url) return null;
+      return {
+        title: String(s.title).trim(),
+        url,
+        category: String(s.category || 'Caregiving').trim(),
+        risk: String(s.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
+      };
+    })
+    .filter(Boolean);
   saveSources({ feeds: cleanFeeds, seeds: cleanSeeds });
   return loadSources();
 }
@@ -344,7 +355,7 @@ function updateTopics(payload = {}) {
         risk: String(t.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
         used: Boolean(t.used),
         angle: String(t.angle || '').trim(),
-        source_url: String(t.source_url || '').trim(),
+        source_url: sanitizeSourceUrl(t.source_url || ''),
         source_name: String(t.source_name || '').trim(),
       };
     })
