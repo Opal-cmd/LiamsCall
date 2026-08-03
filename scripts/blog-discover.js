@@ -23,6 +23,7 @@ const {
   loadTopics,
   appendTopics,
   loadSources,
+  sanitizeSourceUrl,
 } = require('./lib/blog-utils');
 
 const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
@@ -116,6 +117,7 @@ function heuristicTopics(inspirations, limit) {
 
 async function openaiPropose(inspirations, limit) {
   if (!API_KEY) return null;
+  const allowedSourceUrls = new Set(inspirations.map((s) => sanitizeSourceUrl(s.url)).filter(Boolean));
   const payload = inspirations.slice(0, 12).map((s, i) => ({
     i,
     title: s.title,
@@ -163,7 +165,7 @@ Rules:
     category: t.category || 'Caregiving',
     risk: guessRisk(`${t.title} ${t.angle} ${t.risk}`, t.risk || 'safe'),
     angle: t.angle,
-    source_url: t.source_url || '',
+    source_url: allowedSourceUrls.has(sanitizeSourceUrl(t.source_url)) ? sanitizeSourceUrl(t.source_url) : '',
     source_name: t.source_name || '',
   }));
 }
@@ -180,7 +182,7 @@ function isCaregiverRelevant(text) {
 async function collectInspirations() {
   const { feeds, seeds } = loadSources();
   const existing = loadTopics();
-  const seenUrls = new Set(existing.map((t) => t.source_url).filter(Boolean));
+  const seenUrls = new Set(existing.map((t) => sanitizeSourceUrl(t.source_url)).filter(Boolean));
   const list = [];
 
   for (const feed of feeds) {
@@ -189,9 +191,11 @@ async function collectInspirations() {
       const kept = items.filter((item) => isCaregiverRelevant(`${item.title} ${item.summary}`));
       console.log(`Feed ${feed.id}: ${kept.length}/${items.length} relevant`);
       for (const item of kept.slice(0, 8)) {
-        if (seenUrls.has(item.url)) continue;
+        const sourceUrl = sanitizeSourceUrl(item.url);
+        if (!sourceUrl || seenUrls.has(sourceUrl)) continue;
         list.push({
           ...item,
+          url: sourceUrl,
           source_name: feed.name,
           default_risk: feed.default_risk || 'review',
           category: 'Caregiving',
@@ -205,10 +209,11 @@ async function collectInspirations() {
   // Prefer curated seeds first so discovery stays on-brand even if feeds are noisy.
   const seedItems = [];
   for (const seed of seeds) {
-    if (seenUrls.has(seed.url)) continue;
+    const sourceUrl = sanitizeSourceUrl(seed.url);
+    if (!sourceUrl || seenUrls.has(sourceUrl)) continue;
     seedItems.push({
       title: seed.title,
-      url: seed.url,
+      url: sourceUrl,
       summary: '',
       source_name: seed.title.split(' - ')[0] || 'Seed',
       default_risk: seed.risk || 'safe',

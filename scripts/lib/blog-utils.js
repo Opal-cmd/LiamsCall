@@ -78,6 +78,24 @@ const ALLOWED_HOSTS = new Set([
   'www.wellnesstogether.ca',
 ]);
 
+function isAllowedSourceUrl(url) {
+  const raw = String(url || '').trim();
+  if (!raw) return false;
+  try {
+    const parsed = new URL(raw);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return false;
+    return ALLOWED_HOSTS.has(parsed.hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
+function sanitizeSourceUrl(url) {
+  const raw = String(url || '').trim();
+  if (!raw || !isAllowedSourceUrl(raw)) return '';
+  return new URL(raw).href;
+}
+
 function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
@@ -297,6 +315,7 @@ function normalizeUrlForCompare(url) {
 function findDisallowedUrls(text, { allowUrls = [] } = {}) {
   const allowedExact = new Set(
     (Array.isArray(allowUrls) ? allowUrls : [])
+      .map(sanitizeSourceUrl)
       .map(normalizeUrlForCompare)
       .filter(Boolean),
   );
@@ -397,11 +416,12 @@ function saveTopics(topics) {
 function appendTopics(newTopics) {
   const existing = loadTopics();
   const ids = new Set(existing.map((t) => t.id));
-  const urls = new Set(existing.map((t) => t.source_url).filter(Boolean));
+  const urls = new Set(existing.map((t) => sanitizeSourceUrl(t.source_url)).filter(Boolean));
   const added = [];
   for (const t of newTopics) {
     if (!t?.id || ids.has(t.id)) continue;
-    if (t.source_url && urls.has(t.source_url)) continue;
+    const sourceUrl = sanitizeSourceUrl(t.source_url);
+    if (sourceUrl && urls.has(sourceUrl)) continue;
     existing.push({
       id: t.id,
       title: t.title,
@@ -409,11 +429,11 @@ function appendTopics(newTopics) {
       risk: (t.risk || 'safe').toLowerCase(),
       used: false,
       angle: t.angle || '',
-      source_url: t.source_url || '',
+      source_url: sourceUrl,
       source_name: t.source_name || '',
     });
     ids.add(t.id);
-    if (t.source_url) urls.add(t.source_url);
+    if (sourceUrl) urls.add(sourceUrl);
     added.push(t.id);
   }
   if (added.length) saveTopics(existing);
@@ -475,15 +495,21 @@ function loadSources() {
  * so topics do not all collapse onto the same org homepage.
  */
 function resolveSourceForTopic(topic = {}, { usedUrls = null } = {}) {
-  const existing = String(topic.source_url || topic.url || '').trim();
-  if (existing) {
+  const rawExisting = String(topic.source_url || topic.url || '').trim();
+  if (rawExisting) {
+    const existing = sanitizeSourceUrl(rawExisting);
+    if (!existing) {
+      throw new Error(`Disallowed source_url host: ${rawExisting}`);
+    }
     return {
       source_url: existing,
       source_name: String(topic.source_name || '').trim(),
     };
   }
 
-  const { seeds } = loadSources();
+  const seeds = loadSources().seeds
+    .map((seed) => ({ ...seed, url: sanitizeSourceUrl(seed.url) }))
+    .filter((seed) => seed.url);
   if (!seeds.length) {
     return { source_url: '', source_name: '' };
   }
@@ -1831,6 +1857,8 @@ module.exports = {
   ensureDir,
   parseFrontmatter,
   toSlug,
+  isAllowedSourceUrl,
+  sanitizeSourceUrl,
   escapeHtml,
   markdownToHtml,
   extractExcerpt,
