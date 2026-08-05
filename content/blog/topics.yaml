@@ -7,7 +7,7 @@
 topics:
   - id: saying-no-without-exploding
     title: "Saying No Without Exploding - Boundaries for Exhausted Caregivers"
-    category: "Communication"
+    category: "Care Giver Tips"
     risk: review
     used: true
     angle: "How to set one small boundary at a time when your calendar is already full of other people's needs."
@@ -61,7 +61,7 @@ topics:
 
   - id: finding-shelters-without-guessing
     title: "How to Find Shelter Help Without Guessing Phone Numbers"
-    category: "Housing"
+    category: "Homelessness"
     risk: review
     used: true
     angle: "Point people to 211, municipal 311, and official directories - never invent local shelter phones."
@@ -70,7 +70,7 @@ topics:
 
   - id: ontario-detox-near-me
     title: "Ontario Detox Near Me: How to Find Help That Is Actually Open"
-    category: "Housing"
+    category: "Homelessness"
     risk: review
     used: true
     angle: "Point people to ConnexOntario for live detox/treatment referral - never invent clinic phones."
@@ -135,7 +135,7 @@ topics:
     title: "Noticing Use and Mood Changes Without Becoming a Full-Time Monitor"
     category: "Addiction"
     risk: review
-    used: false
+    used: true
     angle: "A light log of substance use, sleep, and crisis signs that helps appointments — without turning home into a clinic or a surveillance operation."
     source_url: "https://www.camh.ca/en/camh-news-and-stories"
     source_name: "CAMH getting help"
