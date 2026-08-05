@@ -10,7 +10,7 @@
  *   node scripts/blog-discover.js --limit=5
  *   node scripts/blog-discover.js --dry-run
  *
- * Env: OPENAI_API_KEY (recommended), BLOG_OPENAI_MODEL or OPENAI_MODEL (optional, default gpt-5.5)
+ * Env: GEMINI_API_KEY (recommended), BLOG_GEMINI_MODEL or GEMINI_MODEL (optional, default gemini-2.5-flash)
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
@@ -25,8 +25,8 @@ const {
   loadSources,
 } = require('./lib/blog-utils');
 
-const MODEL = process.env.BLOG_OPENAI_MODEL || process.env.OPENAI_MODEL || 'gpt-5.5';
-const API_KEY = process.env.OPENAI_API_KEY;
+const MODEL = process.env.BLOG_GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const API_KEY = process.env.GEMINI_API_KEY;
 
 function parseArgs(argv) {
   const out = { limit: 5, dryRun: false };
@@ -114,7 +114,7 @@ function heuristicTopics(inspirations, limit) {
   return out;
 }
 
-async function openaiPropose(inspirations, limit) {
+async function geminiPropose(inspirations, limit) {
   if (!API_KEY) return null;
   const payload = inspirations.slice(0, 12).map((s, i) => ({
     i,
@@ -132,8 +132,7 @@ Rules:
 - Propose at most ${limit} topics.
 - risk=review if crisis, shelters, treatment, diagnosis, or hotlines are central.`;
 
-  const usesCompletionTokens = /^(gpt-5|o[0-9])/i.test(MODEL);
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${API_KEY}`,
@@ -142,7 +141,7 @@ Rules:
     body: JSON.stringify({
       model: MODEL,
       temperature: 0.6,
-      response_format: { type: 'json_object' },
+      max_tokens: 2500,
       messages: [
         { role: 'system', content: system },
         {
@@ -150,12 +149,12 @@ Rules:
           content: `Create up to ${limit} original topic ideas from these inspirations:\n${JSON.stringify(payload, null, 2)}`,
         },
       ],
-      ...(usesCompletionTokens
-        ? { max_completion_tokens: 2500 }
-        : { max_tokens: 2500 }),
+      ...(/gemini-2\.5|gemini-3/i.test(MODEL)
+        ? { reasoning_effort: process.env.GEMINI_REASONING_EFFORT || 'none' }
+        : {}),
     }),
   });
-  if (!res.ok) throw new Error(`OpenAI discover failed: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new Error(`Gemini discover failed: ${res.status} ${await res.text()}`);
   const data = await res.json();
   const text = data.choices?.[0]?.message?.content || '';
   const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -232,9 +231,9 @@ async function main() {
 
   let proposed = [];
   try {
-    proposed = (await openaiPropose(inspirations, args.limit)) || [];
+    proposed = (await geminiPropose(inspirations, args.limit)) || [];
   } catch (err) {
-    console.warn(`OpenAI propose failed, using heuristic: ${err.message}`);
+    console.warn(`Gemini propose failed, using heuristic: ${err.message}`);
   }
   if (!proposed.length) proposed = heuristicTopics(inspirations, args.limit);
 

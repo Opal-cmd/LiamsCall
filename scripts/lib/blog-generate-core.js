@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Shared OpenAI blog generation used by CLI and Blog desk admin.
+ * Shared Gemini blog generation used by CLI and Blog desk admin.
  */
 
 const fs = require('fs');
@@ -35,11 +35,11 @@ HARD RULES:
 - End with one gentle practical next step, not a hard sell.`;
 
 function getModel() {
-  return process.env.BLOG_OPENAI_MODEL || process.env.OPENAI_MODEL || 'gpt-5.5';
+  return process.env.BLOG_GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 }
 
 function getApiKey() {
-  return process.env.OPENAI_API_KEY || '';
+  return process.env.GEMINI_API_KEY || '';
 }
 
 function pickTopic(topics, forcedId) {
@@ -89,12 +89,10 @@ Return ONLY valid JSON (no markdown fences) with keys:
 }`;
 }
 
-async function callOpenAI(userPrompt) {
+async function callGemini(userPrompt) {
   const apiKey = getApiKey();
-  if (!apiKey) throw new Error('Missing OPENAI_API_KEY. Add it to the server .env (or Render env), then try again.');
+  if (!apiKey) throw new Error('Missing GEMINI_API_KEY. Add it to the server .env (or Render env), then try again.');
   const model = getModel();
-  // Newer GPT-5 family prefers max_completion_tokens; older models use max_tokens.
-  const usesCompletionTokens = /^(gpt-5|o[0-9])/i.test(model);
   const body = {
     model,
     messages: [
@@ -102,12 +100,10 @@ async function callOpenAI(userPrompt) {
       { role: 'user', content: userPrompt },
     ],
     temperature: 0.7,
-    response_format: { type: 'json_object' },
-    ...(usesCompletionTokens
-      ? { max_completion_tokens: 4096 }
-      : { max_tokens: 4096 }),
+    max_tokens: 4096,
+    ...( /gemini-2\.5|gemini-3/i.test(model) ? { reasoning_effort: process.env.GEMINI_REASONING_EFFORT || 'none' } : {}),
   };
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -117,7 +113,7 @@ async function callOpenAI(userPrompt) {
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`OpenAI error ${res.status}: ${text.slice(0, 400)}`);
+    throw new Error(`Gemini error ${res.status}: ${text.slice(0, 400)}`);
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content || '';
@@ -175,7 +171,7 @@ async function generateTopic(opts = {}) {
   }
 
   const model = getModel();
-  const content = await callOpenAI(buildUserPrompt(topic));
+  const content = await callGemini(buildUserPrompt(topic));
   const parsed = extractJson(content);
 
   const title = parsed.title || topic.title;
