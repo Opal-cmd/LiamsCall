@@ -1223,12 +1223,18 @@ app.post('/api/blog-admin/login', (req, res) => {
   noteBlogLoginAttempt(ip, true);
   appendBlogAudit('login_ok', { ip });
 
-  const persistHint =
-    process.env.NODE_ENV === 'production'
-      ? 'Tip: after you publish here on the live site, ask the site owner to save a backup of the post files so a server restart does not wipe recent publishes. Publishing from this desk on the office computer, then deploying, is the safest routine.'
-      : 'You are on the local desk on this computer. Approved posts update the blog files here right away.';
+  const persistHint = blogAdminOps.backupConfigured()
+    ? 'Seeds and Topics saves are backed up to GitHub automatically, so they survive redeploys.'
+    : process.env.NODE_ENV === 'production'
+      ? 'Warning: Seeds/Topics saves on this live server will be wiped on the next deploy unless the site owner sets BLOG_GIT_TOKEN and BLOG_GIT_REPO. Publishing from this desk on the office computer, then deploying, is also safe.'
+      : 'You are on the local desk on this computer. Approved posts update the blog files here right away. Set BLOG_GIT_TOKEN + BLOG_GIT_REPO to auto-backup Seeds/Topics to GitHub.';
 
-  return res.json({ ok: true, token: signBlogAdminToken(), persistHint });
+  return res.json({
+    ok: true,
+    token: signBlogAdminToken(),
+    persistHint,
+    backup: blogAdminOps.backupStatus(),
+  });
 });
 
 app.get('/api/blog-admin/posts', requireBlogAdmin, (_req, res) => {
@@ -1344,13 +1350,15 @@ app.get('/api/blog-admin/sources', requireBlogAdmin, (_req, res) => {
   }
 });
 
-app.put('/api/blog-admin/sources', requireBlogAdmin, (req, res) => {
+app.put('/api/blog-admin/sources', requireBlogAdmin, async (req, res) => {
   try {
-    const result = blogAdminOps.updateSources(req.body || {});
+    const result = await blogAdminOps.updateSources(req.body || {});
     appendBlogAudit('sources_update', {
       ip: getClientIp(req),
       seeds: result.seeds?.length,
       feeds: result.feeds?.length,
+      backupOk: Boolean(result.backup?.ok),
+      backupSkipped: Boolean(result.backup?.skipped),
     });
     res.json(result);
   } catch (error) {
@@ -1366,11 +1374,16 @@ app.get('/api/blog-admin/topics', requireBlogAdmin, (_req, res) => {
   }
 });
 
-app.put('/api/blog-admin/topics', requireBlogAdmin, (req, res) => {
+app.put('/api/blog-admin/topics', requireBlogAdmin, async (req, res) => {
   try {
-    const topics = blogAdminOps.updateTopics(req.body || {});
-    appendBlogAudit('topics_update', { ip: getClientIp(req), count: topics.length });
-    res.json({ topics });
+    const result = await blogAdminOps.updateTopicsAndBackup(req.body || {});
+    appendBlogAudit('topics_update', {
+      ip: getClientIp(req),
+      count: result.topics?.length,
+      backupOk: Boolean(result.backup?.ok),
+      backupSkipped: Boolean(result.backup?.skipped),
+    });
+    res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not save topics.' });
   }

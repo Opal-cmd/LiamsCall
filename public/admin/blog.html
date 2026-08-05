@@ -364,7 +364,7 @@
         <div id="seeds-view" class="card hidden stack">
           <div>
             <strong>Idea sources</strong>
-            <p class="help" style="margin:0.35rem 0 0;">Curated inspiration links and RSS feeds for discovery. Keep only trusted orgs. Never republish full articles. Tip: after editing on the live site, also save a copy into git (or edit locally and deploy) — Render disk resets on redeploy.</p>
+            <p class="help" style="margin:0.35rem 0 0;">Curated inspiration links and RSS feeds for discovery. Keep only trusted orgs. Never republish full articles. Saves write to the server and, when git backup is configured, commit <code>sources.yaml</code> to GitHub so redeploys do not wipe them.</p>
           </div>
           <div class="field">
             <label>RSS feeds (read-only name + URL)</label>
@@ -383,7 +383,7 @@
         <div id="topics-view" class="card hidden stack">
           <div>
             <strong>Topic queue</strong>
-            <p class="help" style="margin:0.35rem 0 0;">Add ideas for the writing queue. Stay on niche: families supporting someone with <strong>addiction</strong>, <strong>homelessness/housing crisis</strong>, or mental health <em>tied to those</em> — not general wellness tips, and not eldercare. Each topic needs a title; the id is filled in automatically if you leave it blank. Use <strong>Generate</strong> to write an article with Gemini — it always opens a draft under <strong>Needs review</strong>. Used topics show <strong>Force generate</strong> instead. Tip: after editing on the live site, also save a copy into git — Render disk resets on redeploy.</p>
+            <p class="help" style="margin:0.35rem 0 0;">Add ideas for the writing queue. Stay on niche: families supporting someone with <strong>addiction</strong>, <strong>homelessness/housing crisis</strong>, or mental health <em>tied to those</em> — not general wellness tips, and not eldercare. Each topic needs a title; the id is filled in automatically if you leave it blank. Use <strong>Generate</strong> to write an article with Gemini — it always opens a draft under <strong>Needs review</strong>. Used topics show <strong>Force generate</strong> instead. Saves (and generates) also back up <code>topics.yaml</code> to GitHub when configured, so the queue survives redeploys.</p>
           </div>
           <div class="field">
             <div id="topics-list" class="list"></div>
@@ -1288,7 +1288,7 @@
       // Save first without wiping UI, then show lasting feedback for the long Gemini call.
       setGenerateButtonsBusy(true, id);
       try {
-        await saveTopics({ silent: true, skipRender: true });
+        await saveTopics({ silent: true, skipRender: true, skipBackup: true });
 
         showBanner(`Generating draft for "${title}"… This can take up to a minute.`, 'ok');
         showToast('Generating draft…', '', 60000);
@@ -1334,17 +1334,28 @@
       });
     }
 
+    function describeBackup(backup) {
+      if (!backup) return '';
+      if (backup.ok) return ' Backed up to GitHub.';
+      if (backup.skipped) return ` Not backed up to git yet: ${backup.reason || 'configure BLOG_GIT_TOKEN + BLOG_GIT_REPO on the server.'}`;
+      return ` Saved on server, but git backup failed: ${backup.error || 'unknown error'}`;
+    }
+
     async function saveSources() {
       hideBanner();
       const saved = await api('/api/blog-admin/sources', {
         method: 'PUT',
         body: JSON.stringify(state.sources),
       });
-      state.sources = saved;
+      state.sources = {
+        feeds: saved.feeds || [],
+        seeds: saved.seeds || [],
+      };
       renderFeeds();
       renderSeeds();
-      showBanner('Changes saved. Seeds are up to date.', 'ok');
-      showToast('Changes saved');
+      const note = describeBackup(saved.backup);
+      showBanner(`Changes saved. Seeds are up to date.${note}`, saved.backup?.ok || saved.backup?.skipped ? (saved.backup?.ok ? 'ok' : '') : 'err');
+      showToast(saved.backup?.ok ? 'Changes saved · backed up' : 'Changes saved');
     }
 
     async function saveTopics(options = {}) {
@@ -1368,13 +1379,15 @@
       }
       const saved = await api('/api/blog-admin/topics', {
         method: 'PUT',
-        body: JSON.stringify({ topics: prepared }),
+        body: JSON.stringify({ topics: prepared, skipBackup: Boolean(options.skipBackup) }),
       });
       state.topics = saved.topics || [];
       if (!options.skipRender) renderTopics();
-      if (options.silent) return;
-      showBanner('Changes saved. Topics are up to date.', 'ok');
-      showToast('Changes saved');
+      if (options.silent) return saved;
+      const note = describeBackup(saved.backup);
+      showBanner(`Changes saved. Topics are up to date.${note}`, saved.backup?.ok || saved.backup?.skipped ? (saved.backup?.ok ? 'ok' : '') : 'err');
+      showToast(saved.backup?.ok ? 'Changes saved · backed up' : 'Changes saved');
+      return saved;
     }
 
     $('login-btn').addEventListener('click', async () => {

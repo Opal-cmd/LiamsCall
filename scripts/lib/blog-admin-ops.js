@@ -21,6 +21,12 @@ const {
 } = require('./blog-utils');
 const { ensurePostImage, setFrontmatterImage } = require('./blog-images');
 const { generateTopic } = require('./blog-generate-core');
+const {
+  backupConfigured,
+  backupStatus,
+  backupSourcesYaml,
+  backupTopicsYaml,
+} = require('./blog-git-backup');
 
 function rebuildBlog() {
   const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'blog-build.js')], {
@@ -356,7 +362,7 @@ function getSources() {
   return loadSources();
 }
 
-function updateSources(payload = {}) {
+async function updateSources(payload = {}) {
   const current = loadSources();
   const feeds = Array.isArray(payload.feeds) ? payload.feeds : current.feeds;
   const seeds = Array.isArray(payload.seeds) ? payload.seeds : current.seeds;
@@ -378,7 +384,11 @@ function updateSources(payload = {}) {
       risk: String(s.risk || 'review').toLowerCase() === 'safe' ? 'safe' : 'review',
     }));
   saveSources({ feeds: cleanFeeds, seeds: cleanSeeds });
-  return loadSources();
+  const sources = loadSources();
+  const backup = await backupSourcesYaml(
+    `Blog desk: save seeds/sources (${cleanSeeds.length} seeds)`,
+  );
+  return { ...sources, backup };
 }
 
 function getTopics() {
@@ -446,6 +456,15 @@ function updateTopics(payload = {}) {
   return loadTopics();
 }
 
+async function updateTopicsAndBackup(payload = {}) {
+  const topics = updateTopics(payload);
+  if (payload && payload.skipBackup) {
+    return { topics, backup: { ok: false, skipped: true, reason: 'Backup skipped for this save.' } };
+  }
+  const backup = await backupTopicsYaml(`Blog desk: save topics (${topics.length} topics)`);
+  return { topics, backup };
+}
+
 /**
  * Generate an article for a topic from the Blog desk.
  * Always lands in drafts so a human approves before anything goes live.
@@ -472,12 +491,18 @@ async function generateTopicArticle(topicId, options = {}) {
     buildLog = rebuildBlog();
   }
 
+  // Persist "used" flag + any seed link written during generate.
+  const backup = await backupTopicsYaml(
+    `Blog desk: generate topic ${id} → ${summary.slug || 'draft'}`,
+  );
+
   return {
     ok: true,
     ...summary,
     url: summary.mode === 'published' ? `/blog/${summary.slug}` : null,
     topics: loadTopics(),
     buildLog,
+    backup,
   };
 }
 
@@ -498,5 +523,8 @@ module.exports = {
   updateSources,
   getTopics,
   updateTopics,
+  updateTopicsAndBackup,
   generateTopicArticle,
+  backupConfigured,
+  backupStatus,
 };
