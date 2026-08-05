@@ -639,7 +639,7 @@
     }
 
     let toastTimer = null;
-    function showToast(msg, kind = '') {
+    function showToast(msg, kind = '', ms = 3200) {
       const toast = $('toast');
       toast.textContent = msg;
       toast.className = kind ? kind : '';
@@ -647,7 +647,7 @@
       void toast.offsetWidth;
       toast.classList.add('show');
       if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), ms);
     }
 
     async function api(path, options = {}) {
@@ -1048,7 +1048,7 @@
                 <input type="checkbox" data-topic-field="used" data-topic-idx="${idx}"${t.used ? ' checked' : ''}>
                 Already used
               </label>
-              <button class="btn" type="button" data-generate-topic="${idx}" title="${t.used ? 'Force generate even though this topic is marked used' : 'Write this article with Gemini'}">${t.used ? 'Force generate' : 'Generate'}</button>
+              <button class="btn" type="button" data-generate-topic="${idx}" data-topic-id="${escapeHtml(t.id || '')}" title="${t.used ? 'Force generate even though this topic is marked used' : 'Write this article with Gemini'}">${t.used ? 'Force generate' : 'Generate'}</button>
               <button class="btn danger" type="button" data-remove-topic="${idx}">Remove</button>
             </div>
           </div>
@@ -1100,7 +1100,7 @@
       }
       topic.id = id;
 
-      if (!window.confirm(`Generate a draft for “${title}”? Nothing goes live until you approve it under Needs review.`)) return;
+      if (!window.confirm(`Generate a draft for "${title}"? Nothing goes live until you approve it under Needs review.`)) return;
 
       let allowUsed = false;
       if (topic.used) {
@@ -1108,39 +1108,53 @@
         if (!allowUsed) return;
       }
 
-      await saveTopics({ silent: true });
-
-      const originalLabel = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Generating…';
-      document.querySelectorAll('[data-generate-topic]').forEach((b) => { b.disabled = true; });
-
+      // Save first without wiping UI, then show lasting feedback for the long Gemini call.
+      setGenerateButtonsBusy(true, id);
       try {
+        await saveTopics({ silent: true, skipRender: true });
+
+        showBanner(`Generating draft for "${title}"… This can take up to a minute.`, 'ok');
+        showToast('Generating draft…', '', 60000);
+
         const result = await api('/api/blog-admin/topics/' + encodeURIComponent(id) + '/generate', {
           method: 'POST',
-          body: JSON.stringify({ allowUsed }),
+          body: JSON.stringify({ allowUsed, forceDraft: true }),
         });
         state.topics = result.topics || state.topics;
         renderTopics();
         await refreshLists();
 
+        showToast('Draft ready');
         if (result.mode === 'published') {
-          showBanner(`Published “${result.title || title}”. Live at ${result.url}`, 'ok');
+          showBanner(`Published "${result.title || title}". Live at ${result.url}`, 'ok');
           switchTab('live');
         } else {
-          showBanner(`Draft ready: “${result.title || title}”. Open it under Needs review to edit and approve.`, 'ok');
+          showBanner(`Draft ready: "${result.title || title}". Open it under Needs review to edit and approve.`, 'ok');
           switchTab('drafts');
           if (result.slug) {
             try { await openDraft(result.slug); } catch (_) { /* list is enough */ }
           }
         }
+      } catch (err) {
+        showToast(err.message || 'Generate failed', 'err');
+        throw err;
       } finally {
-        document.querySelectorAll('[data-generate-topic]').forEach((b) => { b.disabled = false; });
-        if (btn.isConnected) {
-          btn.disabled = false;
-          btn.textContent = originalLabel;
-        }
+        setGenerateButtonsBusy(false);
       }
+    }
+
+    function setGenerateButtonsBusy(busy, activeId) {
+      document.querySelectorAll('[data-generate-topic]').forEach((b) => {
+        b.disabled = busy;
+        if (!busy) {
+          const used = state.topics[Number(b.getAttribute('data-generate-topic'))]?.used;
+          b.textContent = used ? 'Force generate' : 'Generate';
+          return;
+        }
+        if (activeId && b.getAttribute('data-topic-id') === activeId) {
+          b.textContent = 'Generating…';
+        }
+      });
     }
 
     async function saveSources() {
@@ -1157,7 +1171,7 @@
     }
 
     async function saveTopics(options = {}) {
-      hideBanner();
+      if (!options.silent) hideBanner();
       const prepared = state.topics.map((t, i) => {
         const title = String(t.title || '').trim();
         let id = String(t.id || '').trim();
@@ -1180,7 +1194,7 @@
         body: JSON.stringify({ topics: prepared }),
       });
       state.topics = saved.topics || [];
-      renderTopics();
+      if (!options.skipRender) renderTopics();
       if (options.silent) return;
       showBanner('Changes saved. Topics are up to date.', 'ok');
       showToast('Changes saved');

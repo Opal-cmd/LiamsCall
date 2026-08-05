@@ -371,7 +371,8 @@ async function generateTopicArticle(topicId, options = {}) {
 
   const summary = await generateTopic({
     topicId: id,
-    forceDraft: Boolean(options.forceDraft),
+    // Desk generate always writes a draft for human review.
+    forceDraft: true,
   });
 
   let buildLog = '';
