@@ -28,13 +28,13 @@ By framing the situation as a family medical issue, you maintain your privacy. A
 
 ## Exploring workplace benefits and EAP
 
-If your workplace has an Employee Assistance Program (EAP), it can be a valuable, confidential resource. Many people hesitate to use their EAP because they worry their employer will find out. EAP services are strictly confidential, and your employer will only receive aggregated data about usage, never your personal details. 
+If your workplace has an Employee Assistance Program (EAP), it can be a valuable, confidential resource. Many people hesitate to use their EAP because they worry their employer will find out. EAP services are strictly confidential, and your employer will only receive aggregated data about usage, never your personal details.
 
 An EAP can help connect you with professional counseling, stress management resources, or legal and financial advice related to caregiving. If your loved one's situation is severely impacting your own mental health, accessing professional support through public systems can also help you stay grounded. Resources provided by [Canada.ca mental health](https://www.canada.ca/en/public-health/services/mental-health-services.html) can guide you toward free, confidential support services in your province or territory, which can complement any workplace benefits you have.
 
 ## Finding external coordination support
 
-Reducing the time you spend researching resources during work hours can help restore your focus. Instead of searching for detox beds or housing programs while at your desk, utilize centralized navigation services during your breaks or after hours. 
+Reducing the time you spend researching resources during work hours can help restore your focus. Instead of searching for detox beds or housing programs while at your desk, utilize centralized navigation services during your breaks or after hours.
 
 If you are in Canada, you can call or text 211, or visit [211 Canada](https://211.ca) to find local community, social, and government services, including emergency housing and financial assistance. For those supporting someone with substance use or mental health challenges in Ontario, [ConnexOntario](https://connexontario.ca) provides 211-style navigation specifically for addiction and mental health services, helping you find open detox beds or treatment programs without spending hours searching online. For those in the United States, utilizing [SAMHSA homelessness resources](https://www.samhsa.gov/homelessness-programs-resources) can help you find specialized support programs for individuals experiencing housing crises alongside substance use disorders.
 
@@ -46,7 +46,10 @@ Sources referenced: [Canada.ca mental health](https://www.canada.ca/en/public-he
 
 ## Further reading
 
-* [Canada.ca mental health](https://www.canada.ca/en/public-health/services/mental-health-services.html)
-* [ConnexOntario](https://connexontario.ca)
-* [211 Canada](https://211.ca)
-* [SAMHSA homelessness resources](https://www.samhsa.gov/homelessness-programs-resources)
+- [Canada.ca mental health](https://www.canada.ca/en/public-health/services/mental-health-services.html)
+
+- [ConnexOntario](https://connexontario.ca)
+
+- [211 Canada](https://211.ca)
+
+- [SAMHSA homelessness resources](https://www.samhsa.gov/homelessness-programs-resources)
