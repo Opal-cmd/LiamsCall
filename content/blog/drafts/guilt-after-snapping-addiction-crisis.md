@@ -9,7 +9,6 @@ risk: review
 source_url: "https://www.nami.org"
 image: "/assets/blog/guilt-after-snapping-addiction-crisis.jpg"
 ---
-
 It is common to lose your temper when supporting a loved one through active addiction or withdrawal. This post provides practical steps for the immediate hour after you snap, helping you de-escalate your own guilt, repair the communication break down, and maintain your boundaries without pretending the substance use is acceptable.
 
 ## Step 1: Breathe and step back
