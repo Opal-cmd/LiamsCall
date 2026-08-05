@@ -18,6 +18,7 @@ const {
   loadPost,
   resolveSourceForTopic,
   saveTopics,
+  loadSources,
 } = require('./blog-utils');
 const { ensurePostImage } = require('./blog-images');
 
@@ -25,14 +26,16 @@ const SYSTEM = `You write calm, practical blog posts for Liam's Call (liamscall.
 
 HARD RULES:
 - Never invent phone numbers or local shelter/clinic contact details.
-- Only link to these hosts if you include a URL: ontariocaregiver.ca, connexontario.ca, 988.ca, 988lifeline.org, 211.ca, 211ontario.ca, 211.org, toronto.ca, samhsa.gov, kidshelpphone.ca, mentalhealthcommission.ca, nami.org, camh.ca, hopeforwellness.ca, canada.ca, wellnesstogether.ca, liamscall.com — PLUS the inspiration source URL provided in the user message.
-- Every post MUST include at least one Markdown hyperlink to the exact inspiration source URL from the user message (natural inline citation and a short "Further reading" line near the end). Do not invent other URLs. Do not copy or closely paraphrase the source article.
+- Only link to these hosts if you include a URL: ontariocaregiver.ca, connexontario.ca, 988.ca, 988lifeline.org, 211.ca, 211ontario.ca, 211.org, toronto.ca, samhsa.gov, kidshelpphone.ca, mentalhealthcommission.ca, nami.org, camh.ca, hopeforwellness.ca, canada.ca, wellnesstogether.ca, liamscall.com — PLUS any exact resource URLs listed in the user message.
+- Hyperlinks are required. Whenever you use a resource (inspiration article, org page, helpline overview), include a Markdown hyperlink to that exact URL in the body — do not mention a site without linking it.
+- Always include: (1) at least one natural inline Markdown link to the inspiration source URL from the user message, and (2) a short final section titled "Further reading" (or "Resources") with Markdown links to every resource URL you used, including the inspiration source. Example: [Ontario Caregiver Organization](https://ontariocaregiver.ca/get-support/).
+- Do not invent URLs. Do not copy or closely paraphrase source articles.
 - Allowed phone/short codes only if relevant: 988, 911, 211, 311, 811, Ontario Caregiver Organization 1-833-227-3778, ConnexOntario 1-866-531-2600, Kids Help Phone 1-800-668-6868, Hope for Wellness 1-855-242-3310, SAMHSA 1-800-662-4357
 - Never diagnose, recommend medications, or give dosing advice.
 - Never use exclamation points.
 - Write 500–800 words in Markdown paragraphs (optional ## headings). No # title in the body (title is separate).
 - Tone: steady, kind friend; no performative AI warmth; no cheerleading.
-- End with one gentle practical next step, not a hard sell.`;
+- End with one gentle practical next step, then the Further reading / Resources links.`;
 
 function getModel() {
   return process.env.BLOG_GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
@@ -59,17 +62,45 @@ function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function relatedResourceHints(topic) {
+  const seeds = loadSources().seeds || [];
+  const hay = `${topic.title || ''} ${topic.angle || ''} ${topic.category || ''}`.toLowerCase();
+  const sourceUrl = String(topic.source_url || topic.url || '').trim();
+  return seeds
+    .filter((s) => s.url && s.url !== sourceUrl)
+    .map((s) => {
+      const blob = `${s.title || ''} ${s.url || ''} ${s.category || ''}`.toLowerCase();
+      let score = 0;
+      if (hay.includes('988') || hay.includes('crisis')) score += /988/.test(blob) ? 5 : 0;
+      if (/shelter|homeless|housing|211/.test(hay)) score += /211|toronto|homeless/.test(blob) ? 5 : 0;
+      if (/detox|addiction|substance|recovery|treatment/.test(hay)) score += /connex|samhsa|helpline|camh/.test(blob) ? 5 : 0;
+      if (/caregiver|boundary|burnout|sleep|guilt|respite|identity/.test(hay)) score += /ontariocaregiver|nami|caregiver/.test(blob) ? 4 : 0;
+      if (/kid|child|youth|teen/.test(hay)) score += /kidshelpphone/.test(blob) ? 5 : 0;
+      if (/mental|anxiety|depression|psych/.test(hay)) score += /mentalhealth|camh|wellness|canada\.ca|connex/.test(blob) ? 3 : 0;
+      return { s, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((x) => `- ${x.s.title || x.s.url}: ${x.s.url}`);
+}
+
 function buildUserPrompt(topic) {
   const sourceUrl = String(topic.source_url || topic.url || '').trim();
   const sourceName = String(topic.source_name || '').trim();
+  const related = relatedResourceHints(topic);
   let sourceBlock;
   if (sourceUrl) {
-    sourceBlock = `Inspiration source (link to this; do NOT copy the article):
+    sourceBlock = `Primary resource used for this post (must be hyperlinked in the body AND listed under Further reading):
 URL: ${sourceUrl}${sourceName ? `\nName: ${sourceName}` : ''}
-Requirement: the body MUST include (1) one natural inline Markdown link to this exact URL and (2) a short final line like [Further reading](${sourceUrl}).`;
+Do NOT copy the article. Use it only as inspiration / citation.`;
   } else {
-    sourceBlock = `No inspiration source URL was provided. Still include at least one Markdown hyperlink to an allowlisted host that fits the topic (e.g. ontariocaregiver.ca, 211.ca, 988.ca).`;
+    sourceBlock = `No primary inspiration URL was provided. Still hyperlink every allowlisted resource you rely on.`;
   }
+
+  const relatedBlock = related.length
+    ? `\nAdditional allowlisted resources you may cite (if you use one, hyperlink it):\n${related.join('\n')}`
+    : '';
 
   return `Write one blog post.
 
@@ -79,6 +110,12 @@ Risk tier: ${topic.risk || 'safe'}
 Angle: ${topic.angle || 'Practical caregiver support'}
 
 ${sourceBlock}
+${relatedBlock}
+
+Linking requirements:
+1. Include natural inline Markdown links to resources you use while writing.
+2. End with a short "## Further reading" section listing Markdown links for every resource URL used (at least the primary resource when provided).
+3. Never invent URLs.
 
 Return ONLY valid JSON (no markdown fences) with keys:
 {
@@ -197,8 +234,12 @@ async function generateTopic(opts = {}) {
   }
 
   if (sourceUrl && !body.includes(sourceUrl)) {
-    console.warn(`Generated body missing source hyperlink for ${sourceUrl}; appending Further reading.`);
-    body = `${body.trim()}\n\n[Further reading](${sourceUrl})\n`;
+    const label = String(topic.source_name || 'Further reading').trim() || 'Further reading';
+    console.warn(`Generated body missing source hyperlink for ${sourceUrl}; appending Further reading section.`);
+    body = `${body.trim()}\n\n## Further reading\n\n- [${label}](${sourceUrl})\n`;
+  } else if (sourceUrl && !/further reading|## resources/i.test(body)) {
+    const label = String(topic.source_name || 'Primary resource').trim() || 'Primary resource';
+    body = `${body.trim()}\n\n## Further reading\n\n- [${label}](${sourceUrl})\n`;
   }
 
   const md = writeMarkdown({
