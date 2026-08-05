@@ -5,7 +5,7 @@ date: 2026-08-05
 category: "Care Giver Tips"
 region: "Canada"
 description: "How to have one clear conversation when a loved one refuses support — without turning it into a permanent fight."
-risk: safe
+risk: review
 source_url: "https://www.nami.org/Your-Journey/Family-Members-and-Caregivers"
 image: "/assets/blog/when-they-wont-accept-help.jpg"
 ---

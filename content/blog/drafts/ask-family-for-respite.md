@@ -5,7 +5,7 @@ date: 2026-08-05
 category: "Care Giver Tips"
 region: "Canada"
 description: "Scripts for asking siblings or relatives for a specific, time-bound care shift without turning it into a permanent argument."
-risk: safe
+risk: review
 source_url: "https://ontariocaregiver.ca"
 image: "/assets/blog/ask-family-for-respite.jpg"
 ---

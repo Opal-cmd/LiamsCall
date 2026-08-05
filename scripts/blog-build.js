@@ -432,10 +432,6 @@ function renderStoryMeta({ date, shareUrl, shareTitle }) {
             <p class="story-meta-label">Published</p>
             <p class="story-meta-value"><time datetime="${escapeHtml(date)}">${escapeHtml(formatDateDisplay(date))}</time></p>
           </div>
-          <div class="story-meta-row">
-            <p class="story-meta-label">Words</p>
-            <p class="story-meta-value">Liam's Call</p>
-          </div>
           <ul class="story-actions">
             <li>
               <button type="button" class="story-share" data-share-url="${escapeHtml(shareUrl)}" data-share-title="${escapeHtml(shareTitle)}" aria-label="Share this story">
@@ -649,6 +645,7 @@ function main() {
   }
 
   writeSitemapViaMain();
+  verifyGeneratedMetadata(posts);
   console.log(`Built ${posts.length} blog post(s) → public/blog/`);
 }
 
@@ -658,6 +655,37 @@ function writeSitemapViaMain() {
   execFileSync(process.execPath, [path.join(__dirname, 'write-sitemap.js')], {
     stdio: 'inherit',
   });
+}
+
+function verifyGeneratedMetadata(posts) {
+  const root = path.join(__dirname, '..');
+  const sitemapXml = fs.readFileSync(path.join(root, 'public', 'sitemap.xml'), 'utf8');
+  const sitemapHtml = fs.readFileSync(path.join(root, 'public', 'sitemap.html'), 'utf8');
+  const requiredFiles = [
+    path.join(root, 'public', 'site-identity.json'),
+    path.join(root, 'public', '.well-known', 'brand.json'),
+  ];
+
+  for (const filePath of requiredFiles) {
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Metadata build failed: missing ${path.relative(root, filePath)}`);
+    }
+  }
+
+  for (const post of posts) {
+    const route = `/blog/${post.slug}`;
+    const pagePath = path.join(PUBLIC_BLOG_DIR, post.slug, 'index.html');
+    const page = fs.readFileSync(pagePath, 'utf8');
+    if (!page.includes('"@type": "BlogPosting"')) {
+      throw new Error(`Metadata build failed: BlogPosting schema missing for ${post.slug}`);
+    }
+    if (!sitemapXml.includes(`<loc>${SITE}${route}</loc>`)) {
+      throw new Error(`Metadata build failed: sitemap.xml is missing ${route}`);
+    }
+    if (!sitemapHtml.includes(`href="${route}"`)) {
+      throw new Error(`Metadata build failed: sitemap.html is missing ${route}`);
+    }
+  }
 }
 
 main();

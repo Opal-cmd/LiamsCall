@@ -5,7 +5,7 @@ date: 2026-08-05
 category: "Homelessness"
 region: "Canada"
 description: "A calm essentials list for families helping someone prepare for emergency shelter intake — without overpacking."
-risk: safe
+risk: review
 source_url: "https://211ontario.ca"
 image: "/assets/blog/pack-before-shelter-search.jpg"
 ---

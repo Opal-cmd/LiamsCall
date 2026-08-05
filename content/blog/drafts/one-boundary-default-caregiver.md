@@ -5,7 +5,7 @@ date: 2026-08-05
 category: "Care Giver Tips"
 region: "Canada"
 description: "Pick one sustainable boundary when you are the default caregiver — instead of overhauling the whole care map overnight."
-risk: safe
+risk: review
 source_url: "https://ontariocaregiver.ca/get-support/"
 image: "/assets/blog/one-boundary-default-caregiver.jpg"
 ---
