@@ -22,13 +22,13 @@ Once a person has stable housing, supportive services are offered to help them m
 
 ## Why this approach is used
 
-It is incredibly difficult to manage a severe mental illness or work toward recovery from addiction while sleeping on the street, in a car, or in a temporary shelter. The daily struggle to find food, warmth, and safety takes up all of a person's energy. 
+It is incredibly difficult to manage a severe mental illness or work toward recovery from addiction while sleeping on the street, in a car, or in a temporary shelter. The daily struggle to find food, warmth, and safety takes up all of a person's energy.
 
 Research has shown that when people are housed first, they are much more likely to remain housed long-term. This stability often leads to reduced emergency room visits, fewer interactions with the justice system, and a more stable environment where recovery can eventually begin. For families, knowing a loved one has a secure door to lock can bring an immense sense of relief, even if the loved one is still actively struggling with addiction or mental health symptoms.
 
 ## What Housing First is not
 
-Housing First does not mean "housing only." It is not about abandoning people in an apartment without support. The model relies heavily on case managers, crisis intervention, and healthcare workers who check in regularly and offer assistance. 
+Housing First does not mean "housing only." It is not about abandoning people in an apartment without support. The model relies heavily on case managers, crisis intervention, and healthcare workers who check in regularly and offer assistance.
 
 It also does not mean there are no rules. Tenants in Housing First programs typically sign standard leases and must follow the same rules as any other tenant, such as paying a portion of their rent on time and not damaging the property.
 
@@ -36,7 +36,7 @@ It also does not mean there are no rules. Tenants in Housing First programs typi
 
 Housing First is a guiding philosophy used by many different local charities, non-profits, and government agencies. Because programs are run locally, there is no single national registry to sign up for. The best way to find out if these programs exist in your area is to connect with local information and referral services.
 
-If you are in the United States, you can search [211 United States](https://www.211.org) or dial 211 to speak with a local specialist who can direct you to coordinated entry systems for housing. 
+If you are in the United States, you can search [211 United States](https://www.211.org) or dial 211 to speak with a local specialist who can direct you to coordinated entry systems for housing.
 
 If you are in Canada, you can use [211 Canada](https://211.ca) or [211 Ontario](https://211ontario.ca) to find local housing help centres and outreach teams that operate under this model.
 
@@ -48,8 +48,12 @@ Sources referenced: [SAMHSA homelessness resources](https://www.samhsa.gov/homel
 
 ## Further reading
 
-* [SAMHSA homelessness resources](https://www.samhsa.gov/homelessness-programs-resources)
-* [211 United States](https://www.211.org)
-* [211 Canada](https://211.ca)
-* [211 Ontario](https://211ontario.ca)
-* [Liam's Call](https://liamscall.com/)
+- [SAMHSA homelessness resources](https://www.samhsa.gov/homelessness-programs-resources)
+
+- [211 United States](https://www.211.org)
+
+- [211 Canada](https://211.ca)
+
+- [211 Ontario](https://211ontario.ca)
+
+- [Liam's Call](https://liamscall.com/)
