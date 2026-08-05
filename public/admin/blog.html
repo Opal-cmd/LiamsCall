@@ -248,7 +248,8 @@
       <div class="tabs">
         <button class="tab active" data-tab="drafts" type="button">1. Needs review</button>
         <button class="tab" data-tab="live" type="button">2. Live on site</button>
-        <button class="tab" data-tab="sources" type="button">3. Topics &amp; sources</button>
+        <button class="tab" data-tab="seeds" type="button">3. Seeds</button>
+        <button class="tab" data-tab="topics" type="button">4. Topics</button>
       </div>
 
       <div id="list-view">
@@ -268,10 +269,10 @@
           <div id="live-list" class="list"></div>
         </div>
 
-        <div id="sources-view" class="card hidden stack">
+        <div id="seeds-view" class="card hidden stack">
           <div>
-            <strong>Idea sources &amp; topic queue</strong>
-            <p class="help" style="margin:0.35rem 0 0;">Edit inspiration seeds and the writing queue. RSS feeds are listed for reference — keep only trusted orgs. Never republish full articles. Tip: after editing seeds/topics on the live site, also save a copy into git (or edit locally and deploy) — Render disk resets on redeploy.</p>
+            <strong>Idea sources</strong>
+            <p class="help" style="margin:0.35rem 0 0;">Curated inspiration links and RSS feeds for discovery. Keep only trusted orgs. Never republish full articles. Tip: after editing on the live site, also save a copy into git (or edit locally and deploy) — Render disk resets on redeploy.</p>
           </div>
           <div class="field">
             <label>RSS feeds (read-only name + URL)</label>
@@ -285,9 +286,14 @@
               <button id="save-sources-btn" class="btn" type="button">Save sources</button>
             </div>
           </div>
+        </div>
+
+        <div id="topics-view" class="card hidden stack">
+          <div>
+            <strong>Topic queue</strong>
+            <p class="help" style="margin:0.35rem 0 0;">Add ideas for the writing queue. Each topic needs a title; the id is filled in automatically if you leave it blank. Use <strong>Generate</strong> to write an article with Gemini (<em>safe</em> publishes live, <em>review</em> opens a draft). Used topics show <strong>Force generate</strong> instead. Tip: after editing on the live site, also save a copy into git — Render disk resets on redeploy.</p>
+          </div>
           <div class="field">
-            <label>Topic queue</label>
-            <p class="help" style="margin:0.25rem 0 0.5rem;">Add ideas for the writing queue. Each topic needs a title; the id is filled in automatically if you leave it blank. Use <strong>Generate</strong> to write an article with Gemini: <em>safe</em> publishes to the live blog, <em>review</em> opens a draft here for you to approve.</p>
             <div id="topics-list" class="list"></div>
             <div class="row" style="margin-top:0.5rem;">
               <button id="add-topic-btn" class="btn secondary" type="button">Add topic</button>
@@ -349,6 +355,13 @@
             <label for="image">Optional hero image path</label>
             <input id="image" type="text" placeholder="/assets/your-image.jpg">
             <div class="help">Use a path under /assets/ or leave blank. In the post body you can also add images like ![description](/assets/photo.jpg)</div>
+          </div>
+          <div class="field">
+            <label for="source_url">Seed links</label>
+            <input id="source_url" type="url" placeholder="https://…">
+            <div class="help">Primary inspiration URL for this post (stored in frontmatter as <code>source_url</code>). Use a verified org page — never invent links.</div>
+            <p id="source_url_link" class="help" style="margin:0.35rem 0 0;"></p>
+            <div id="further-seeds" class="help" style="margin:0.5rem 0 0;"></div>
           </div>
         </div>
 
@@ -629,8 +642,9 @@
       });
       $('drafts-view').classList.toggle('hidden', tab !== 'drafts');
       $('live-view').classList.toggle('hidden', tab !== 'live');
-      $('sources-view').classList.toggle('hidden', tab !== 'sources');
-      if (tab === 'sources') {
+      $('seeds-view').classList.toggle('hidden', tab !== 'seeds');
+      $('topics-view').classList.toggle('hidden', tab !== 'topics');
+      if (tab === 'seeds' || tab === 'topics') {
         refreshSourcesPanel().catch((e) => showBanner(e.message, 'err'));
       }
     }
@@ -701,6 +715,40 @@
       renderLive(data.published || []);
     }
 
+    function parseFurtherReadingLinks(md) {
+      const text = String(md || '');
+      const section = text.match(/##\s*(Further reading|Resources)\s*\n([\s\S]*?)(?=\n##\s|$)/i);
+      if (!section) return [];
+      const links = [];
+      const re = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
+      let m;
+      while ((m = re.exec(section[2]))) {
+        links.push({ label: m[1], url: m[2] });
+      }
+      return links;
+    }
+
+    function updateSeedUi(sourceUrl, bodyMd) {
+      const url = String(sourceUrl || '').trim();
+      const linkEl = $('source_url_link');
+      if (url) {
+        linkEl.innerHTML = 'Open: <a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(url) + '</a>';
+      } else {
+        linkEl.textContent = 'No primary seed URL set yet.';
+      }
+      const chips = parseFurtherReadingLinks(bodyMd)
+        .filter((l) => l.url !== url)
+        .slice(0, 6);
+      const box = $('further-seeds');
+      if (!chips.length) {
+        box.innerHTML = '';
+        return;
+      }
+      box.innerHTML = 'Also linked in Further reading: ' + chips.map((l) =>
+        '<a href="' + escapeHtml(l.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(l.label || l.url) + '</a>'
+      ).join(' · ');
+    }
+
     async function openDraft(slug) {
       hideBanner();
       const draft = await api('/api/blog-admin/drafts/' + encodeURIComponent(slug));
@@ -721,9 +769,11 @@
       $('date').value = draft.date || '';
       $('risk').value = draft.risk === 'safe' ? 'safe' : 'review';
       $('description').value = draft.description || '';
+      $('source_url').value = draft.source_url || '';
       $('image').value = draft.image || '';
       setBodyMarkdown(draft.body || '');
       $('preview').innerHTML = draft.html || '';
+      updateSeedUi(draft.source_url || '', draft.body || '');
       showEditor();
     }
 
@@ -737,6 +787,7 @@
         date: $('date').value,
         risk: $('risk').value,
         description: $('description').value.trim(),
+        source_url: $('source_url').value.trim(),
         image: $('image').value.trim(),
         body: getBodyMarkdown(),
       };
@@ -746,6 +797,7 @@
       });
       state.currentSlug = saved.slug;
       $('preview').innerHTML = saved.html || '';
+      updateSeedUi(payload.source_url, payload.body);
       showBanner('Saved. Nothing is live yet until you approve & publish.', 'ok');
     }
 
@@ -961,7 +1013,7 @@
                 <input type="checkbox" data-topic-field="used" data-topic-idx="${idx}"${t.used ? ' checked' : ''}>
                 Already used
               </label>
-              <button class="btn" type="button" data-generate-topic="${idx}" title="Write this article with Gemini">Generate</button>
+              <button class="btn" type="button" data-generate-topic="${idx}" title="${t.used ? 'Force generate even though this topic is marked used' : 'Write this article with Gemini'}">${t.used ? 'Force generate' : 'Generate'}</button>
               <button class="btn danger" type="button" data-remove-topic="${idx}">Remove</button>
             </div>
           </div>

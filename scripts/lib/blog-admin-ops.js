@@ -94,6 +94,7 @@ function getDraft(slug) {
     risk: post.risk,
     body: post.body,
     image: post.image || '',
+    source_url: post.sourceUrl || '',
     raw,
     html: post.html,
     status: 'draft',
