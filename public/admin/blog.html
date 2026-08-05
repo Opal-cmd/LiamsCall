@@ -376,7 +376,11 @@
             <div class="row" style="margin-top:0.5rem;">
               <button id="add-seed-btn" class="btn secondary" type="button">Add seed</button>
               <button id="save-sources-btn" class="btn" type="button">Save changes</button>
+              <button id="download-sources-btn" class="btn secondary" type="button">Download sources.yaml</button>
+              <button id="upload-sources-btn" class="btn secondary" type="button">Upload YAML…</button>
+              <input id="upload-sources-file" type="file" accept=".yaml,.yml,text/yaml,text/plain" class="hidden">
             </div>
+            <p class="help">Download the file to enrich seeds offline (or with AI), then upload the full <code>sources.yaml</code> to replace the list. Upload replaces feeds + seeds on the server and backs them up to git when configured.</p>
           </div>
         </div>
 
@@ -390,7 +394,11 @@
             <div class="row" style="margin-top:0.5rem;">
               <button id="add-topic-btn" class="btn secondary" type="button">Add topic</button>
               <button id="save-topics-btn" class="btn" type="button">Save changes</button>
+              <button id="download-topics-btn" class="btn secondary" type="button">Download topics.yaml</button>
+              <button id="upload-topics-btn" class="btn secondary" type="button">Upload YAML…</button>
+              <input id="upload-topics-file" type="file" accept=".yaml,.yml,text/yaml,text/plain" class="hidden">
             </div>
+            <p class="help">Download the queue to enrich topics offline (or with AI), then upload the full <code>topics.yaml</code> to replace it. Upload replaces the entire topic list and backs it up to git when configured.</p>
           </div>
         </div>
       </div>
@@ -731,6 +739,75 @@
         throw err;
       }
       return data;
+    }
+
+    async function downloadYaml(apiPath, filename) {
+      const headers = {};
+      if (state.token) headers['x-blog-admin-token'] = state.token;
+      const res = await fetch(apiPath, { headers });
+      if (!res.ok) {
+        let msg = 'Download failed.';
+        try {
+          const data = await res.json();
+          if (data.error) msg = data.error;
+        } catch { /* ignore */ }
+        throw new Error(msg);
+      }
+      const text = await res.text();
+      const blob = new Blob([text], { type: 'text/yaml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function readFileAsText(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('Could not read that file.'));
+        reader.readAsText(file);
+      });
+    }
+
+    async function uploadYamlFile(kind, file) {
+      if (!file) return;
+      const name = String(file.name || '').toLowerCase();
+      if (name && !/\.(ya?ml|txt)$/i.test(name)) {
+        throw new Error('Please upload a .yaml or .yml file.');
+      }
+      const yaml = await readFileAsText(file);
+      if (kind === 'sources') {
+        if (!window.confirm('Replace all seeds and feeds with this uploaded sources.yaml? The current list on the server will be overwritten.')) return;
+        const saved = await api('/api/blog-admin/sources/upload', {
+          method: 'POST',
+          body: JSON.stringify({ yaml }),
+        });
+        state.sources = {
+          feeds: saved.feeds || [],
+          seeds: saved.seeds || [],
+        };
+        renderFeeds();
+        renderSeeds();
+        const note = describeBackup(saved.backup);
+        showBanner(`Uploaded sources.yaml (${(saved.seeds || []).length} seeds).${note}`, saved.backup?.ok ? 'ok' : (saved.backup?.skipped ? '' : 'err'));
+        showToast(saved.backup?.ok ? 'Upload saved · backed up' : 'Upload saved');
+        return;
+      }
+      if (!window.confirm('Replace the entire topic queue with this uploaded topics.yaml? The current list on the server will be overwritten.')) return;
+      const saved = await api('/api/blog-admin/topics/upload', {
+        method: 'POST',
+        body: JSON.stringify({ yaml }),
+      });
+      state.topics = saved.topics || [];
+      renderTopics();
+      const note = describeBackup(saved.backup);
+      showBanner(`Uploaded topics.yaml (${(saved.topics || []).length} topics).${note}`, saved.backup?.ok ? 'ok' : (saved.backup?.skipped ? '' : 'err'));
+      showToast(saved.backup?.ok ? 'Upload saved · backed up' : 'Upload saved');
     }
 
     function setLoggedIn(on) {
@@ -1461,6 +1538,23 @@
       showBanner(e.message, 'err');
       showToast('Could not save changes', 'err');
     }));
+    $('download-sources-btn').addEventListener('click', () => {
+      downloadYaml('/api/blog-admin/sources.yaml', 'sources.yaml')
+        .then(() => showToast('Downloaded sources.yaml'))
+        .catch((e) => {
+          showBanner(e.message, 'err');
+          showToast('Download failed', 'err');
+        });
+    });
+    $('upload-sources-btn').addEventListener('click', () => $('upload-sources-file').click());
+    $('upload-sources-file').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      uploadYamlFile('sources', file).catch((err) => {
+        showBanner(err.message, 'err');
+        showToast('Upload failed', 'err');
+      });
+    });
     $('add-topic-btn').addEventListener('click', () => {
       state.topics.unshift({
         id: '',
@@ -1480,6 +1574,23 @@
       showBanner(e.message, 'err');
       showToast('Could not save changes', 'err');
     }));
+    $('download-topics-btn').addEventListener('click', () => {
+      downloadYaml('/api/blog-admin/topics.yaml', 'topics.yaml')
+        .then(() => showToast('Downloaded topics.yaml'))
+        .catch((e) => {
+          showBanner(e.message, 'err');
+          showToast('Download failed', 'err');
+        });
+    });
+    $('upload-topics-btn').addEventListener('click', () => $('upload-topics-file').click());
+    $('upload-topics-file').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      uploadYamlFile('topics', file).catch((err) => {
+        showBanner(err.message, 'err');
+        showToast('Upload failed', 'err');
+      });
+    });
 
     (async function boot() {
       if (!state.token) {

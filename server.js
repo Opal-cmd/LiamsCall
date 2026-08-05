@@ -1350,6 +1350,17 @@ app.get('/api/blog-admin/sources', requireBlogAdmin, (_req, res) => {
   }
 });
 
+app.get('/api/blog-admin/sources.yaml', requireBlogAdmin, (_req, res) => {
+  try {
+    const yaml = blogAdminOps.exportSourcesYaml();
+    res.setHeader('Content-Type', 'text/yaml; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="sources.yaml"');
+    res.send(yaml);
+  } catch (error) {
+    res.status(500).json({ error: error.message || 'Could not download sources.' });
+  }
+});
+
 app.put('/api/blog-admin/sources', requireBlogAdmin, async (req, res) => {
   try {
     const result = await blogAdminOps.updateSources(req.body || {});
@@ -1366,11 +1377,38 @@ app.put('/api/blog-admin/sources', requireBlogAdmin, async (req, res) => {
   }
 });
 
+app.post('/api/blog-admin/sources/upload', requireBlogAdmin, async (req, res) => {
+  try {
+    const yaml = typeof req.body?.yaml === 'string' ? req.body.yaml : String(req.body?.raw || '');
+    const result = await blogAdminOps.importSourcesYaml(yaml);
+    appendBlogAudit('sources_upload', {
+      ip: getClientIp(req),
+      seeds: result.seeds?.length,
+      feeds: result.feeds?.length,
+      backupOk: Boolean(result.backup?.ok),
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not upload sources.' });
+  }
+});
+
 app.get('/api/blog-admin/topics', requireBlogAdmin, (_req, res) => {
   try {
     res.json({ topics: blogAdminOps.getTopics() });
   } catch (error) {
     res.status(500).json({ error: error.message || 'Could not load topics.' });
+  }
+});
+
+app.get('/api/blog-admin/topics.yaml', requireBlogAdmin, (_req, res) => {
+  try {
+    const yaml = blogAdminOps.exportTopicsYaml();
+    res.setHeader('Content-Type', 'text/yaml; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="topics.yaml"');
+    res.send(yaml);
+  } catch (error) {
+    res.status(500).json({ error: error.message || 'Could not download topics.' });
   }
 });
 
@@ -1386,6 +1424,21 @@ app.put('/api/blog-admin/topics', requireBlogAdmin, async (req, res) => {
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not save topics.' });
+  }
+});
+
+app.post('/api/blog-admin/topics/upload', requireBlogAdmin, async (req, res) => {
+  try {
+    const yaml = typeof req.body?.yaml === 'string' ? req.body.yaml : String(req.body?.raw || '');
+    const result = await blogAdminOps.importTopicsYaml(yaml);
+    appendBlogAudit('topics_upload', {
+      ip: getClientIp(req),
+      count: result.topics?.length,
+      backupOk: Boolean(result.backup?.ok),
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not upload topics.' });
   }
 });
 

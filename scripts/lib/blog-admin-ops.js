@@ -18,6 +18,10 @@ const {
   saveSources,
   loadTopics,
   saveTopics,
+  serializeSources,
+  serializeTopics,
+  parseSourcesYaml,
+  parseTopicsYaml,
 } = require('./blog-utils');
 const { ensurePostImage, setFrontmatterImage } = require('./blog-images');
 const { generateTopic } = require('./blog-generate-core');
@@ -362,6 +366,58 @@ function getSources() {
   return loadSources();
 }
 
+function exportSourcesYaml() {
+  const p = path.join(CONTENT_DIR, 'sources.yaml');
+  if (fs.existsSync(p)) return fs.readFileSync(p, 'utf8');
+  return serializeSources(loadSources());
+}
+
+function exportTopicsYaml() {
+  const p = path.join(CONTENT_DIR, 'topics.yaml');
+  if (fs.existsSync(p)) return fs.readFileSync(p, 'utf8');
+  return serializeTopics(loadTopics());
+}
+
+/**
+ * Replace sources from a full YAML document (feeds + seeds).
+ * Validates through the same cleaner as the desk editor.
+ */
+async function importSourcesYaml(raw) {
+  const text = String(raw || '').trim();
+  if (!text) throw new Error('Upload is empty. Paste or choose a sources.yaml file.');
+  let parsed;
+  try {
+    parsed = parseSourcesYaml(text);
+  } catch (err) {
+    throw new Error(`Could not read sources YAML: ${err.message || err}`);
+  }
+  if (!Array.isArray(parsed.seeds) && !Array.isArray(parsed.feeds)) {
+    throw new Error('YAML must include feeds and/or seeds lists.');
+  }
+  return updateSources({
+    feeds: parsed.feeds || [],
+    seeds: parsed.seeds || [],
+  });
+}
+
+/**
+ * Replace the topic queue from a full topics.yaml document.
+ */
+async function importTopicsYaml(raw) {
+  const text = String(raw || '').trim();
+  if (!text) throw new Error('Upload is empty. Paste or choose a topics.yaml file.');
+  let parsed;
+  try {
+    parsed = parseTopicsYaml(text);
+  } catch (err) {
+    throw new Error(`Could not read topics YAML: ${err.message || err}`);
+  }
+  if (!Array.isArray(parsed) || !parsed.length) {
+    throw new Error('YAML must include a topics list with at least one topic.');
+  }
+  return updateTopicsAndBackup({ topics: parsed });
+}
+
 async function updateSources(payload = {}) {
   const current = loadSources();
   const feeds = Array.isArray(payload.feeds) ? payload.feeds : current.feeds;
@@ -521,9 +577,13 @@ module.exports = {
   previewMarkdown,
   getSources,
   updateSources,
+  exportSourcesYaml,
+  importSourcesYaml,
   getTopics,
   updateTopics,
   updateTopicsAndBackup,
+  exportTopicsYaml,
+  importTopicsYaml,
   generateTopicArticle,
   backupConfigured,
   backupStatus,
