@@ -965,8 +965,8 @@
       const msg = action === 'approve'
         ? `Approved ${okCount} draft${okCount === 1 ? '' : 's'}.`
         : `Deleted ${okCount} draft${okCount === 1 ? '' : 's'}.`;
-      showBanner(msg + summarizeBatchErrors(result.errors), errCount ? 'err' : 'ok');
-      showToast(errCount ? 'Batch finished with errors' : 'Batch done', errCount ? 'err' : '');
+      showBanner(msg + summarizeBatchErrors(result.errors) + describeBackup(result.backup), errCount ? 'err' : (result.backup?.ok ? 'ok' : ''));
+      showToast(errCount ? 'Batch finished with errors' : (result.backup?.ok ? 'Batch done · backed up' : 'Batch done'), errCount ? 'err' : '');
       await refreshLists();
       if (action === 'approve' && okCount) switchTab('live');
     }
@@ -992,8 +992,8 @@
       const msg = action === 'unpublish'
         ? `Moved ${okCount} post${okCount === 1 ? '' : 's'} to drafts.`
         : `Deleted ${okCount} live post${okCount === 1 ? '' : 's'}.`;
-      showBanner(msg + summarizeBatchErrors(result.errors), errCount ? 'err' : 'ok');
-      showToast(errCount ? 'Batch finished with errors' : 'Batch done', errCount ? 'err' : '');
+      showBanner(msg + summarizeBatchErrors(result.errors) + describeBackup(result.backup), errCount ? 'err' : (result.backup?.ok ? 'ok' : ''));
+      showToast(errCount ? 'Batch finished with errors' : (result.backup?.ok ? 'Batch done · backed up' : 'Batch done'), errCount ? 'err' : '');
       await refreshLists();
       if (action === 'unpublish' && okCount) switchTab('drafts');
     }
@@ -1087,7 +1087,9 @@
       state.currentSlug = saved.slug;
       $('preview').innerHTML = saved.html || '';
       updateSeedUi(payload.source_url, payload.body);
-      showBanner('Saved. Nothing is live yet until you approve & publish.', 'ok');
+      const note = describeBackup(saved.backup);
+      showBanner(`Saved. Nothing is live yet until you approve & publish.${note}`, saved.backup?.ok ? 'ok' : (saved.backup?.skipped ? '' : 'err'));
+      if (saved.backup?.ok) showToast('Draft saved · backed up');
     }
 
     async function approveDraft() {
@@ -1108,13 +1110,15 @@
         showList();
         await refreshLists();
         switchTab('live');
+        const note = describeBackup(result.backup);
         if (result.url) {
-          banner.innerHTML = 'Published. <a href="' + escapeHtml(result.url) + '" target="_blank" rel="noopener">Open the live post</a>';
-          banner.className = 'notice ok';
+          banner.innerHTML = 'Published. <a href="' + escapeHtml(result.url) + '" target="_blank" rel="noopener">Open the live post</a>.' + escapeHtml(note);
+          banner.className = 'notice ' + (result.backup?.ok ? 'ok' : (result.backup?.skipped ? '' : 'err'));
           banner.classList.remove('hidden');
         } else {
-          showBanner('Published. You can open it under Live on site.', 'ok');
+          showBanner('Published. You can open it under Live on site.' + note, result.backup?.ok ? 'ok' : '');
         }
+        if (result.backup?.ok) showToast('Published · backed up');
       } catch (err) {
         showBanner(err.message || 'Could not publish.', 'err');
       }
@@ -1123,19 +1127,19 @@
     async function deleteDraft() {
       if (!state.currentSlug) return;
       if (!confirm('Delete this draft permanently?')) return;
-      await api('/api/blog-admin/drafts/' + encodeURIComponent(state.currentSlug), { method: 'DELETE' });
-      showBanner('Draft deleted.', 'ok');
+      const result = await api('/api/blog-admin/drafts/' + encodeURIComponent(state.currentSlug), { method: 'DELETE' });
+      showBanner('Draft deleted.' + describeBackup(result.backup), result.backup?.ok ? 'ok' : '');
       showList();
       await refreshLists();
     }
 
     async function unpublish(slug) {
       if (!confirm('Move this live post back to drafts? It will leave the public blog.')) return;
-      await api('/api/blog-admin/published/' + encodeURIComponent(slug) + '/unpublish', {
+      const result = await api('/api/blog-admin/published/' + encodeURIComponent(slug) + '/unpublish', {
         method: 'POST',
         body: '{}',
       });
-      showBanner('Moved back to drafts.', 'ok');
+      showBanner('Moved back to drafts.' + describeBackup(result.backup), result.backup?.ok ? 'ok' : '');
       await refreshLists();
       switchTab('drafts');
     }

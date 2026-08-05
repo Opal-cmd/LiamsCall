@@ -1208,10 +1208,10 @@ app.post('/api/blog-admin/login', (req, res) => {
   appendBlogAudit('login_ok', { ip });
 
   const persistHint = blogAdminOps.backupConfigured()
-    ? 'Seeds and Topics saves are backed up to GitHub automatically, so they survive redeploys.'
+    ? 'Drafts, published posts, Seeds, and Topics are backed up to GitHub automatically, so they survive redeploys.'
     : process.env.NODE_ENV === 'production'
-      ? 'Warning: Seeds/Topics saves on this live server will be wiped on the next deploy unless the site owner sets BLOG_GIT_TOKEN and BLOG_GIT_REPO. Publishing from this desk on the office computer, then deploying, is also safe.'
-      : 'You are on the local desk on this computer. Approved posts update the blog files here right away. Set BLOG_GIT_TOKEN + BLOG_GIT_REPO to auto-backup Seeds/Topics to GitHub.';
+      ? 'Warning: drafts and posts saved on this live server will be wiped on the next deploy unless the site owner sets BLOG_GIT_TOKEN and BLOG_GIT_REPO.'
+      : 'You are on the local desk on this computer. Set BLOG_GIT_TOKEN + BLOG_GIT_REPO to auto-backup drafts, posts, Seeds, and Topics to GitHub.';
 
   return res.json({
     ok: true,
@@ -1248,9 +1248,9 @@ app.put('/api/blog-admin/drafts/:slug', requireBlogAdmin, async (req, res) => {
   }
 });
 
-app.delete('/api/blog-admin/drafts/:slug', requireBlogAdmin, (req, res) => {
+app.delete('/api/blog-admin/drafts/:slug', requireBlogAdmin, async (req, res) => {
   try {
-    res.json(blogAdminOps.deleteDraft(req.params.slug));
+    res.json(await blogAdminOps.deleteDraft(req.params.slug));
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not delete draft.' });
   }
@@ -1264,6 +1264,7 @@ app.post('/api/blog-admin/drafts/batch', requireBlogAdmin, async (req, res) => {
       action,
       count: result.results?.length || 0,
       errors: result.errors?.length || 0,
+      backupOk: Boolean(result.backup?.ok),
       ip: getClientIp(req),
     });
     res.json(result);
@@ -1275,21 +1276,26 @@ app.post('/api/blog-admin/drafts/batch', requireBlogAdmin, async (req, res) => {
 app.post('/api/blog-admin/drafts/:slug/approve', requireBlogAdmin, async (req, res) => {
   try {
     const result = await blogAdminOps.approveDraft(req.params.slug);
-    appendBlogAudit('approve', { slug: result.slug, ip: getClientIp(req) });
+    appendBlogAudit('approve', {
+      slug: result.slug,
+      backupOk: Boolean(result.backup?.ok),
+      ip: getClientIp(req),
+    });
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not publish draft.' });
   }
 });
 
-app.post('/api/blog-admin/published/batch', requireBlogAdmin, (req, res) => {
+app.post('/api/blog-admin/published/batch', requireBlogAdmin, async (req, res) => {
   try {
     const action = String(req.body?.action || '').trim();
-    const result = blogAdminOps.batchPublished(action, req.body?.slugs || []);
+    const result = await blogAdminOps.batchPublished(action, req.body?.slugs || []);
     appendBlogAudit('published_batch', {
       action,
       count: result.results?.length || 0,
       errors: result.errors?.length || 0,
+      backupOk: Boolean(result.backup?.ok),
       ip: getClientIp(req),
     });
     res.json(result);
@@ -1298,20 +1304,28 @@ app.post('/api/blog-admin/published/batch', requireBlogAdmin, (req, res) => {
   }
 });
 
-app.post('/api/blog-admin/published/:slug/unpublish', requireBlogAdmin, (req, res) => {
+app.post('/api/blog-admin/published/:slug/unpublish', requireBlogAdmin, async (req, res) => {
   try {
-    const result = blogAdminOps.unpublish(req.params.slug);
-    appendBlogAudit('unpublish', { slug: result.slug, ip: getClientIp(req) });
+    const result = await blogAdminOps.unpublish(req.params.slug);
+    appendBlogAudit('unpublish', {
+      slug: result.slug,
+      backupOk: Boolean(result.backup?.ok),
+      ip: getClientIp(req),
+    });
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not move post back to drafts.' });
   }
 });
 
-app.delete('/api/blog-admin/published/:slug', requireBlogAdmin, (req, res) => {
+app.delete('/api/blog-admin/published/:slug', requireBlogAdmin, async (req, res) => {
   try {
-    const result = blogAdminOps.deletePublished(req.params.slug);
-    appendBlogAudit('published_delete', { slug: result.slug, ip: getClientIp(req) });
+    const result = await blogAdminOps.deletePublished(req.params.slug);
+    appendBlogAudit('published_delete', {
+      slug: result.slug,
+      backupOk: Boolean(result.backup?.ok),
+      ip: getClientIp(req),
+    });
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not delete live post.' });

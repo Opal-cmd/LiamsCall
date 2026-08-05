@@ -30,6 +30,15 @@ const {
   backupStatus,
   backupSourcesYaml,
   backupTopicsYaml,
+  backupDraft,
+  backupApprovedPost,
+  backupUnpublishedPost,
+  backupDeletedDraft,
+  backupDeletedPublished,
+  syncFilesToGit,
+  draftContentPath,
+  publishedContentPath,
+  publicPostPath,
 } = require('./blog-git-backup');
 
 function rebuildBlog() {
@@ -191,13 +200,17 @@ async function saveDraft(slug, updates = {}) {
   const dest = path.join(DRAFTS_DIR, `${nextSlug}.md`);
   fs.writeFileSync(dest, md, 'utf8');
   if (dest !== filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  return getDraft(nextSlug);
+  const draft = getDraft(nextSlug);
+  const backup = await backupDraft(nextSlug, `Blog desk: save draft ${nextSlug}`);
+  return { ...draft, backup };
 }
 
-function deleteDraft(slug) {
-  const filePath = draftPathFor(slug);
+async function deleteDraft(slug) {
+  const safe = toSlug(slug);
+  const filePath = draftPathFor(safe);
   fs.unlinkSync(filePath);
-  return { ok: true, slug: toSlug(slug) };
+  const backup = await backupDeletedDraft(safe, `Blog desk: delete draft ${safe}`);
+  return { ok: true, slug: safe, backup };
 }
 
 /**
@@ -205,6 +218,7 @@ function deleteDraft(slug) {
  */
 async function approveDraft(slug, options = {}) {
   const rebuild = options.rebuild !== false;
+  const backupGit = options.backup !== false;
   const filePath = draftPathFor(slug);
   const post = loadPost(filePath);
   assertPostGuards(post, { strictSafe: false });
@@ -232,16 +246,21 @@ async function approveDraft(slug, options = {}) {
   fs.unlinkSync(filePath);
 
   const buildLog = rebuild ? rebuildBlog() : '';
+  const backup = backupGit
+    ? await backupApprovedPost(post.slug, `Blog desk: publish ${post.slug}`)
+    : { ok: false, skipped: true, reason: 'Backup deferred for batch.' };
   return {
     ok: true,
     slug: post.slug,
     url: `/blog/${post.slug}`,
     buildLog,
+    backup,
   };
 }
 
-function unpublish(slug, options = {}) {
+async function unpublish(slug, options = {}) {
   const rebuild = options.rebuild !== false;
+  const backupGit = options.backup !== false;
   const pub = publishedPathFor(slug);
   if (!fs.existsSync(pub)) throw new Error('Live post not found.');
   const post = loadPost(pub);
@@ -256,17 +275,24 @@ function unpublish(slug, options = {}) {
   fs.writeFileSync(draft, raw, 'utf8');
   fs.unlinkSync(pub);
   const buildLog = rebuild ? rebuildBlog() : '';
-  return { ok: true, slug: post.slug, buildLog };
+  const backup = backupGit
+    ? await backupUnpublishedPost(post.slug, `Blog desk: unpublish ${post.slug}`)
+    : { ok: false, skipped: true, reason: 'Backup deferred for batch.' };
+  return { ok: true, slug: post.slug, buildLog, backup };
 }
 
-function deletePublished(slug, options = {}) {
+async function deletePublished(slug, options = {}) {
   const rebuild = options.rebuild !== false;
+  const backupGit = options.backup !== false;
   const pub = publishedPathFor(slug);
   if (!fs.existsSync(pub)) throw new Error('Live post not found.');
   const safe = toSlug(slug);
   fs.unlinkSync(pub);
   const buildLog = rebuild ? rebuildBlog() : '';
-  return { ok: true, slug: safe, buildLog };
+  const backup = backupGit
+    ? await backupDeletedPublished(safe, `Blog desk: delete live post ${safe}`)
+    : { ok: false, skipped: true, reason: 'Backup deferred for batch.' };
+  return { ok: true, slug: safe, buildLog, backup };
 }
 
 function normalizeSlugList(slugs) {
@@ -291,30 +317,54 @@ async function batchDrafts(action, slugs) {
   if (action === 'delete') {
     for (const slug of list) {
       try {
-        results.push(deleteDraft(slug));
+        results.push(await deleteDraft(slug));
       } catch (err) {
         errors.push({ slug, error: err.message || String(err) });
       }
     }
-    return { ok: errors.length === 0, action, results, errors };
+    return {
+      ok: errors.length === 0,
+      action,
+      results,
+      errors,
+      backup: results.find((r) => r.backup)?.backup,
+    };
   }
 
   if (action === 'approve') {
     for (const slug of list) {
       try {
-        results.push(await approveDraft(slug, { rebuild: false }));
+        results.push(await approveDraft(slug, { rebuild: false, backup: false }));
       } catch (err) {
         errors.push({ slug, error: err.message || String(err) });
       }
     }
     const buildLog = results.length ? rebuildBlog() : '';
-    return { ok: errors.length === 0, action, results, errors, buildLog };
+    const upsert = [
+      ...results.map((r) => publishedContentPath(r.slug)),
+      ...results.map((r) => publicPostPath(r.slug)),
+      'public/blog/index.html',
+      'public/sitemap.xml',
+      'public/sitemap.html',
+      'public/site-identity.json',
+      'public/.well-known/brand.json',
+      'content/blog/topics.yaml',
+    ];
+    const remove = results.map((r) => draftContentPath(r.slug));
+    const backup = results.length
+      ? await syncFilesToGit({
+          upsert,
+          remove,
+          message: `Blog desk: batch approve ${results.length} draft(s)`,
+        })
+      : { ok: false, skipped: true, reason: 'Nothing approved.' };
+    return { ok: errors.length === 0, action, results, errors, buildLog, backup };
   }
 
   throw new Error('Unknown batch action. Use approve or delete.');
 }
 
-function batchPublished(action, slugs) {
+async function batchPublished(action, slugs) {
   const list = normalizeSlugList(slugs);
   const results = [];
   const errors = [];
@@ -322,25 +372,61 @@ function batchPublished(action, slugs) {
   if (action === 'unpublish') {
     for (const slug of list) {
       try {
-        results.push(unpublish(slug, { rebuild: false }));
+        results.push(await unpublish(slug, { rebuild: false, backup: false }));
       } catch (err) {
         errors.push({ slug, error: err.message || String(err) });
       }
     }
     const buildLog = results.length ? rebuildBlog() : '';
-    return { ok: errors.length === 0, action, results, errors, buildLog };
+    const upsert = [
+      ...results.map((r) => draftContentPath(r.slug)),
+      'public/blog/index.html',
+      'public/sitemap.xml',
+      'public/sitemap.html',
+      'public/site-identity.json',
+      'public/.well-known/brand.json',
+    ];
+    const remove = [
+      ...results.map((r) => publishedContentPath(r.slug)),
+      ...results.map((r) => publicPostPath(r.slug)),
+    ];
+    const backup = results.length
+      ? await syncFilesToGit({
+          upsert,
+          remove,
+          message: `Blog desk: batch unpublish ${results.length} post(s)`,
+        })
+      : { ok: false, skipped: true, reason: 'Nothing unpublished.' };
+    return { ok: errors.length === 0, action, results, errors, buildLog, backup };
   }
 
   if (action === 'delete') {
     for (const slug of list) {
       try {
-        results.push(deletePublished(slug, { rebuild: false }));
+        results.push(await deletePublished(slug, { rebuild: false, backup: false }));
       } catch (err) {
         errors.push({ slug, error: err.message || String(err) });
       }
     }
     const buildLog = results.length ? rebuildBlog() : '';
-    return { ok: errors.length === 0, action, results, errors, buildLog };
+    const remove = [
+      ...results.map((r) => publishedContentPath(r.slug)),
+      ...results.map((r) => publicPostPath(r.slug)),
+    ];
+    const backup = results.length
+      ? await syncFilesToGit({
+          upsert: [
+            'public/blog/index.html',
+            'public/sitemap.xml',
+            'public/sitemap.html',
+            'public/site-identity.json',
+            'public/.well-known/brand.json',
+          ],
+          remove,
+          message: `Blog desk: batch delete ${results.length} live post(s)`,
+        })
+      : { ok: false, skipped: true, reason: 'Nothing deleted.' };
+    return { ok: errors.length === 0, action, results, errors, buildLog, backup };
   }
 
   throw new Error('Unknown batch action. Use unpublish or delete.');
@@ -547,8 +633,9 @@ async function generateTopicArticle(topicId, options = {}) {
     buildLog = rebuildBlog();
   }
 
-  // Persist "used" flag + any seed link written during generate.
-  const backup = await backupTopicsYaml(
+  // Persist draft markdown + used topic flag so redeploys keep them.
+  const backup = await backupDraft(
+    summary.slug,
     `Blog desk: generate topic ${id} → ${summary.slug || 'draft'}`,
   );
 

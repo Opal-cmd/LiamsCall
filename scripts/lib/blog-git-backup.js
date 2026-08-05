@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * Persist Blog desk YAML (seeds/topics) to GitHub so Render redeploys
- * do not wipe admin edits that only lived on the ephemeral disk.
+ * Persist Blog desk changes to GitHub so Render redeploys do not wipe
+ * seeds, topics, drafts, or published posts that only lived on disk.
  *
  * Env:
  *   BLOG_GIT_TOKEN or GITHUB_TOKEN  — PAT with Contents: Read and Write
@@ -12,7 +12,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { ROOT } = require('./blog-utils');
+const { ROOT, toSlug } = require('./blog-utils');
 
 const API = 'https://api.github.com';
 
@@ -37,6 +37,15 @@ function backupStatus() {
     configured: backupConfigured(),
     repo: gitRepo() || null,
     branch: gitBranch(),
+  };
+}
+
+function notConfiguredResult() {
+  return {
+    ok: false,
+    skipped: true,
+    reason:
+      'Git backup is not configured. Set BLOG_GIT_TOKEN and BLOG_GIT_REPO on the server so drafts and posts survive redeploys.',
   };
 }
 
@@ -70,17 +79,21 @@ async function githubRequest(method, apiPath, body) {
   return data;
 }
 
-async function getFileMeta(repoPath) {
-  const repo = gitRepo();
-  const branch = gitBranch();
-  const encoded = repoPath
+function encodeRepoPath(repoPath) {
+  return String(repoPath)
+    .replace(/\\/g, '/')
     .split('/')
     .map((p) => encodeURIComponent(p))
     .join('/');
+}
+
+async function getFileMeta(repoPath) {
+  const repo = gitRepo();
+  const branch = gitBranch();
   try {
     return await githubRequest(
       'GET',
-      `/repos/${repo}/contents/${encoded}?ref=${encodeURIComponent(branch)}`,
+      `/repos/${repo}/contents/${encodeRepoPath(repoPath)}?ref=${encodeURIComponent(branch)}`,
     );
   } catch (err) {
     if (err.status === 404) return null;
@@ -88,128 +101,236 @@ async function getFileMeta(repoPath) {
   }
 }
 
-/**
- * Commit one or more repo-relative files from disk to GitHub.
- * @param {string[]} relativePaths e.g. ['content/blog/sources.yaml']
- * @param {string} message
- * @returns {Promise<{ ok: boolean, skipped?: boolean, reason?: string, commitUrl?: string, files?: string[], error?: string }>}
- */
-async function backupFilesToGit(relativePaths, message) {
-  if (!backupConfigured()) {
-    return {
-      ok: false,
-      skipped: true,
-      reason:
-        'Git backup is not configured. Set BLOG_GIT_TOKEN and BLOG_GIT_REPO on the server so Seeds/Topics survive redeploys.',
-    };
-  }
+function draftContentPath(slug) {
+  return `content/blog/drafts/${toSlug(slug)}.md`;
+}
 
-  const paths = [...new Set((relativePaths || []).map((p) => String(p).replace(/\\/g, '/')).filter(Boolean))];
-  if (!paths.length) {
-    return { ok: false, skipped: true, reason: 'No files to back up.' };
-  }
+function publishedContentPath(slug) {
+  return `content/blog/${toSlug(slug)}.md`;
+}
 
+function publicPostPath(slug) {
+  return `public/blog/${toSlug(slug)}/index.html`;
+}
+
+function postImagePath(slug) {
+  const rel = `public/assets/blog/${toSlug(slug)}.jpg`;
+  return fs.existsSync(path.join(ROOT, rel)) ? rel : null;
+}
+
+function siteMetaPaths() {
+  return [
+    'public/blog/index.html',
+    'public/sitemap.xml',
+    'public/sitemap.html',
+    'public/site-identity.json',
+    'public/.well-known/brand.json',
+  ].filter((rel) => fs.existsSync(path.join(ROOT, rel)));
+}
+
+function existingPaths(rels) {
+  return [...new Set((rels || []).map((p) => String(p).replace(/\\/g, '/')).filter(Boolean))].filter(
+    (rel) => fs.existsSync(path.join(ROOT, rel)),
+  );
+}
+
+async function putOneFile(rel, message) {
+  const abs = path.join(ROOT, rel);
+  if (!fs.existsSync(abs)) {
+    return { path: rel, ok: false, error: 'File missing on disk' };
+  }
+  const content = fs.readFileSync(abs);
+  const b64 = content.toString('base64');
   const repo = gitRepo();
   const branch = gitBranch();
-  const results = [];
+  const encoded = encodeRepoPath(rel);
 
-  for (const rel of paths) {
-    const abs = path.join(ROOT, rel);
-    if (!fs.existsSync(abs)) {
-      results.push({ path: rel, ok: false, error: 'File missing on disk' });
-      continue;
-    }
-    const content = fs.readFileSync(abs);
+  const tryPut = async (sha) =>
+    githubRequest('PUT', `/repos/${repo}/contents/${encoded}`, {
+      message,
+      content: b64,
+      branch,
+      ...(sha ? { sha } : {}),
+      committer: {
+        name: 'liamscall-blog-bot',
+        email: 'blog-bot@liamscall.com',
+      },
+    });
+
+  try {
     const meta = await getFileMeta(rel);
-    const existingSha = meta && meta.type === 'file' ? meta.sha : undefined;
-    const b64 = content.toString('base64');
-
-    // Skip no-op updates when content matches (same sha of blob).
-    if (existingSha) {
-      // GitHub blob sha is git sha of content; compare via API put only when needed.
-      // Cheap check: if base64 lengths differ we must update; otherwise still PUT —
-      // GitHub returns 200 with same commit if unchanged is rare; we always PUT when
-      // admin explicitly saved. Optional: compare sha of content.
-    }
-
-    try {
-      const encoded = rel
-        .split('/')
-        .map((p) => encodeURIComponent(p))
-        .join('/');
-      const data = await githubRequest('PUT', `/repos/${repo}/contents/${encoded}`, {
-        message: message || `Backup ${rel} from Blog desk`,
-        content: b64,
-        branch,
-        ...(existingSha ? { sha: existingSha } : {}),
-        committer: {
-          name: 'liamscall-blog-bot',
-          email: 'blog-bot@liamscall.com',
-        },
-      });
-      results.push({
-        path: rel,
-        ok: true,
-        commitUrl: data?.commit?.html_url || null,
-        contentUrl: data?.content?.html_url || null,
-      });
-    } catch (err) {
-      // Stale SHA — refetch once and retry.
-      if (err.status === 409 || /sha/i.test(err.message || '')) {
-        try {
-          const fresh = await getFileMeta(rel);
-          const encoded = rel
-            .split('/')
-            .map((p) => encodeURIComponent(p))
-            .join('/');
-          const data = await githubRequest('PUT', `/repos/${repo}/contents/${encoded}`, {
-            message: message || `Backup ${rel} from Blog desk`,
-            content: b64,
-            branch,
-            ...(fresh?.sha ? { sha: fresh.sha } : {}),
-            committer: {
-              name: 'liamscall-blog-bot',
-              email: 'blog-bot@liamscall.com',
-            },
-          });
-          results.push({
-            path: rel,
-            ok: true,
-            commitUrl: data?.commit?.html_url || null,
-            contentUrl: data?.content?.html_url || null,
-          });
-          continue;
-        } catch (retryErr) {
-          results.push({ path: rel, ok: false, error: retryErr.message || String(retryErr) });
-          continue;
-        }
+    const data = await tryPut(meta && meta.type === 'file' ? meta.sha : undefined);
+    return {
+      path: rel,
+      ok: true,
+      action: 'upsert',
+      commitUrl: data?.commit?.html_url || null,
+    };
+  } catch (err) {
+    if (err.status === 409 || /sha/i.test(err.message || '')) {
+      try {
+        const fresh = await getFileMeta(rel);
+        const data = await tryPut(fresh?.sha);
+        return {
+          path: rel,
+          ok: true,
+          action: 'upsert',
+          commitUrl: data?.commit?.html_url || null,
+        };
+      } catch (retryErr) {
+        return { path: rel, ok: false, action: 'upsert', error: retryErr.message || String(retryErr) };
       }
-      results.push({ path: rel, ok: false, error: err.message || String(err) });
     }
+    return { path: rel, ok: false, action: 'upsert', error: err.message || String(err) };
+  }
+}
+
+async function deleteOneFile(rel, message) {
+  const repo = gitRepo();
+  const branch = gitBranch();
+  const encoded = encodeRepoPath(rel);
+  const meta = await getFileMeta(rel);
+  if (!meta || meta.type !== 'file' || !meta.sha) {
+    return { path: rel, ok: true, action: 'delete', skipped: true, reason: 'Not on GitHub' };
+  }
+  try {
+    const data = await githubRequest('DELETE', `/repos/${repo}/contents/${encoded}`, {
+      message,
+      sha: meta.sha,
+      branch,
+      committer: {
+        name: 'liamscall-blog-bot',
+        email: 'blog-bot@liamscall.com',
+      },
+    });
+    return {
+      path: rel,
+      ok: true,
+      action: 'delete',
+      commitUrl: data?.commit?.html_url || null,
+    };
+  } catch (err) {
+    if (err.status === 404) {
+      return { path: rel, ok: true, action: 'delete', skipped: true, reason: 'Already gone' };
+    }
+    return { path: rel, ok: false, action: 'delete', error: err.message || String(err) };
+  }
+}
+
+/**
+ * Upsert and/or delete repo-relative paths in GitHub.
+ * @param {{ upsert?: string[], remove?: string[], message?: string }} opts
+ */
+async function syncFilesToGit(opts = {}) {
+  if (!backupConfigured()) return notConfiguredResult();
+
+  const upsert = existingPaths(opts.upsert || []);
+  const remove = [...new Set((opts.remove || []).map((p) => String(p).replace(/\\/g, '/')).filter(Boolean))];
+  const message = opts.message || 'Blog desk backup';
+
+  if (!upsert.length && !remove.length) {
+    return { ok: false, skipped: true, reason: 'No files to sync.' };
+  }
+
+  const results = [];
+  for (const rel of upsert) {
+    results.push(await putOneFile(rel, `${message}: update ${path.posix.basename(rel)}`));
+  }
+  for (const rel of remove) {
+    // Don't delete a path we just upserted in the same sync.
+    if (upsert.includes(rel)) continue;
+    results.push(await deleteOneFile(rel, `${message}: remove ${path.posix.basename(rel)}`));
   }
 
   const failed = results.filter((r) => !r.ok);
-  const okOnes = results.filter((r) => r.ok);
+  const okOnes = results.filter((r) => r.ok && !r.skipped);
   return {
-    ok: failed.length === 0 && okOnes.length > 0,
+    ok: failed.length === 0 && (okOnes.length > 0 || results.some((r) => r.skipped)),
     files: results,
     commitUrl: okOnes.find((r) => r.commitUrl)?.commitUrl || null,
     error: failed.length ? failed.map((f) => `${f.path}: ${f.error}`).join('; ') : undefined,
   };
 }
 
+async function backupFilesToGit(relativePaths, message) {
+  return syncFilesToGit({ upsert: relativePaths, message });
+}
+
 async function backupSourcesYaml(reason = 'Blog desk saved seeds/sources') {
-  return backupFilesToGit(['content/blog/sources.yaml'], reason);
+  return syncFilesToGit({ upsert: ['content/blog/sources.yaml'], message: reason });
 }
 
 async function backupTopicsYaml(reason = 'Blog desk saved topics') {
-  return backupFilesToGit(['content/blog/topics.yaml'], reason);
+  return syncFilesToGit({ upsert: ['content/blog/topics.yaml'], message: reason });
+}
+
+async function backupDraft(slug, reason) {
+  const safe = toSlug(slug);
+  const upsert = [draftContentPath(safe), 'content/blog/topics.yaml'];
+  const img = postImagePath(safe);
+  if (img) upsert.push(img);
+  return syncFilesToGit({
+    upsert,
+    message: reason || `Blog desk draft: ${safe}`,
+  });
+}
+
+async function backupApprovedPost(slug, reason) {
+  const safe = toSlug(slug);
+  const upsert = [publishedContentPath(safe), publicPostPath(safe), ...siteMetaPaths(), 'content/blog/topics.yaml'];
+  const img = postImagePath(safe);
+  if (img) upsert.push(img);
+  return syncFilesToGit({
+    upsert,
+    remove: [draftContentPath(safe)],
+    message: reason || `Blog desk publish: ${safe}`,
+  });
+}
+
+async function backupUnpublishedPost(slug, reason) {
+  const safe = toSlug(slug);
+  const upsert = [draftContentPath(safe), ...siteMetaPaths()];
+  return syncFilesToGit({
+    upsert,
+    remove: [publishedContentPath(safe), publicPostPath(safe)],
+    message: reason || `Blog desk unpublish: ${safe}`,
+  });
+}
+
+async function backupDeletedDraft(slug, reason) {
+  const safe = toSlug(slug);
+  return syncFilesToGit({
+    remove: [draftContentPath(safe)],
+    message: reason || `Blog desk delete draft: ${safe}`,
+  });
+}
+
+async function backupDeletedPublished(slug, reason) {
+  const safe = toSlug(slug);
+  const remove = [publishedContentPath(safe), publicPostPath(safe)];
+  const img = postImagePath(safe);
+  // Keep image file if still on disk from another use; only remove if gone locally.
+  if (!img) remove.push(`public/assets/blog/${safe}.jpg`);
+  return syncFilesToGit({
+    upsert: siteMetaPaths(),
+    remove,
+    message: reason || `Blog desk delete live post: ${safe}`,
+  });
 }
 
 module.exports = {
   backupConfigured,
   backupStatus,
   backupFilesToGit,
+  syncFilesToGit,
   backupSourcesYaml,
   backupTopicsYaml,
+  backupDraft,
+  backupApprovedPost,
+  backupUnpublishedPost,
+  backupDeletedDraft,
+  backupDeletedPublished,
+  draftContentPath,
+  publishedContentPath,
+  publicPostPath,
 };
