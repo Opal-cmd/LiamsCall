@@ -1078,6 +1078,22 @@ app.get('/resources', (_req, res) => {
   sendPublicHtml(res, 'resources.html');
 });
 
+app.get('/mental-health-support-for-families', (_req, res) => {
+  sendPublicHtml(res, 'mental-health-support-for-families.html');
+});
+
+app.get('/addiction-help-for-families', (_req, res) => {
+  sendPublicHtml(res, 'addiction-help-for-families.html');
+});
+
+app.get('/housing-help-for-families', (_req, res) => {
+  sendPublicHtml(res, 'housing-help-for-families.html');
+});
+
+app.get('/caregiver-support', (_req, res) => {
+  sendPublicHtml(res, 'caregiver-support.html');
+});
+
 app.get('/blog', (_req, res) => {
   sendPublicHtml(res, path.join('blog', 'index.html'));
 });
@@ -1250,6 +1266,22 @@ app.delete('/api/blog-admin/drafts/:slug', requireBlogAdmin, (req, res) => {
   }
 });
 
+app.post('/api/blog-admin/drafts/batch', requireBlogAdmin, async (req, res) => {
+  try {
+    const action = String(req.body?.action || '').trim();
+    const result = await blogAdminOps.batchDrafts(action, req.body?.slugs || []);
+    appendBlogAudit('drafts_batch', {
+      action,
+      count: result.results?.length || 0,
+      errors: result.errors?.length || 0,
+      ip: getClientIp(req),
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not run batch on drafts.' });
+  }
+});
+
 app.post('/api/blog-admin/drafts/:slug/approve', requireBlogAdmin, async (req, res) => {
   try {
     const result = await blogAdminOps.approveDraft(req.params.slug);
@@ -1260,6 +1292,22 @@ app.post('/api/blog-admin/drafts/:slug/approve', requireBlogAdmin, async (req, r
   }
 });
 
+app.post('/api/blog-admin/published/batch', requireBlogAdmin, (req, res) => {
+  try {
+    const action = String(req.body?.action || '').trim();
+    const result = blogAdminOps.batchPublished(action, req.body?.slugs || []);
+    appendBlogAudit('published_batch', {
+      action,
+      count: result.results?.length || 0,
+      errors: result.errors?.length || 0,
+      ip: getClientIp(req),
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not run batch on live posts.' });
+  }
+});
+
 app.post('/api/blog-admin/published/:slug/unpublish', requireBlogAdmin, (req, res) => {
   try {
     const result = blogAdminOps.unpublish(req.params.slug);
@@ -1267,6 +1315,16 @@ app.post('/api/blog-admin/published/:slug/unpublish', requireBlogAdmin, (req, re
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not move post back to drafts.' });
+  }
+});
+
+app.delete('/api/blog-admin/published/:slug', requireBlogAdmin, (req, res) => {
+  try {
+    const result = blogAdminOps.deletePublished(req.params.slug);
+    appendBlogAudit('published_delete', { slug: result.slug, ip: getClientIp(req) });
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Could not delete live post.' });
   }
 });
 

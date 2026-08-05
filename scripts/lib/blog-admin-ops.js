@@ -190,7 +190,11 @@ function deleteDraft(slug) {
   return { ok: true, slug: toSlug(slug) };
 }
 
-async function approveDraft(slug) {
+/**
+ * Move a draft to published content. Pass { rebuild: false } when batching.
+ */
+async function approveDraft(slug, options = {}) {
+  const rebuild = options.rebuild !== false;
   const filePath = draftPathFor(slug);
   const post = loadPost(filePath);
   assertPostGuards(post, { strictSafe: false });
@@ -217,7 +221,7 @@ async function approveDraft(slug) {
   fs.writeFileSync(dest, raw, 'utf8');
   fs.unlinkSync(filePath);
 
-  const buildLog = rebuildBlog();
+  const buildLog = rebuild ? rebuildBlog() : '';
   return {
     ok: true,
     slug: post.slug,
@@ -226,7 +230,8 @@ async function approveDraft(slug) {
   };
 }
 
-function unpublish(slug) {
+function unpublish(slug, options = {}) {
+  const rebuild = options.rebuild !== false;
   const pub = publishedPathFor(slug);
   if (!fs.existsSync(pub)) throw new Error('Live post not found.');
   const post = loadPost(pub);
@@ -240,8 +245,95 @@ function unpublish(slug) {
 
   fs.writeFileSync(draft, raw, 'utf8');
   fs.unlinkSync(pub);
-  const buildLog = rebuildBlog();
+  const buildLog = rebuild ? rebuildBlog() : '';
   return { ok: true, slug: post.slug, buildLog };
+}
+
+function deletePublished(slug, options = {}) {
+  const rebuild = options.rebuild !== false;
+  const pub = publishedPathFor(slug);
+  if (!fs.existsSync(pub)) throw new Error('Live post not found.');
+  const safe = toSlug(slug);
+  fs.unlinkSync(pub);
+  const buildLog = rebuild ? rebuildBlog() : '';
+  return { ok: true, slug: safe, buildLog };
+}
+
+function normalizeSlugList(slugs) {
+  if (!Array.isArray(slugs) || !slugs.length) throw new Error('Select at least one post.');
+  const out = [];
+  const seen = new Set();
+  for (const raw of slugs) {
+    const slug = toSlug(raw);
+    if (!slug || seen.has(slug)) continue;
+    seen.add(slug);
+    out.push(slug);
+  }
+  if (!out.length) throw new Error('Select at least one post.');
+  return out;
+}
+
+async function batchDrafts(action, slugs) {
+  const list = normalizeSlugList(slugs);
+  const results = [];
+  const errors = [];
+
+  if (action === 'delete') {
+    for (const slug of list) {
+      try {
+        results.push(deleteDraft(slug));
+      } catch (err) {
+        errors.push({ slug, error: err.message || String(err) });
+      }
+    }
+    return { ok: errors.length === 0, action, results, errors };
+  }
+
+  if (action === 'approve') {
+    for (const slug of list) {
+      try {
+        results.push(await approveDraft(slug, { rebuild: false }));
+      } catch (err) {
+        errors.push({ slug, error: err.message || String(err) });
+      }
+    }
+    const buildLog = results.length ? rebuildBlog() : '';
+    return { ok: errors.length === 0, action, results, errors, buildLog };
+  }
+
+  throw new Error('Unknown batch action. Use approve or delete.');
+}
+
+function batchPublished(action, slugs) {
+  const list = normalizeSlugList(slugs);
+  const results = [];
+  const errors = [];
+
+  if (action === 'unpublish') {
+    for (const slug of list) {
+      try {
+        results.push(unpublish(slug, { rebuild: false }));
+      } catch (err) {
+        errors.push({ slug, error: err.message || String(err) });
+      }
+    }
+    const buildLog = results.length ? rebuildBlog() : '';
+    return { ok: errors.length === 0, action, results, errors, buildLog };
+  }
+
+  if (action === 'delete') {
+    for (const slug of list) {
+      try {
+        results.push(deletePublished(slug, { rebuild: false }));
+      } catch (err) {
+        errors.push({ slug, error: err.message || String(err) });
+      }
+    }
+    const buildLog = results.length ? rebuildBlog() : '';
+    return { ok: errors.length === 0, action, results, errors, buildLog };
+  }
+
+  throw new Error('Unknown batch action. Use unpublish or delete.');
 }
 
 function previewMarkdown(rawOrParts) {
@@ -397,6 +489,9 @@ module.exports = {
   deleteDraft,
   approveDraft,
   unpublish,
+  deletePublished,
+  batchDrafts,
+  batchPublished,
   rebuildBlog,
   previewMarkdown,
   getSources,

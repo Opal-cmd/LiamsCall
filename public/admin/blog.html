@@ -81,7 +81,7 @@
     .list { display: flex; flex-direction: column; gap: 0.65rem; }
     .item {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: auto 1fr auto;
       gap: 0.75rem;
       align-items: start;
       padding: 0.95rem 1rem;
@@ -91,6 +91,52 @@
     }
     .item h3 { margin: 0 0 0.25rem; font-size: 1rem; }
     .item p { margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.4; }
+    .item-check {
+      display: flex;
+      align-items: center;
+      padding-top: 0.35rem;
+    }
+    .item-check input {
+      width: 1.05rem;
+      height: 1.05rem;
+      margin: 0;
+      accent-color: var(--green);
+      cursor: pointer;
+    }
+    .batch-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: 0.85rem;
+      background: #fafafa;
+    }
+    .batch-bar .select-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.85rem;
+      font-weight: 650;
+      color: #374151;
+      cursor: pointer;
+      user-select: none;
+    }
+    .batch-bar .select-all input {
+      width: 1.05rem;
+      height: 1.05rem;
+      margin: 0;
+      accent-color: var(--green);
+      cursor: pointer;
+    }
+    .batch-count {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-right: 0.25rem;
+    }
     .meta { font-size: 0.75rem; color: #9ca3af; margin-top: 0.35rem; }
     .badge {
       display: inline-block;
@@ -125,7 +171,8 @@
     }
     @media (max-width: 900px) {
       .editor-grid { grid-template-columns: 1fr; }
-      .item { grid-template-columns: 1fr; }
+      .item { grid-template-columns: auto 1fr; }
+      .item .row { grid-column: 1 / -1; }
     }
     .preview {
       border: 1px solid var(--line);
@@ -281,6 +328,17 @@
             <strong>Drafts waiting for you</strong>
             <button id="refresh-btn" class="btn secondary" type="button">Refresh</button>
           </div>
+          <div id="drafts-batch-bar" class="batch-bar hidden">
+            <label class="select-all">
+              <input id="drafts-select-all" type="checkbox">
+              Select all
+            </label>
+            <div class="row">
+              <span id="drafts-selected-count" class="batch-count">0 selected</span>
+              <button id="drafts-batch-approve" class="btn" type="button" disabled>Approve selected</button>
+              <button id="drafts-batch-delete" class="btn danger" type="button" disabled>Delete selected</button>
+            </div>
+          </div>
           <div id="drafts-list" class="list"></div>
         </div>
 
@@ -288,6 +346,17 @@
           <div class="row spread" style="margin-bottom:0.85rem;">
             <strong>Already published</strong>
             <button id="refresh-live-btn" class="btn secondary" type="button">Refresh</button>
+          </div>
+          <div id="live-batch-bar" class="batch-bar hidden">
+            <label class="select-all">
+              <input id="live-select-all" type="checkbox">
+              Select all
+            </label>
+            <div class="row">
+              <span id="live-selected-count" class="batch-count">0 selected</span>
+              <button id="live-batch-unpublish" class="btn secondary" type="button" disabled>Move selected to drafts</button>
+              <button id="live-batch-delete" class="btn danger" type="button" disabled>Delete selected</button>
+            </div>
           </div>
           <div id="live-list" class="list"></div>
         </div>
@@ -697,12 +766,19 @@
 
     function renderDrafts(items) {
       const box = $('drafts-list');
+      const bar = $('drafts-batch-bar');
       if (!items.length) {
         box.innerHTML = '<div class="empty">No drafts right now.<br>When the automatic writer creates a careful post, it will show up here for you to review.</div>';
+        bar.classList.add('hidden');
+        syncBatchUi('drafts');
         return;
       }
+      bar.classList.remove('hidden');
       box.innerHTML = items.map((item) => `
         <div class="item">
+          <label class="item-check">
+            <input type="checkbox" data-draft-select="${escapeHtml(item.slug)}" aria-label="Select ${escapeHtml(item.title)}">
+          </label>
           <div>
             <span class="badge review">Needs review</span>
             <h3>${escapeHtml(item.title)}</h3>
@@ -717,16 +793,27 @@
       box.querySelectorAll('[data-open]').forEach((btn) => {
         btn.addEventListener('click', () => openDraft(btn.getAttribute('data-open')));
       });
+      box.querySelectorAll('[data-draft-select]').forEach((el) => {
+        el.addEventListener('change', () => syncBatchUi('drafts'));
+      });
+      syncBatchUi('drafts');
     }
 
     function renderLive(items) {
       const box = $('live-list');
+      const bar = $('live-batch-bar');
       if (!items.length) {
         box.innerHTML = '<div class="empty">No live posts yet.</div>';
+        bar.classList.add('hidden');
+        syncBatchUi('live');
         return;
       }
+      bar.classList.remove('hidden');
       box.innerHTML = items.map((item) => `
         <div class="item">
+          <label class="item-check">
+            <input type="checkbox" data-live-select="${escapeHtml(item.slug)}" aria-label="Select ${escapeHtml(item.title)}">
+          </label>
           <div>
             <span class="badge live">Live</span>
             <h3>${escapeHtml(item.title)}</h3>
@@ -742,6 +829,96 @@
       box.querySelectorAll('[data-unpublish]').forEach((btn) => {
         btn.addEventListener('click', () => unpublish(btn.getAttribute('data-unpublish')));
       });
+      box.querySelectorAll('[data-live-select]').forEach((el) => {
+        el.addEventListener('change', () => syncBatchUi('live'));
+      });
+      syncBatchUi('live');
+    }
+
+    function selectedSlugs(kind) {
+      const attr = kind === 'live' ? 'data-live-select' : 'data-draft-select';
+      return [...document.querySelectorAll(`[${attr}]:checked`)].map((el) => el.getAttribute(attr)).filter(Boolean);
+    }
+
+    function syncBatchUi(kind) {
+      const isLive = kind === 'live';
+      const attr = isLive ? 'data-live-select' : 'data-draft-select';
+      const boxes = [...document.querySelectorAll(`[${attr}]`)];
+      const selected = boxes.filter((el) => el.checked);
+      const countEl = $(isLive ? 'live-selected-count' : 'drafts-selected-count');
+      const selectAll = $(isLive ? 'live-select-all' : 'drafts-select-all');
+      if (countEl) countEl.textContent = `${selected.length} selected`;
+      if (selectAll) {
+        selectAll.checked = boxes.length > 0 && selected.length === boxes.length;
+        selectAll.indeterminate = selected.length > 0 && selected.length < boxes.length;
+      }
+      if (isLive) {
+        $('live-batch-unpublish').disabled = selected.length === 0;
+        $('live-batch-delete').disabled = selected.length === 0;
+      } else {
+        $('drafts-batch-approve').disabled = selected.length === 0;
+        $('drafts-batch-delete').disabled = selected.length === 0;
+      }
+    }
+
+    function summarizeBatchErrors(errors) {
+      if (!errors?.length) return '';
+      return ' Failed: ' + errors.map((e) => `${e.slug} (${e.error})`).slice(0, 3).join('; ')
+        + (errors.length > 3 ? ` +${errors.length - 3} more` : '');
+    }
+
+    async function batchDraftsAction(action) {
+      const slugs = selectedSlugs('drafts');
+      if (!slugs.length) return;
+      if (action === 'approve') {
+        if (!confirm(`Publish ${slugs.length} selected draft${slugs.length === 1 ? '' : 's'} on the public blog now?`)) return;
+      } else if (action === 'delete') {
+        if (!confirm(`Permanently delete ${slugs.length} selected draft${slugs.length === 1 ? '' : 's'}? This cannot be undone.`)) return;
+      } else {
+        return;
+      }
+      hideBanner();
+      showToast(action === 'approve' ? 'Approving…' : 'Deleting…', '', 20000);
+      const result = await api('/api/blog-admin/drafts/batch', {
+        method: 'POST',
+        body: JSON.stringify({ action, slugs }),
+      });
+      const okCount = result.results?.length || 0;
+      const errCount = result.errors?.length || 0;
+      const msg = action === 'approve'
+        ? `Approved ${okCount} draft${okCount === 1 ? '' : 's'}.`
+        : `Deleted ${okCount} draft${okCount === 1 ? '' : 's'}.`;
+      showBanner(msg + summarizeBatchErrors(result.errors), errCount ? 'err' : 'ok');
+      showToast(errCount ? 'Batch finished with errors' : 'Batch done', errCount ? 'err' : '');
+      await refreshLists();
+      if (action === 'approve' && okCount) switchTab('live');
+    }
+
+    async function batchLiveAction(action) {
+      const slugs = selectedSlugs('live');
+      if (!slugs.length) return;
+      if (action === 'unpublish') {
+        if (!confirm(`Move ${slugs.length} live post${slugs.length === 1 ? '' : 's'} back to drafts?`)) return;
+      } else if (action === 'delete') {
+        if (!confirm(`Permanently delete ${slugs.length} live post${slugs.length === 1 ? '' : 's'} from the site? This cannot be undone.`)) return;
+      } else {
+        return;
+      }
+      hideBanner();
+      showToast(action === 'unpublish' ? 'Moving to drafts…' : 'Deleting…', '', 20000);
+      const result = await api('/api/blog-admin/published/batch', {
+        method: 'POST',
+        body: JSON.stringify({ action, slugs }),
+      });
+      const okCount = result.results?.length || 0;
+      const errCount = result.errors?.length || 0;
+      const msg = action === 'unpublish'
+        ? `Moved ${okCount} post${okCount === 1 ? '' : 's'} to drafts.`
+        : `Deleted ${okCount} live post${okCount === 1 ? '' : 's'}.`;
+      showBanner(msg + summarizeBatchErrors(result.errors), errCount ? 'err' : 'ok');
+      showToast(errCount ? 'Batch finished with errors' : 'Batch done', errCount ? 'err' : '');
+      await refreshLists();
+      if (action === 'unpublish' && okCount) switchTab('drafts');
     }
 
     async function refreshLists() {
@@ -1234,6 +1411,30 @@
     });
     $('refresh-btn').addEventListener('click', () => refreshLists().catch((e) => showBanner(e.message, 'err')));
     $('refresh-live-btn').addEventListener('click', () => refreshLists().catch((e) => showBanner(e.message, 'err')));
+    $('drafts-select-all').addEventListener('change', (e) => {
+      document.querySelectorAll('[data-draft-select]').forEach((el) => { el.checked = e.target.checked; });
+      syncBatchUi('drafts');
+    });
+    $('live-select-all').addEventListener('change', (e) => {
+      document.querySelectorAll('[data-live-select]').forEach((el) => { el.checked = e.target.checked; });
+      syncBatchUi('live');
+    });
+    $('drafts-batch-approve').addEventListener('click', () => batchDraftsAction('approve').catch((e) => {
+      showBanner(e.message, 'err');
+      showToast(e.message || 'Batch failed', 'err');
+    }));
+    $('drafts-batch-delete').addEventListener('click', () => batchDraftsAction('delete').catch((e) => {
+      showBanner(e.message, 'err');
+      showToast(e.message || 'Batch failed', 'err');
+    }));
+    $('live-batch-unpublish').addEventListener('click', () => batchLiveAction('unpublish').catch((e) => {
+      showBanner(e.message, 'err');
+      showToast(e.message || 'Batch failed', 'err');
+    }));
+    $('live-batch-delete').addEventListener('click', () => batchLiveAction('delete').catch((e) => {
+      showBanner(e.message, 'err');
+      showToast(e.message || 'Batch failed', 'err');
+    }));
     $('back-list-btn').addEventListener('click', () => { showList(); refreshLists(); });
     $('save-btn').addEventListener('click', () => saveDraft().catch((e) => showBanner(e.message, 'err')));
     $('approve-btn').addEventListener('click', () => approveDraft().catch((e) => showBanner(e.message, 'err')));
