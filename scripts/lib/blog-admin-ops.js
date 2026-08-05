@@ -283,7 +283,7 @@ function updateSources(payload = {}) {
       title: String(s.title).trim(),
       url: String(s.url).trim(),
       category: String(s.category || 'Caregiving').trim(),
-      risk: String(s.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
+      risk: String(s.risk || 'review').toLowerCase() === 'safe' ? 'safe' : 'review',
     }));
   saveSources({ feeds: cleanFeeds, seeds: cleanSeeds });
   return loadSources();
@@ -342,7 +342,7 @@ function updateTopics(payload = {}) {
         id,
         title,
         category: normalizeDeskCategory(t.category),
-        risk: String(t.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe',
+        risk: String(t.risk || 'review').toLowerCase() === 'safe' ? 'safe' : 'review',
         used: Boolean(t.used),
         angle: String(t.angle || '').trim(),
         source_url: String(t.source_url || '').trim(),
@@ -356,8 +356,7 @@ function updateTopics(payload = {}) {
 
 /**
  * Generate an article for a topic from the Blog desk.
- * Safe topics publish + rebuild; review topics land in drafts.
- * Pass forceDraft:true to always write a draft for human review.
+ * Always lands in drafts so a human approves before anything goes live.
  */
 async function generateTopicArticle(topicId, options = {}) {
   const id = String(topicId || '').trim();

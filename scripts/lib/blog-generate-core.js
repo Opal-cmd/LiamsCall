@@ -35,7 +35,8 @@ HARD RULES:
 - Never use exclamation points.
 - Write 500–800 words in Markdown paragraphs (optional ## headings). No # title in the body (title is separate).
 - Tone: steady, kind friend; no performative AI warmth; no cheerleading.
-- End with one gentle practical next step, then the Further reading / Resources links.`;
+- Opening: the first paragraph must be a short summary of what the post covers and what practical information it gives. Put that summary before any ## headings.
+- Closing order (required): (1) one gentle practical next step that invites the reader to continue in Liam's Call chat with a Markdown link to https://liamscall.com/ ; (2) a short paragraph or line beginning with "Sources referenced:" that names and links the seed website(s) you used; (3) then the "## Further reading" section with the full link list.`;
 
 function getModel() {
   return process.env.BLOG_GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-3.6-flash';
@@ -112,10 +113,11 @@ Angle: ${topic.angle || 'Practical caregiver support'}
 ${sourceBlock}
 ${relatedBlock}
 
-Linking requirements:
-1. Include natural inline Markdown links to resources you use while writing.
-2. End with a short "## Further reading" section listing Markdown links for every resource URL used (at least the primary resource when provided).
-3. Never invent URLs.
+Structure & linking requirements:
+1. Start the body with one summary paragraph (what the post is about and what practical info it gives) before any ## headings.
+2. Include natural inline Markdown links to resources you use while writing.
+3. Close in this exact order: (a) a gentle next-step paragraph inviting https://liamscall.com/ chat, (b) a "Sources referenced:" line linking the seed site(s) used, (c) "## Further reading" listing Markdown links for every resource URL used (at least the primary resource when provided).
+4. Never invent URLs.
 
 Return ONLY valid JSON (no markdown fences) with keys:
 {
@@ -156,6 +158,61 @@ async function callGemini(userPrompt) {
   return data.choices?.[0]?.message?.content || '';
 }
 
+/**
+ * Ensure opening summary + closing order: chat CTA → Sources referenced → Further reading.
+ */
+function ensureGeneratedBodyStructure(body, { sourceUrl, sourceName }) {
+  let next = String(body || '').trim();
+  const label = sourceName || 'Primary resource';
+
+  // Opening: if body starts with a heading, prepend a short summary stub.
+  const firstContentLine = next.split('\n').find((l) => l.trim()) || '';
+  if (/^##\s+/.test(firstContentLine)) {
+    console.warn('Generated body missing opening summary paragraph; prepending stub.');
+    next = `This guide walks through practical next steps for this situation and points you to verified support options.\n\n${next}`;
+  }
+
+  let furtherBlock = '';
+  const furtherMatch = next.match(/\n##\s*(Further reading|Resources)\s*\n[\s\S]*$/i);
+  if (furtherMatch) {
+    furtherBlock = furtherMatch[0].trim();
+    next = next.slice(0, furtherMatch.index).trim();
+  }
+
+  const hasChatCta =
+    /liamscall\.com\/?(?:["'\s)]|$)/i.test(next) ||
+    /\[talk with liam'?s call/i.test(next);
+  const hasSourcesLine = /sources referenced/i.test(next);
+  const hasFurther = Boolean(furtherBlock) || /##\s*(further reading|resources)\b/i.test(next);
+  const hasSourceUrl = sourceUrl ? next.includes(sourceUrl) || (furtherBlock && furtherBlock.includes(sourceUrl)) : true;
+
+  const closingParts = [];
+
+  if (!hasChatCta) {
+    closingParts.push(
+      `If you want to keep going privately, you can [talk with Liam's Call AI](https://liamscall.com/) — free, no account required.`,
+    );
+  }
+
+  if (sourceUrl && (!hasSourcesLine || !next.includes(sourceUrl))) {
+    console.warn(`Generated body missing Sources referenced for ${sourceUrl}; appending.`);
+    closingParts.push(`Sources referenced: [${label}](${sourceUrl}).`);
+  }
+
+  if (closingParts.length) {
+    next = `${next}\n\n${closingParts.join('\n\n')}`;
+  }
+
+  if (furtherBlock) {
+    next = `${next}\n\n${furtherBlock}`;
+  } else if (sourceUrl && (!hasFurther || !hasSourceUrl)) {
+    console.warn(`Generated body missing Further reading for ${sourceUrl}; appending.`);
+    next = `${next}\n\n## Further reading\n\n- [${label}](${sourceUrl})`;
+  }
+
+  return `${next.trim()}\n`;
+}
+
 function extractJson(text) {
   const trimmed = String(text || '').trim();
   const fence = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -182,18 +239,21 @@ function writeMarkdown({ title, description, slug, category, risk, body, date, i
 
 /**
  * Generate a post from a topic id (or the next unused topic if omitted).
- * @param {{ topicId?: string|null, dryRun?: boolean, forceDraft?: boolean }} opts
+ *
+ * Generated posts always land in drafts for human review. Risk-based
+ * auto-publishing only happens when a caller passes allowAutoPublish.
+ * @param {{ topicId?: string|null, dryRun?: boolean, forceDraft?: boolean, allowAutoPublish?: boolean }} opts
  * @returns {Promise<{ mode: string, risk: string, topicId: string, slug: string, path: string, title: string }>}
  */
 async function generateTopic(opts = {}) {
   const topicId = opts.topicId || null;
   const dryRun = Boolean(opts.dryRun);
-  const forceDraft = Boolean(opts.forceDraft);
+  const forceDraft = Boolean(opts.forceDraft) || !opts.allowAutoPublish;
 
   const topics = loadTopics();
   const topic = pickTopic(topics, topicId);
-  let risk = (topic.risk || 'safe').toLowerCase();
-  if (forceDraft) risk = 'review';
+  const declaredRisk = String(topic.risk || 'review').toLowerCase() === 'safe' ? 'safe' : 'review';
+  const risk = forceDraft ? 'review' : declaredRisk;
 
   const resolved = resolveSourceForTopic(topic);
   if (resolved.source_url && !topic.source_url) {
@@ -233,14 +293,10 @@ async function generateTopic(opts = {}) {
     console.warn(`Image attach skipped: ${err.message || err}`);
   }
 
-  if (sourceUrl && !body.includes(sourceUrl)) {
-    const label = String(topic.source_name || 'Further reading').trim() || 'Further reading';
-    console.warn(`Generated body missing source hyperlink for ${sourceUrl}; appending Further reading section.`);
-    body = `${body.trim()}\n\n## Further reading\n\n- [${label}](${sourceUrl})\n`;
-  } else if (sourceUrl && !/further reading|## resources/i.test(body)) {
-    const label = String(topic.source_name || 'Primary resource').trim() || 'Primary resource';
-    body = `${body.trim()}\n\n## Further reading\n\n- [${label}](${sourceUrl})\n`;
-  }
+  body = ensureGeneratedBodyStructure(body, {
+    sourceUrl,
+    sourceName: String(topic.source_name || '').trim(),
+  });
 
   const md = writeMarkdown({
     title,
@@ -259,8 +315,10 @@ async function generateTopic(opts = {}) {
   fs.writeFileSync(tmpPath, md);
   try {
     const post = loadPost(tmpPath);
+    // Hold every draft to the same phone/URL standard the build enforces at
+    // publish time, so a reviewer never gets a post that cannot ship.
     assertPostGuards(post, {
-      strictSafe: risk === 'safe',
+      strictSafe: true,
       allowUrls: sourceUrl ? [sourceUrl] : [],
     });
   } finally {

@@ -21,17 +21,17 @@ seeds:
   - title: "Ontario Caregiver Organization - home"
     url: https://ontariocaregiver.ca
     category: Caregiver Wellbeing
-    risk: safe
+    risk: review
 
   - title: "Ontario Caregiver Organization - get support"
     url: https://ontariocaregiver.ca/get-support/
     category: Caregiver Wellbeing
-    risk: safe
+    risk: review
 
   - title: "Ontario Caregiver Organization - about"
     url: https://ontariocaregiver.ca/about/
     category: Caregiver Wellbeing
-    risk: safe
+    risk: review
 
   - title: "Canada 9-8-8"
     url: https://988.ca
@@ -106,7 +106,7 @@ seeds:
   - title: "Mental Health Commission of Canada"
     url: https://mentalhealthcommission.ca
     category: Mental Health
-    risk: safe
+    risk: review
 
   - title: "CAMH health info"
     url: https://www.camh.ca/en/health-info
@@ -126,17 +126,17 @@ seeds:
   - title: "NAMI family caregivers"
     url: https://www.nami.org/Your-Journey/Family-Members-and-Caregivers
     category: Caregiver Wellbeing
-    risk: safe
+    risk: review
 
   - title: "NAMI home"
     url: https://www.nami.org
     category: Mental Health
-    risk: safe
+    risk: review
 
   - title: "NAMI find support"
     url: https://www.nami.org/support-education/
     category: Caregiver Wellbeing
-    risk: safe
+    risk: review
 
   - title: "City of Toronto"
     url: https://www.toronto.ca
@@ -156,9 +156,9 @@ seeds:
   - title: "Canada.ca mental health"
     url: https://www.canada.ca/en/public-health/services/mental-health-services.html
     category: Mental Health
-    risk: safe
+    risk: review
 
   - title: "Wellness Together Canada"
     url: https://www.wellnesstogether.ca
     category: Mental Health
-    risk: safe
+    risk: review

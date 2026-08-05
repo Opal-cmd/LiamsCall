@@ -213,7 +213,7 @@ async function collectInspirations() {
       url: seed.url,
       summary: '',
       source_name: seed.title.split(' - ')[0] || 'Seed',
-      default_risk: seed.risk || 'safe',
+      default_risk: seed.risk || 'review',
       category: seed.category || 'Caregiving',
     });
   }
@@ -237,11 +237,12 @@ async function main() {
   }
   if (!proposed.length) proposed = heuristicTopics(inspirations, args.limit);
 
-  // Normalize ids / risks
+  // Every discovered topic enters the queue as review-tier. Only an admin
+  // editing the topic in the Blog desk can mark one safe.
   proposed = proposed.slice(0, args.limit).map((t) => ({
     ...t,
     id: toSlug(t.id || t.title).slice(0, 60),
-    risk: guessRisk(`${t.title} ${t.angle}`, t.risk || 'safe'),
+    risk: 'review',
     used: false,
   }));
 

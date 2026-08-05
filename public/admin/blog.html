@@ -200,6 +200,28 @@
     }
     .field { margin-bottom: 0.75rem; }
     .help { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+    /* Fixed so a save confirmation is visible even far down a long topic list. */
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 1.5rem;
+      transform: translate(-50%, 0.75rem);
+      z-index: 50;
+      max-width: min(90vw, 26rem);
+      padding: 0.75rem 1.1rem;
+      border-radius: 0.75rem;
+      background: #065f46;
+      color: #ecfdf5;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(6,95,70,0.28);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    #toast.show { opacity: 1; transform: translate(-50%, 0); }
+    #toast.err { background: #991b1b; color: #fef2f2; box-shadow: 0 12px 30px rgba(153,27,27,0.28); }
   </style>
 </head>
 <body>
@@ -216,6 +238,7 @@
     </div>
 
     <div id="banner" class="notice hidden"></div>
+    <div id="toast" role="status" aria-live="polite"></div>
 
     <section id="login-panel" class="card stack">
       <p style="margin:0;color:var(--muted);font-size:0.92rem;">
@@ -283,7 +306,7 @@
             <div id="seeds-list" class="list"></div>
             <div class="row" style="margin-top:0.5rem;">
               <button id="add-seed-btn" class="btn secondary" type="button">Add seed</button>
-              <button id="save-sources-btn" class="btn" type="button">Save sources</button>
+              <button id="save-sources-btn" class="btn" type="button">Save changes</button>
             </div>
           </div>
         </div>
@@ -291,13 +314,13 @@
         <div id="topics-view" class="card hidden stack">
           <div>
             <strong>Topic queue</strong>
-            <p class="help" style="margin:0.35rem 0 0;">Add ideas for the writing queue. Each topic needs a title; the id is filled in automatically if you leave it blank. Use <strong>Generate</strong> to write an article with Gemini (<em>safe</em> publishes live, <em>review</em> opens a draft). Used topics show <strong>Force generate</strong> instead. Tip: after editing on the live site, also save a copy into git — Render disk resets on redeploy.</p>
+            <p class="help" style="margin:0.35rem 0 0;">Add ideas for the writing queue. Each topic needs a title; the id is filled in automatically if you leave it blank. Use <strong>Generate</strong> to write an article with Gemini — it always opens a draft under <strong>Needs review</strong>, so nothing goes live until you approve it. Used topics show <strong>Force generate</strong> instead. Tip: after editing on the live site, also save a copy into git — Render disk resets on redeploy.</p>
           </div>
           <div class="field">
             <div id="topics-list" class="list"></div>
             <div class="row" style="margin-top:0.5rem;">
               <button id="add-topic-btn" class="btn secondary" type="button">Add topic</button>
-              <button id="save-topics-btn" class="btn" type="button">Save topics</button>
+              <button id="save-topics-btn" class="btn" type="button">Save changes</button>
             </div>
           </div>
         </div>
@@ -613,6 +636,18 @@
     }
     function hideBanner() {
       banner.classList.add('hidden');
+    }
+
+    let toastTimer = null;
+    function showToast(msg, kind = '') {
+      const toast = $('toast');
+      toast.textContent = msg;
+      toast.className = kind ? kind : '';
+      // Restart the transition when a toast is already on screen.
+      void toast.offsetWidth;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
     }
 
     async function api(path, options = {}) {
@@ -1065,11 +1100,7 @@
       }
       topic.id = id;
 
-      const risk = String(topic.risk || 'safe').toLowerCase() === 'review' ? 'review' : 'safe';
-      const confirmMsg = risk === 'safe'
-        ? `Generate and publish “${title}” to the live blog? (Risk is safe.)`
-        : `Generate a draft for “${title}”? You can review it under Needs review before publishing.`;
-      if (!window.confirm(confirmMsg)) return;
+      if (!window.confirm(`Generate a draft for “${title}”? Nothing goes live until you approve it under Needs review.`)) return;
 
       let allowUsed = false;
       if (topic.used) {
@@ -1077,7 +1108,7 @@
         if (!allowUsed) return;
       }
 
-      await saveTopics();
+      await saveTopics({ silent: true });
 
       const originalLabel = btn.textContent;
       btn.disabled = true;
@@ -1121,10 +1152,11 @@
       state.sources = saved;
       renderFeeds();
       renderSeeds();
-      showBanner('Sources saved.', 'ok');
+      showBanner('Changes saved. Seeds are up to date.', 'ok');
+      showToast('Changes saved');
     }
 
-    async function saveTopics() {
+    async function saveTopics(options = {}) {
       hideBanner();
       const prepared = state.topics.map((t, i) => {
         const title = String(t.title || '').trim();
@@ -1149,7 +1181,9 @@
       });
       state.topics = saved.topics || [];
       renderTopics();
-      showBanner('Topics saved.', 'ok');
+      if (options.silent) return;
+      showBanner('Changes saved. Topics are up to date.', 'ok');
+      showToast('Changes saved');
     }
 
     $('login-btn').addEventListener('click', async () => {
@@ -1192,16 +1226,19 @@
     $('delete-btn').addEventListener('click', () => deleteDraft().catch((e) => showBanner(e.message, 'err')));
     $('preview-btn').addEventListener('click', () => updatePreview().catch((e) => showBanner(e.message, 'err')));
     $('add-seed-btn').addEventListener('click', () => {
-      state.sources.seeds.push({ title: '', url: '', category: 'Caregiving', risk: 'safe' });
+      state.sources.seeds.push({ title: '', url: '', category: 'Caregiving', risk: 'review' });
       renderSeeds();
     });
-    $('save-sources-btn').addEventListener('click', () => saveSources().catch((e) => showBanner(e.message, 'err')));
+    $('save-sources-btn').addEventListener('click', () => saveSources().catch((e) => {
+      showBanner(e.message, 'err');
+      showToast('Could not save changes', 'err');
+    }));
     $('add-topic-btn').addEventListener('click', () => {
       state.topics.unshift({
         id: '',
         title: '',
         category: 'Care Giver Tips',
-        risk: 'safe',
+        risk: 'review',
         used: false,
         angle: '',
         source_url: '',
@@ -1211,7 +1248,10 @@
       const firstTitle = $('topics-list').querySelector('[data-topic-field="title"]');
       if (firstTitle) firstTitle.focus();
     });
-    $('save-topics-btn').addEventListener('click', () => saveTopics().catch((e) => showBanner(e.message, 'err')));
+    $('save-topics-btn').addEventListener('click', () => saveTopics().catch((e) => {
+      showBanner(e.message, 'err');
+      showToast('Could not save changes', 'err');
+    }));
 
     (async function boot() {
       if (!state.token) {
