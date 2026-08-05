@@ -1,9 +1,11 @@
 {
   "posts": {
     "addiction-showing-up-at-your-job": {
-      "photoId": "",
-      "fileHash": "e5d1e15b131e35c1ab133c5503676dbd13f153a0",
-      "origin": "legacy"
+      "photoId": "photo-1494548162494-384bba4ab999",
+      "url": "https://images.unsplash.com/photo-1494548162494-384bba4ab999?auto=format&fit=crop&w=1600&q=80",
+      "origin": "stock:recovery",
+      "fileHash": "0bbefc4635f1a75ee01612897346c66d14ad57e7",
+      "updated": "2026-08-05"
     },
     "after-hospital-discharge-48-hours": {
       "photoId": "",
@@ -46,9 +48,11 @@
       "origin": "legacy"
     },
     "housing-first-plain-words-families": {
-      "photoId": "",
-      "fileHash": "9767c011f17865187418fb4e1d2e912f93cc1069",
-      "origin": "legacy"
+      "photoId": "photo-1568605114967-8130f3a36994",
+      "url": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=80",
+      "origin": "stock:housing",
+      "fileHash": "c9b79a8344d3d18ac94e90e4843346268114807e",
+      "updated": "2026-08-05"
     },
     "how-to-ask-for-help-without-feeling-guilty": {
       "photoId": "",
@@ -86,9 +90,11 @@
       "origin": "legacy"
     },
     "when-someone-refuses-addiction-treatment": {
-      "photoId": "",
-      "fileHash": "8c3f66c8bee74967aeb8a8baa1e7f3ea791393d2",
-      "origin": "legacy"
+      "photoId": "photo-1516450360452-9312f5e86fc7",
+      "url": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1600&q=80",
+      "origin": "stock:recovery",
+      "fileHash": "3f3961f47fb674d71a2323372328722eee38a414",
+      "updated": "2026-08-05"
     },
     "when-they-wont-accept-help": {
       "photoId": "",

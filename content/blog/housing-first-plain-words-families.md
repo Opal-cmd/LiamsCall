@@ -9,7 +9,6 @@ risk: safe
 source_url: "https://www.samhsa.gov/homelessness-programs-resources"
 image: "/assets/blog/housing-first-plain-words-families.jpg"
 ---
-
 When a family member is experiencing homelessness alongside addiction or mental health challenges, finding the right path forward can feel overwhelming. This post explains the Housing First model, a widely used approach to ending homelessness, and provides practical steps on how to find these programs in your community using local resources. By understanding how this framework operates, you can better advocate for your loved one and navigate the social services system with realistic expectations.
 
 ## What is Housing First?

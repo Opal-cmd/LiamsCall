@@ -9,7 +9,6 @@ risk: review
 source_url: "https://www.canada.ca/en/public-health/services/mental-health-services.html"
 image: "/assets/blog/addiction-showing-up-at-your-job.jpg"
 ---
-
 When a loved one is dealing with addiction, mental health crises, or housing instability, the chaos rarely stays contained to your personal life. This post offers practical strategies for managing your professional life when you are dealing with overnight crises, emergency detox drop-offs, or urgent housing searches. You will learn how to communicate with your employer to get the flexibility you need, how to protect your privacy without lying, and how to utilize workplace support systems like Employee Assistance Programs (EAPs) quietly.
 
 ## The challenge of the split focus

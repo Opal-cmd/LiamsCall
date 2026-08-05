@@ -9,7 +9,6 @@ risk: safe
 source_url: "https://connexontario.ca"
 image: "/assets/blog/when-someone-refuses-addiction-treatment.jpg"
 ---
-
 It is incredibly difficult to watch a family member struggle with substance use, especially when they refuse professional help. This post covers practical, non-confrontational ways to approach your loved one, how to shift your communication style to reduce defensiveness, and where to find support for your own well-being while navigating this journey.
 
 ## Shifting away from confrontation
