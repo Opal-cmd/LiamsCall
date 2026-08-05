@@ -18,7 +18,7 @@ topics:
     title: "When You Cannot Sleep Because They Are Still Using"
     category: "Addiction"
     risk: review
-    used: false
+    used: true
     angle: "Practical ways families can settle their body for a few hours of rest while a loved one is in active use or overnight withdrawal risk — without pretending the danger is gone."
     source_url: "https://www.samhsa.gov/find-help/national-helpline"
     source_name: "SAMHSA National Helpline"
@@ -81,7 +81,7 @@ topics:
     title: "When Someone You Love Refuses Addiction Treatment"
     category: "Addiction"
     risk: review
-    used: true
+    used: false
     angle: "Non-confrontational framing for families when a loved one refuses detox or counseling — no diagnosis or medication advice; invite ConnexOntario / local referral as a next question."
     source_url: "https://connexontario.ca"
     source_name: "ConnexOntario"
@@ -117,7 +117,7 @@ topics:
     title: "When Their Addiction Starts Showing Up at Your Job"
     category: "Care Giver Tips"
     risk: review
-    used: false
+    used: true
     angle: "How to ask for flexibility after overnight crises, detox drop-offs, or housing searches without oversharing — and when EAP is worth a quiet try."
     source_url: "https://www.canada.ca/en/public-health/services/mental-health-services.html"
     source_name: "Canada.ca mental health"
