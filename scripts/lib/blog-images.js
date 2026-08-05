@@ -4,20 +4,26 @@
  * Blog hero images for Liam's Call.
  *
  * Priority order:
- *   1. Keyword-matched Unsplash stock chosen from title + angle + description
- *      + category — the image should feel related to the post's subject.
- *   2. og:image from the inspiration source page (allowlisted hosts), when stock
- *      download fails.
+ *   1. Unsplash Search API using keywords built from the post's title / angle /
+ *      description / category — best relevance, needs UNSPLASH_ACCESS_KEY.
+ *   2. Curated per-theme stock pool (works with no API key).
+ *   3. og:image from the inspiration source page (allowlisted hosts).
+ *
+ * Every choice is recorded in content/blog/image-manifest.json so a photo used by
+ * one post is not reused by another.
  *
  * Images are saved under public/assets/blog/ and referenced as /assets/blog/{slug}.jpg
  */
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { ROOT, ensureDir, toSlug } = require('./blog-utils');
 
 const BLOG_ASSET_DIR = path.join(ROOT, 'public', 'assets', 'blog');
 const PUBLIC_PREFIX = '/assets/blog';
+const MANIFEST_PATH = path.join(ROOT, 'content', 'blog', 'image-manifest.json');
+const UNSPLASH_SEARCH_ENDPOINT = 'https://api.unsplash.com/search/photos';
 
 /** Hosts we may copy og:image from (same allowlist spirit as blog links). */
 const SOURCE_IMAGE_HOSTS = new Set([
@@ -48,7 +54,8 @@ const SOURCE_IMAGE_HOSTS = new Set([
 /**
  * Keyword-matched stock themes. Each theme has:
  *   - keywords: scored against title (x3), angle (x2), description (x1)
- *   - photos: Unsplash photo path ids verified to download
+ *   - queries: Unsplash Search API phrases, most specific first
+ *   - photos: curated fallback photo ids used when no API key is configured
  *
  * Prefer concrete, human, calm scenes — avoid abstract blobs / logos.
  */
@@ -59,11 +66,20 @@ const THEME_RULES = [
       'housing', 'homeless', 'shelter', 'evict', 'unhoused', 'apartment',
       'rent', 'couch', 'sofa surfing', 'place to stay', 'roof',
     ],
+    queries: [
+      'apartment doorway home evening',
+      'packed bag small room',
+      'quiet home interior window light',
+    ],
     photos: [
       'photo-1480074568708-e7b720bb3f09', // house at dusk
       'photo-1505693416388-ac5ce068fe85', // calm bedroom
       'photo-1493663284031-b7e3aefcae8e', // warm home interior
       'photo-1560448204-e02f11c3d0e2', // quiet living room
+      'photo-1523217582562-09d0def993a6', // house exterior evening
+      'photo-1502005229762-cf1b2da7c5d6', // apartment building
+      'photo-1568605114967-8130f3a36994', // home at dusk
+      'photo-1449844908441-8829872d2607', // suburban house
     ],
   },
   {
@@ -72,11 +88,20 @@ const THEME_RULES = [
       'addiction', 'detox', 'substance', 'recovery', 'sober', 'treatment',
       'relapse', 'alcohol', 'drugs', 'using', 'rehab',
     ],
+    queries: [
+      'support group circle talking',
+      'walking path morning light recovery',
+      'hand on shoulder support',
+    ],
     photos: [
       'photo-1476514525535-07fb3b4ae5f1', // road ahead / journey
       'photo-1449824913935-59a10b8d2000', // path forward
       'photo-1469571486292-0ba58a3f068b', // friends supporting each other
       'photo-1506126613408-eca07ce68773', // quiet stretch / grounding
+      'photo-1516450360452-9312f5e86fc7', // open road
+      'photo-1494548162494-384bba4ab999', // path through trees
+      'photo-1524397057410-1e775ed476f3', // sunrise walk
+      'photo-1523240795612-9a054b0db644', // group support table
     ],
   },
   {
@@ -85,11 +110,20 @@ const THEME_RULES = [
       'grief', 'loss', 'bereave', 'anticipatory', 'dying', 'mourning',
       'still here', 'farewell', 'goodbye', 'hospice', 'palliative',
     ],
+    queries: [
+      'empty chair window soft light',
+      'holding hands hospital gentle',
+      'misty quiet forest morning',
+    ],
     photos: [
       'photo-1441974231531-c6227db76b6e', // quiet forest
       'photo-1499209974431-9dddcece7f88', // soft sunset
       'photo-1470071459604-3b5ec3a7fe05', // misty hills
       'photo-1518173946687-a4c8892bbd9f', // soft window light
+      'photo-1447752875215-b2761acb3c5d', // forest path
+      'photo-1502082553048-f009c37129b9', // sunlight through trees
+      'photo-1518495973542-4542c06a5843', // sun through leaves
+      'photo-1495653797063-114787b77b23', // rain on window
     ],
   },
   {
@@ -98,11 +132,19 @@ const THEME_RULES = [
       'boundary', 'boundaries', 'saying no', 'say no', 'no without',
       'limit', 'overcommitted', 'people-pleas', 'people pleas',
     ],
+    queries: [
+      'two people serious conversation table',
+      'person alone calm doorway',
+      'closed door quiet room',
+    ],
     photos: [
       'photo-1529156069898-49953e39b3ac', // friends outdoors — space + connection
-      'photo-1511632765486-a01980e36a55', // holding hands with space
-      'photo-1506126613408-eca07ce68773', // person claiming quiet space
+      'photo-1573497620053-ea5300f94f21', // measured conversation
       'photo-1495474472287-4d71bcdd2085', // solo coffee moment
+      'photo-1488521787991-ed7bbaae773c', // two people talking
+      'photo-1517048676732-d65bc937f952', // meeting conversation
+      'photo-1522202176988-66273c2fd55f', // friends outdoors
+      'photo-1521737604893-d14cc237f11d', // group talking
     ],
   },
   {
@@ -111,11 +153,18 @@ const THEME_RULES = [
       'sleep', 'night', 'overnight', 'insomnia', 'night-shift', 'night shift',
       'broken sleep', 'awake', '3 a.m', '3am', 'bedside',
     ],
+    queries: [
+      'bedside lamp night quiet',
+      'window at night city calm',
+      'made bed morning light',
+    ],
     photos: [
       'photo-1511295742362-92c96b1cf484', // quiet night window
       'photo-1505693416388-ac5ce068fe85', // soft bedroom
-      'photo-1499209974431-9dddcece7f88', // evening light
       'photo-1518173946687-a4c8892bbd9f', // lamp / soft indoor light
+      'photo-1531353826977-0941b4779a1c', // night window
+      'photo-1470252649378-9c29740c9fa8', // night sky
+      'photo-1497294815431-9365093b7331', // bedroom morning
     ],
   },
   {
@@ -124,37 +173,59 @@ const THEME_RULES = [
       'sibling', 'brother', 'sister', 'family meeting', 'sharing care',
       'relative', 'in-law', 'parent', 'parents', 'adult child',
     ],
+    queries: [
+      'family sitting around kitchen table talking',
+      'adult siblings conversation home',
+      'multigenerational family together',
+    ],
     photos: [
       'photo-1511895426328-dc8714191300', // family around a table
-      'photo-1529156069898-49953e39b3ac', // adult friends/family outdoors
-      'photo-1573497019940-1cfe75a9f7f0', // two people talking
+      'photo-1600880292203-757bb62b4baf', // two people talking
       'photo-1469571486292-0ba58a3f068b', // supportive group
+      'photo-1543269865-cbf427effbad', // people at a table
+      'photo-1478476868527-002ae3f3e159', // family together
+      'photo-1529156069898-49953e39b3ac', // family outdoors
     ],
   },
   {
     theme: 'identity',
     keywords: [
-      'who am i', 'identity', 'besides a caregiver', 'myself', 'myselflessness',
-      'myself', 'hobby', 'hobbies', 'reclaim', 'own life',
+      'who am i', 'identity', 'besides a caregiver', 'myself',
+      'hobby', 'hobbies', 'reclaim', 'own life',
+    ],
+    queries: [
+      'person reading alone window peaceful',
+      'walking alone outdoors morning',
+      'hands hobby craft table',
     ],
     photos: [
       'photo-1506126613408-eca07ce68773', // person stretching outdoors
       'photo-1476514525535-07fb3b4ae5f1', // open road / journey
       'photo-1469474968028-56623f02e42e', // sunrise field
-      'photo-1495474472287-4d71bcdd2085', // quiet personal ritual
+      'photo-1483721310020-03333e577078', // person reading
+      'photo-1499996860823-5214fcc65f8f', // person outdoors
+      'photo-1508672019048-805c876b67e2', // solo viewpoint
     ],
   },
   {
     theme: 'guilt-anger',
     keywords: [
-      'guilt', 'angry', 'angryed', 'snap', 'angry', 'resent', 'furious',
+      'guilt', 'angry', 'snap', 'resent', 'furious',
       'lost your temper', 'regret', 'ashamed', 'frustrat',
+    ],
+    queries: [
+      'person sitting head in hands quiet',
+      'rain on window reflective',
+      'walking outside cooling off',
     ],
     photos: [
       'photo-1499209974431-9dddcece7f88', // soft sunset — cool-down
       'photo-1441974231531-c6227db76b6e', // quiet forest walk
-      'photo-1506126613408-eca07ce68773', // grounding stretch
-      'photo-1511632765486-a01980e36a55', // reconnection / holding hands
+      'photo-1495653797063-114787b77b23', // rain on window
+      'photo-1502082553048-f009c37129b9', // sunlight through trees
+      'photo-1447752875215-b2761acb3c5d', // forest path
+      'photo-1470071459604-3b5ec3a7fe05', // misty hills
+      'photo-1518173946687-a4c8892bbd9f', // soft window light
     ],
   },
   {
@@ -164,11 +235,18 @@ const THEME_RULES = [
       'friend', 'friends', 'lonely', 'isolation', 'reach out', 'listening',
       'hard conversation', 'script',
     ],
+    queries: [
+      'two people talking coffee listening',
+      'friend comforting another person',
+      'phone call sitting at home',
+    ],
     photos: [
-      'photo-1573497019940-1cfe75a9f7f0', // two people talking
+      'photo-1600880292203-757bb62b4baf', // two people talking
       'photo-1529156069898-49953e39b3ac', // group of friends
-      'photo-1511632765486-a01980e36a55', // people holding hands
-      'photo-1511895426328-dc8714191300', // family / close people
+      'photo-1521791136064-7986c2920216', // hands together, support
+      'photo-1488521787991-ed7bbaae773c', // two people conversation
+      'photo-1543269865-cbf427effbad', // people at a table
+      'photo-1524504388940-b1c1722653e1', // two women talking
     ],
   },
   {
@@ -177,11 +255,18 @@ const THEME_RULES = [
       'reset', 'break', 'burnout', 'rest', 'empty cup', 'micro', 'pause',
       'exhaust', 'recharge', 'self-care', 'self care', 'breathe', 'breathing',
     ],
+    queries: [
+      'hands holding warm mug calm',
+      'person breathing outdoors calm',
+      'quiet corner chair tea',
+    ],
     photos: [
       'photo-1495474472287-4d71bcdd2085', // warm coffee cup
       'photo-1506126613408-eca07ce68773', // quiet stretch / breathing
-      'photo-1499209974431-9dddcece7f88', // calm evening light
       'photo-1518173946687-a4c8892bbd9f', // soft indoor pause
+      'photo-1499750310107-5fef28a66643', // coffee moment
+      'photo-1517842645767-c639042777db', // notebook and tea
+      'photo-1447452001602-7090c7ab2db3', // tea cup
     ],
   },
   {
@@ -190,11 +275,18 @@ const THEME_RULES = [
       'routine', 'schedule', 'checklist', 'plan', 'habit', 'appointment',
       'organize', 'calendar', 'go-bag', 'go bag', 'packing', 'prepare',
     ],
+    queries: [
+      'notebook checklist planning desk',
+      'calendar planner week writing',
+      'packing a bag organized',
+    ],
     photos: [
+      'photo-1450101499163-c8848c66ca85', // notebook / planning
       'photo-1506905925346-21bda4d32df4', // steady horizon
       'photo-1469474968028-56623f02e42e', // sunrise over a field
-      'photo-1470071459604-3b5ec3a7fe05', // morning mist path
-      'photo-1484480974693-6ca0a06fb55b', // notebook / planning
+      'photo-1454165804606-c3d57bc86b40', // planning desk
+      'photo-1434030216411-0b793f4b4173', // notebook writing
+      'photo-1517842645767-c639042777db', // journal and tea
     ],
   },
   {
@@ -203,11 +295,18 @@ const THEME_RULES = [
       'crisis', '988', 'helpline', 'help line', 'emergency', 'er visit',
       'hospital', '911', 'hotline', 'suicid',
     ],
+    queries: [
+      'hospital waiting room quiet hallway',
+      'phone in hand calling for help',
+      'nurse talking with patient calm',
+    ],
     photos: [
-      'photo-1573497019940-1cfe75a9f7f0', // supportive conversation
       'photo-1576091160399-112ba8d25d1d', // healthcare context
       'photo-1559839734-2b71ea197ec2', // clinician listening
-      'photo-1511632765486-a01980e36a55', // human support
+      'photo-1573496359142-b8d87734a5a2', // clinician with patient
+      'photo-1519494026892-80bbd2d6fd0d', // hospital corridor
+      'photo-1584515933487-779824d29309', // healthcare setting
+      'photo-1631217868264-e5b90bb7e133', // clinical care
     ],
   },
   {
@@ -216,14 +315,33 @@ const THEME_RULES = [
       'caregiver', 'caregiving', 'caring for', 'looking after', 'loved one',
       'help them', 'supporting someone', 'beside',
     ],
+    queries: [
+      'caregiver holding hand older person',
+      'person helping family member at home',
+      'gentle hands support together',
+    ],
     photos: [
-      'photo-1573497019940-1cfe75a9f7f0', // caring conversation
-      'photo-1511632765486-a01980e36a55', // holding hands
+      'photo-1505455184862-554165e5f6ba', // holding an older person's hands
+      'photo-1521791136064-7986c2920216', // caring hands together
       'photo-1511895426328-dc8714191300', // family closeness
       'photo-1559839734-2b71ea197ec2', // attentive listening
+      'photo-1516307365426-bea591f05011', // holding hands close
+      'photo-1543269865-cbf427effbad', // family table
     ],
   },
 ];
+
+/** Words that add nothing to an image search. */
+const QUERY_STOPWORDS = new Set([
+  'a', 'an', 'the', 'and', 'or', 'but', 'for', 'to', 'of', 'in', 'on', 'at',
+  'is', 'are', 'was', 'were', 'be', 'been', 'it', 'its', 'this', 'that',
+  'with', 'without', 'your', 'you', 'their', 'them', 'they', 'when', 'what',
+  'how', 'why', 'who', 'not', 'can', 'cant', 'do', 'does', 'dont', 'from',
+  'about', 'into', 'after', 'before', 'while', 'still', 'here', 'there',
+  'first', 'next', 'guide', 'tips', 'things', 'ways', 'help', 'need',
+  'if', 'my', 'me', 'we', 'our', 'us', 'so', 'no', 'yes', 'get', 'got',
+  'hour', 'hours', 'minute', 'minutes', 'day', 'days',
+]);
 
 /** Category fallback when no keyword rule matches. */
 const CATEGORY_THEME = {
@@ -278,15 +396,199 @@ function stockUrl(photoId, width = 1600) {
   return `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=${width}&q=80`;
 }
 
-function pickStockPhoto({ category, title, angle, description, slug, avoid }) {
+function slugHash(value) {
+  return [...String(value || 'x')].reduce((n, ch) => n + ch.charCodeAt(0), 0);
+}
+
+function pickStockPhoto({ category, title, angle, description, slug, avoid, avoidIds }) {
   const rule = pickTheme({ title, angle, description, category });
-  const hash = [...String(slug || title || 'x')].reduce((n, ch) => n + ch.charCodeAt(0), 0);
+  const hash = slugHash(slug || title);
   const n = rule.photos.length;
   for (let step = 0; step < n; step += 1) {
-    const url = stockUrl(rule.photos[(hash + step) % n]);
-    if (!avoid || !avoid.has(url)) return { url, theme: rule.theme };
+    const photoId = rule.photos[(hash + step) % n];
+    const url = stockUrl(photoId);
+    const usedUrl = avoid && avoid.has(url);
+    const usedId = avoidIds && avoidIds.has(photoId);
+    if (!usedUrl && !usedId) return { url, photoId, theme: rule.theme };
   }
-  return { url: stockUrl(rule.photos[hash % n]), theme: rule.theme };
+  const fallbackId = rule.photos[hash % n];
+  return { url: stockUrl(fallbackId), photoId: fallbackId, theme: rule.theme };
+}
+
+/** Ordered curated candidates for a theme, starting at the slug's offset. */
+function stockCandidates({ category, title, angle, description, slug }) {
+  const rule = pickTheme({ title, angle, description, category });
+  const hash = slugHash(slug || title);
+  const n = rule.photos.length;
+  const out = [];
+  for (let step = 0; step < n; step += 1) {
+    const photoId = rule.photos[(hash + step) % n];
+    out.push({ photoId, url: stockUrl(photoId), theme: rule.theme });
+  }
+  return { theme: rule.theme, candidates: out };
+}
+
+/* ─── Used-image manifest ──────────────────────────────────────────────────── */
+
+function loadImageManifest() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+    if (parsed && typeof parsed === 'object' && parsed.posts) return parsed;
+  } catch {
+    /* first run / unreadable → start fresh */
+  }
+  return { posts: {} };
+}
+
+function saveImageManifest(manifest) {
+  ensureDir(path.dirname(MANIFEST_PATH));
+  const sorted = {};
+  for (const key of Object.keys(manifest.posts || {}).sort()) {
+    sorted[key] = manifest.posts[key];
+  }
+  fs.writeFileSync(MANIFEST_PATH, `${JSON.stringify({ posts: sorted }, null, 2)}\n`);
+}
+
+/** Photo ids already used by other posts, so we never repeat one. */
+function usedPhotoIds(excludeSlug = '') {
+  const manifest = loadImageManifest();
+  const skip = toSlug(excludeSlug);
+  const ids = new Set();
+  for (const [slug, entry] of Object.entries(manifest.posts || {})) {
+    if (slug === skip) continue;
+    if (entry && entry.photoId) ids.add(entry.photoId);
+  }
+  return ids;
+}
+
+function fileSha1(filePath) {
+  try {
+    return crypto.createHash('sha1').update(fs.readFileSync(filePath)).digest('hex');
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Image fingerprints already on disk. Catches duplicates even for older posts
+ * whose photo id was never recorded, or the same photo served under two ids.
+ */
+function usedFileHashes(excludeSlug = '') {
+  const manifest = loadImageManifest();
+  const skip = toSlug(excludeSlug);
+  const hashes = new Set();
+  for (const [slug, entry] of Object.entries(manifest.posts || {})) {
+    if (slug === skip) continue;
+    if (entry && entry.fileHash) hashes.add(entry.fileHash);
+  }
+  return hashes;
+}
+
+/**
+ * Record fingerprints for hero images already on disk but missing from the
+ * manifest, so posts written before this manifest existed still block reuse.
+ */
+function seedManifestFromExistingFiles() {
+  if (!fs.existsSync(BLOG_ASSET_DIR)) return;
+  const manifest = loadImageManifest();
+  let changed = false;
+  for (const name of fs.readdirSync(BLOG_ASSET_DIR)) {
+    if (!/\.(jpe?g|png|webp)$/i.test(name)) continue;
+    const slug = toSlug(name.replace(/\.[^.]+$/, ''));
+    if (!slug || manifest.posts[slug]) continue;
+    const hash = fileSha1(path.join(BLOG_ASSET_DIR, name));
+    if (!hash) continue;
+    manifest.posts[slug] = { photoId: '', fileHash: hash, origin: 'legacy' };
+    changed = true;
+  }
+  if (changed) saveImageManifest(manifest);
+}
+
+function recordImageChoice(slug, entry) {
+  const manifest = loadImageManifest();
+  manifest.posts[toSlug(slug)] = {
+    ...entry,
+    updated: new Date().toISOString().slice(0, 10),
+  };
+  saveImageManifest(manifest);
+}
+
+/* ─── Unsplash Search API ─────────────────────────────────────────────────── */
+
+function unsplashKey() {
+  return String(process.env.UNSPLASH_ACCESS_KEY || '').trim();
+}
+
+/** Salient words from the post title, for a title-derived search query. */
+function titleQuery(title) {
+  const words = String(title || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/[\s-]+/)
+    .filter((w) => w.length > 2 && !QUERY_STOPWORDS.has(w));
+  return words.slice(0, 4).join(' ');
+}
+
+/**
+ * Search phrases for a post, most specific first: the post's own words, then the
+ * theme's curated phrases.
+ */
+function buildImageQueries({ title, angle, description, category }) {
+  const rule = pickTheme({ title, angle, description, category });
+  const queries = [];
+  const fromTitle = titleQuery(title);
+  if (fromTitle) queries.push(fromTitle);
+  for (const q of rule.queries || []) queries.push(q);
+  return { theme: rule.theme, queries: [...new Set(queries)].filter(Boolean) };
+}
+
+async function searchUnsplash(query, { perPage = 24 } = {}) {
+  const key = unsplashKey();
+  if (!key) return [];
+  const url = new URL(UNSPLASH_SEARCH_ENDPOINT);
+  url.searchParams.set('query', query);
+  url.searchParams.set('per_page', String(perPage));
+  url.searchParams.set('orientation', 'landscape');
+  url.searchParams.set('content_filter', 'high');
+
+  const res = await fetch(url.href, {
+    headers: {
+      Authorization: `Client-ID ${key}`,
+      'Accept-Version': 'v1',
+      'User-Agent': "LiamsCallBlogBot/1.0 (+https://liamscall.com; hero image search)",
+    },
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) throw new Error(`Unsplash search failed ${res.status} for "${query}"`);
+  const data = await res.json();
+  return (data.results || [])
+    .filter((r) => r && r.id && r.urls && (r.urls.raw || r.urls.regular))
+    .map((r) => ({
+      photoId: r.id,
+      url: r.urls.raw
+        ? `${r.urls.raw}&auto=format&fit=crop&w=1600&q=80`
+        : r.urls.regular,
+      downloadLocation: r.links && r.links.download_location ? r.links.download_location : '',
+      credit: {
+        name: (r.user && r.user.name) || '',
+        username: (r.user && r.user.username) || '',
+        link: (r.user && r.user.links && r.user.links.html) || '',
+      },
+    }));
+}
+
+/** Unsplash API guideline: ping download_location when a photo is actually used. */
+async function pingUnsplashDownload(downloadLocation) {
+  const key = unsplashKey();
+  if (!key || !downloadLocation) return;
+  try {
+    await fetch(downloadLocation, {
+      headers: { Authorization: `Client-ID ${key}`, 'Accept-Version': 'v1' },
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch {
+    /* attribution ping is best-effort */
+  }
 }
 
 function isAllowedImageHost(hostname) {
@@ -397,7 +699,9 @@ function diskPathForSlug(slug) {
 
 /**
  * Ensure a local hero image exists for a post.
- * Returns { path, origin } where origin is 'stock:<theme>', 'source', or 'existing'.
+ *
+ * Returns { path, origin, photoId?, credit? } where origin is
+ * 'existing', 'search:<query>', 'stock:<theme>', or 'source'.
  */
 async function ensurePostImage({
   slug,
@@ -421,47 +725,157 @@ async function ensurePostImage({
 
   ensureDir(BLOG_ASSET_DIR);
 
+  // Never reuse a photo another post already owns.
+  seedManifestFromExistingFiles();
+  const takenIds = usedPhotoIds(safeSlug);
+  const takenHashes = usedFileHashes(safeSlug);
+
+  /**
+   * Download a candidate and report whether its bytes are new. Returns the file
+   * hash, or null when the image duplicates another post's hero.
+   */
+  const downloadUnique = async (candidate) => {
+    await downloadToFile(candidate.url, dest);
+    const hash = fileSha1(dest);
+    return hash && takenHashes.has(hash) ? null : hash;
+  };
+
   const trySource = async () => {
     if (!sourceUrl) return null;
     try {
       const og = await tryOgImageFromSource(sourceUrl);
       if (!og) return null;
       await downloadToFile(og, dest);
-      return { path: pub, origin: 'source' };
+      recordImageChoice(safeSlug, {
+        photoId: `source:${og}`,
+        url: og,
+        origin: 'source',
+        fileHash: fileSha1(dest),
+      });
+      return { path: pub, origin: 'source', sourcePage: sourceUrl };
     } catch {
       return null;
     }
   };
 
+  // 1. Unsplash search on the post's own keywords (best relevance).
+  const trySearch = async () => {
+    if (!unsplashKey()) return null;
+    const { queries } = buildImageQueries({ title, angle, description, category });
+    const offset = slugHash(safeSlug);
+    for (const query of queries) {
+      let results;
+      try {
+        results = await searchUnsplash(query);
+      } catch (err) {
+        console.warn(`Unsplash search error for "${query}": ${err.message || err}`);
+        continue;
+      }
+      const fresh = results.filter(
+        (r) => !takenIds.has(r.photoId) && !(avoidStockUrls && avoidStockUrls.has(r.url)),
+      );
+      if (!fresh.length) continue;
+      // Rotate the starting point so similar posts don't all take the top hit.
+      const ordered = fresh
+        .slice(offset % fresh.length)
+        .concat(fresh.slice(0, offset % fresh.length));
+      for (const candidate of ordered.slice(0, 5)) {
+        let hash;
+        try {
+          hash = await downloadUnique(candidate);
+        } catch {
+          continue;
+        }
+        if (!hash) continue;
+        await pingUnsplashDownload(candidate.downloadLocation);
+        if (avoidStockUrls) avoidStockUrls.add(candidate.url);
+        recordImageChoice(safeSlug, {
+          photoId: candidate.photoId,
+          url: candidate.url,
+          origin: `search:${query}`,
+          credit: candidate.credit,
+          fileHash: hash,
+        });
+        return {
+          path: pub,
+          origin: `search:${query}`,
+          photoId: candidate.photoId,
+          credit: candidate.credit,
+        };
+      }
+    }
+    return null;
+  };
+
+  // 2. Curated pool, skipping anything already used elsewhere.
   const tryStock = async () => {
-    const stock = pickStockPhoto({
+    const { theme, candidates } = stockCandidates({
       category,
       title,
       angle,
       description,
       slug: safeSlug,
-      avoid: avoidStockUrls,
     });
-    await downloadToFile(stock.url, dest);
-    if (avoidStockUrls) avoidStockUrls.add(stock.url);
-    return { path: pub, origin: `stock:${stock.theme}`, stockUrl: stock.url };
+    const fresh = candidates.filter(
+      (c) => !takenIds.has(c.photoId) && !(avoidStockUrls && avoidStockUrls.has(c.url)),
+    );
+    let reusable = null;
+    for (const candidate of fresh) {
+      let hash;
+      try {
+        hash = await downloadUnique(candidate);
+      } catch {
+        continue;
+      }
+      if (!hash) {
+        reusable = reusable || candidate;
+        continue;
+      }
+      if (avoidStockUrls) avoidStockUrls.add(candidate.url);
+      recordImageChoice(safeSlug, {
+        photoId: candidate.photoId,
+        url: candidate.url,
+        origin: `stock:${theme}`,
+        fileHash: hash,
+      });
+      return { path: pub, origin: `stock:${theme}`, photoId: candidate.photoId, stockUrl: candidate.url };
+    }
+
+    // Pool exhausted: reuse a themed photo rather than failing the build.
+    for (const candidate of [reusable, ...candidates].filter(Boolean)) {
+      try {
+        await downloadToFile(candidate.url, dest);
+      } catch {
+        continue;
+      }
+      if (avoidStockUrls) avoidStockUrls.add(candidate.url);
+      recordImageChoice(safeSlug, {
+        photoId: candidate.photoId,
+        url: candidate.url,
+        origin: `stock:${theme}:reused`,
+        fileHash: fileSha1(dest),
+      });
+      return { path: pub, origin: `stock:${theme}`, photoId: candidate.photoId, stockUrl: candidate.url };
+    }
+    throw new Error(`No downloadable stock photo for theme ${theme}`);
   };
 
-  // Default: topic-matched stock first (more relatable than org og:images).
-  if (!preferSource) {
-    try {
-      return await tryStock();
-    } catch (err) {
-      console.warn(`Stock hero failed (${err.message || err}); trying source og:image`);
-      const fromSource = await trySource();
-      if (fromSource) return fromSource;
-      throw err;
-    }
+  if (preferSource) {
+    const fromSource = await trySource();
+    if (fromSource) return fromSource;
   }
 
-  const fromSource = await trySource();
-  if (fromSource) return fromSource;
-  return tryStock();
+  const fromSearch = await trySearch();
+  if (fromSearch) return fromSearch;
+
+  try {
+    return await tryStock();
+  } catch (err) {
+    console.warn(`Stock hero failed (${err.message || err}); trying source og:image`);
+    const fromSource = await trySource();
+    if (fromSource) return fromSource;
+    throw err;
+  }
 }
 
 function setFrontmatterImage(markdown, imagePath) {
@@ -483,9 +897,18 @@ function setFrontmatterImage(markdown, imagePath) {
 
 module.exports = {
   BLOG_ASSET_DIR,
+  MANIFEST_PATH,
   ensurePostImage,
   pickStockPhoto,
+  stockCandidates,
   pickTheme,
+  buildImageQueries,
+  searchUnsplash,
+  loadImageManifest,
+  saveImageManifest,
+  seedManifestFromExistingFiles,
+  usedPhotoIds,
+  usedFileHashes,
   setFrontmatterImage,
   publicPathForSlug,
   tryOgImageFromSource,

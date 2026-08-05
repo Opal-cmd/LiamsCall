@@ -12,11 +12,13 @@ description: >-
 ## Required behavior
 
 1. Every published/draft post must have frontmatter `image: "/assets/blog/{slug}.jpg"`.
-2. **First choice — topic-matched stock.** `ensurePostImage` scores Unsplash pools against title + angle + description + category (housing, recovery, grief, boundaries, sleep, siblings-family, identity, guilt-anger, connection, rest, routine, crisis-support, caregiving). Prefer human, calm scenes that match the post subject.
-3. **Fallback — inspiration source og:image.** If stock download fails, fetch `source_url`'s `og:image` when the host is curated (SAMHSA, ConnexOntario, 988, 211, Ontario Caregiver, Kids Help Phone, Mental Health Commission, toronto.ca, or other .gov/.ca/.org sources) and the image lives on the article's own domain or an allowlisted CDN.
-4. `ensurePostImage` returns `{ path, origin }` — log the origin (`source`, `stock:<theme>`, `existing`) so it is auditable.
-5. Never invent clinic/shelter photos. Never hotlink third-party article images in production HTML — always save under `public/assets/blog/`.
-6. After attaching images, run `node scripts/blog-build.js` so `/blog` cards show the art.
+2. **First choice — Unsplash search on the post's own keywords.** With `UNSPLASH_ACCESS_KEY` set, `ensurePostImage` searches the Search API using the post title's salient words, then the theme's curated phrases (landscape orientation, high content filter).
+3. **Second choice — curated theme pool.** Falls back to per-theme photo pools scored against title + angle + description + category (housing, recovery, grief, boundaries, sleep, siblings-family, identity, guilt-anger, connection, rest, routine, crisis-support, caregiving). Prefer human, calm scenes that match the post subject.
+4. **Last resort — inspiration source og:image.** Fetch `source_url`'s `og:image` when the host is curated (SAMHSA, ConnexOntario, 988, 211, Ontario Caregiver, Kids Help Phone, Mental Health Commission, toronto.ca, or other .gov/.ca/.org sources) and the image lives on the article's own domain or an allowlisted CDN.
+5. **No repeats.** Every choice is recorded in `content/blog/image-manifest.json` (photo id + file hash). A photo id or identical image already used by another post is skipped, so no two posts share a hero. Commit the manifest with the post.
+6. `ensurePostImage` returns `{ path, origin, photoId?, credit? }` — log the origin (`search:<query>`, `stock:<theme>`, `source`, `existing`) so it is auditable.
+7. Never invent clinic/shelter photos. Never hotlink third-party article images in production HTML — always save under `public/assets/blog/`.
+8. After attaching images, run `node scripts/blog-build.js` so `/blog` cards show the art.
 
 ## Commands
 

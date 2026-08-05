@@ -31,6 +31,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
           BLOG_GEMINI_MODEL: ${{ vars.BLOG_GEMINI_MODEL }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: |
           export BLOG_GEMINI_MODEL="${BLOG_GEMINI_MODEL:-${GEMINI_MODEL:-gemini-3.6-flash}}"
           node scripts/blog-generate.js
@@ -60,7 +61,7 @@ jobs:
           git config user.name "liamscall-blog-bot"
           git config user.email "blog-bot@liamscall.com"
           git checkout -b "$BRANCH"
-          git add content/blog/drafts content/blog/topics.yaml
+          git add content/blog/drafts content/blog/topics.yaml content/blog/image-manifest.json public/assets/blog
           git commit -m "Draft blog post for review: ${{ steps.result.outputs.slug }}"
           git push -u origin "$BRANCH"
           gh pr create \

@@ -128,6 +128,12 @@ function siteMetaPaths() {
   ].filter((rel) => fs.existsSync(path.join(ROOT, rel)));
 }
 
+/** Record of which stock photo each post used — must survive redeploys. */
+function imageManifestPaths() {
+  const rel = 'content/blog/image-manifest.json';
+  return fs.existsSync(path.join(ROOT, rel)) ? [rel] : [];
+}
+
 function existingPaths(rels) {
   return [...new Set((rels || []).map((p) => String(p).replace(/\\/g, '/')).filter(Boolean))].filter(
     (rel) => fs.existsSync(path.join(ROOT, rel)),
@@ -266,7 +272,7 @@ async function backupTopicsYaml(reason = 'Blog desk saved topics') {
 
 async function backupDraft(slug, reason) {
   const safe = toSlug(slug);
-  const upsert = [draftContentPath(safe), 'content/blog/topics.yaml'];
+  const upsert = [draftContentPath(safe), 'content/blog/topics.yaml', ...imageManifestPaths()];
   const img = postImagePath(safe);
   if (img) upsert.push(img);
   return syncFilesToGit({
@@ -277,7 +283,13 @@ async function backupDraft(slug, reason) {
 
 async function backupApprovedPost(slug, reason) {
   const safe = toSlug(slug);
-  const upsert = [publishedContentPath(safe), publicPostPath(safe), ...siteMetaPaths(), 'content/blog/topics.yaml'];
+  const upsert = [
+    publishedContentPath(safe),
+    publicPostPath(safe),
+    ...siteMetaPaths(),
+    ...imageManifestPaths(),
+    'content/blog/topics.yaml',
+  ];
   const img = postImagePath(safe);
   if (img) upsert.push(img);
   return syncFilesToGit({
