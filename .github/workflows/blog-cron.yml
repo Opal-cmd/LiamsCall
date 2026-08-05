@@ -1,9 +1,7 @@
-# Automated / hybrid blog publisher — Mon & Thu 14:00 UTC
+# Manual-only blog generator. New posts are never created on a schedule.
 name: Blog generate
 
 on:
-  schedule:
-    - cron: '0 14 * * 1,4'
   workflow_dispatch:
 
 permissions:
@@ -44,16 +42,14 @@ jobs:
           echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
           echo "risk=$RISK" >> "$GITHUB_OUTPUT"
 
-      - name: Build blog HTML
-        if: steps.result.outputs.mode == 'published'
-        run: node scripts/blog-build.js
-
       - name: Commit published post to main
         if: steps.result.outputs.mode == 'published'
         run: |
           git config user.name "liamscall-blog-bot"
           git config user.email "blog-bot@liamscall.com"
-          git add content/blog public/blog public/sitemap.xml
+          git add content/blog public/blog public/assets/blog
+          git add public/sitemap.xml public/sitemap.html
+          git add public/site-identity.json public/.well-known/brand.json
           git add -u content/blog/topics.yaml
           if git diff --cached --quiet; then
             echo "No changes to commit"
