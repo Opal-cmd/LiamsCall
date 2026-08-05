@@ -20,17 +20,17 @@ To get through these nights, the goal is not to achieve deep, peaceful sleep whe
 
 ## Practical Steps to Settle Your Body
 
-When your mind is racing with worst-case scenarios, try to focus on physical sensations to signal to your nervous system that you are safe in your bed for the next few hours. 
+When your mind is racing with worst-case scenarios, try to focus on physical sensations to signal to your nervous system that you are safe in your bed for the next few hours.
 
 First, acknowledge the risk instead of fighting it. Tell yourself that you are aware of the situation, you have done what you can for this evening, and staying awake will not change the outcome. If you have safety measures in place, such as keeping naloxone nearby or ensuring doors are locked, mentally check those off so your brain can stop scanning for those specific tasks.
 
-Second, try a simple physical grounding exercise. Place one hand on your chest and the other on your stomach. Breathe in slowly, letting your stomach rise, and exhale even slower than you inhaled. This slow exhalation directly signals the vagus nerve to reduce your heart rate. 
+Second, try a simple physical grounding exercise. Place one hand on your chest and the other on your stomach. Breathe in slowly, letting your stomach rise, and exhale even slower than you inhaled. This slow exhalation directly signals the vagus nerve to reduce your heart rate.
 
 Third, manage your environment. If you are constantly checking your phone to see if they have called or texted, place the phone across the room. Set your phone to allow calls only from your loved one or emergency services, so you do not have to jump at every notification but know you will still hear an urgent call.
 
 ## Setting Realistic Boundaries for the Night
 
-It is okay to decide that you cannot resolve a crisis at three in the morning. If your loved one is safe from immediate medical danger but is actively using or experiencing mild withdrawal, there is often very little you can do to change their path in the middle of the night. 
+It is okay to decide that you cannot resolve a crisis at three in the morning. If your loved one is safe from immediate medical danger but is actively using or experiencing mild withdrawal, there is often very little you can do to change their path in the middle of the night.
 
 If you find yourself overwhelmed by the isolation of these hours, remember that professional support is available during the day to help you plan your next steps. For those in the United States, the [SAMHSA National Helpline](https://www.samhsa.gov/find-help/national-helpline) is a confidential, free, 24/7 information service that can connect you with local treatment facilities and support groups. You can also explore options through the [SAMHSA Find Treatment](https://www.samhsa.gov/find-help/find-treatment) portal. For those in Canada, [ConnexOntario](https://connexontario.ca) provides similar free health services and support for people experiencing problems with alcohol and drugs.
 
@@ -42,6 +42,8 @@ Sources referenced: [SAMHSA National Helpline](https://www.samhsa.gov/find-help/
 
 ## Further reading
 
-* [SAMHSA National Helpline](https://www.samhsa.gov/find-help/national-helpline)
-* [SAMHSA Find Treatment](https://www.samhsa.gov/find-help/find-treatment)
-* [ConnexOntario](https://connexontario.ca)
+- [SAMHSA National Helpline](https://www.samhsa.gov/find-help/national-helpline)
+
+- [SAMHSA Find Treatment](https://www.samhsa.gov/find-help/find-treatment)
+
+- [ConnexOntario](https://connexontario.ca)
