@@ -335,13 +335,6 @@ function buildIndex(posts) {
       <p class="blog-hero-lead">
         Grounded pieces on wellbeing, communication, and supporting someone through mental health, addiction, or housing challenges.
       </p>
-      <p class="blog-hero-lead" style="margin-top:0.75rem;font-size:0.92rem;">
-        Start with a topic guide:
-        <a href="/mental-health-support-for-families">Mental health for families</a> ·
-        <a href="/addiction-help-for-families">Addiction help</a> ·
-        <a href="/housing-help-for-families">Housing help</a> ·
-        <a href="/caregiver-support">Caregiver support</a>
-      </p>
     </header>
     ${strip}
     <div class="blog-toolbar">

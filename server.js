@@ -1078,22 +1078,6 @@ app.get('/resources', (_req, res) => {
   sendPublicHtml(res, 'resources.html');
 });
 
-app.get('/mental-health-support-for-families', (_req, res) => {
-  sendPublicHtml(res, 'mental-health-support-for-families.html');
-});
-
-app.get('/addiction-help-for-families', (_req, res) => {
-  sendPublicHtml(res, 'addiction-help-for-families.html');
-});
-
-app.get('/housing-help-for-families', (_req, res) => {
-  sendPublicHtml(res, 'housing-help-for-families.html');
-});
-
-app.get('/caregiver-support', (_req, res) => {
-  sendPublicHtml(res, 'caregiver-support.html');
-});
-
 app.get('/blog', (_req, res) => {
   sendPublicHtml(res, path.join('blog', 'index.html'));
 });

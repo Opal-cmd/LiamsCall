@@ -135,6 +135,7 @@ function writeHtmlSitemap(pages) {
 
 function main() {
   const logo = brandImage();
+
   const pages = [
     {
       route: '/',
