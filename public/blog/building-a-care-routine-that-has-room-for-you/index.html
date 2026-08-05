@@ -528,11 +528,11 @@
     }
     .empty-feed { padding: 2rem 1.5rem; color: var(--muted); }
 
-    /* ---- Story page (WePresent article: tinted page, white card) ---- */
+    /* ---- Story page (WePresent editorial rhythm, Liam's Call tones) ---- */
     main.blog-main.is-article {
       max-width: none;
       margin: 0;
-      padding: 0 0 4rem;
+      padding: 0 0 4.5rem;
       background: var(--story-cream);
     }
     main.blog-main.story-tone-sage { background: var(--story-sage); }
@@ -540,7 +540,6 @@
     main.blog-main.story-tone-sand { background: var(--story-sand); }
     main.blog-main.story-tone-cream { background: var(--story-cream); }
     main.blog-main.is-article .blog-crumb {
-      margin: 0;
       padding: 1.25rem 1.5rem 0;
       max-width: 72rem;
       margin: 0 auto;
@@ -590,6 +589,7 @@
       max-height: 40rem;
       object-fit: cover;
       border-radius: 1rem;
+      background: rgba(18, 18, 18, 0.06);
     }
     .story-card {
       background: #fff;
@@ -600,21 +600,87 @@
       padding: clamp(2.25rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3.5rem);
       box-sizing: border-box;
     }
+    .story-card.is-continuation { margin-top: 1rem; }
     .story-grid {
       display: grid;
       grid-template-columns: 11rem minmax(0, 40rem);
       gap: clamp(1.5rem, 4vw, 4rem);
       justify-content: center;
+      align-items: start;
     }
-    .story-meta { font-size: 0.82rem; color: var(--muted); }
+    .story-grid.is-body-only {
+      grid-template-columns: minmax(0, 40rem);
+    }
+    .story-meta {
+      position: sticky;
+      top: 1.25rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .story-meta-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      margin: 0 0 1.35rem;
+    }
     .story-meta-label {
-      margin: 0 0 0.3rem;
+      margin: 0;
       font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
+      color: var(--muted);
     }
-    .story-meta-date { margin: 0 0 1.25rem; font-weight: 600; color: var(--ink); }
+    .story-meta-value {
+      margin: 0;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+    .story-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0 0 1.5rem;
+      list-style: none;
+      padding: 0;
+    }
+    .story-share,
+    .story-share-float {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      padding: 0;
+      border: 1px solid rgba(18, 18, 18, 0.25);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+    }
+    .story-share:focus-visible,
+    .story-share-float:focus-visible {
+      outline: 2px solid var(--green-dark);
+      outline-offset: 2px;
+    }
+    .story-share:hover,
+    .story-share-float:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+    .story-share.is-copied,
+    .story-share-float.is-copied {
+      background: var(--green-dark);
+      border-color: var(--green-dark);
+      color: #fff;
+    }
+    .story-share svg,
+    .story-share-float svg { width: 1.05rem; height: 1.05rem; fill: none; stroke: currentColor; stroke-width: 1.75; }
     .story-back {
       display: inline-flex;
       align-items: center;
@@ -625,6 +691,79 @@
       text-decoration: none;
     }
     .story-back:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .story-quote-band {
+      max-width: none;
+      width: 100%;
+      margin: 0;
+      padding: clamp(2.75rem, 7vw, 5rem) 1.5rem;
+      background: transparent;
+      text-align: center;
+    }
+    .story-quote-band blockquote {
+      margin: 0 auto;
+      max-width: 40rem;
+      padding: 0;
+      border: none;
+      font-family: var(--font-story-title);
+      font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+      font-weight: 400;
+      line-height: 1.25;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+    }
+    .story-quote-band blockquote p { margin: 0; }
+    .story-quote-band blockquote p + p { margin-top: 0.75rem; }
+    .story-tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem 1rem;
+      margin: 2.5rem 0 0;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--line);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .story-tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(18, 18, 18, 0.35);
+      border-radius: 999px;
+      padding: 0.45rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+      text-decoration: none;
+      color: var(--ink);
+      transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+    }
+    .story-tag:hover {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
+    }
+    .story-share-float {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 40;
+      width: 3rem;
+      height: 3rem;
+      box-shadow: 0 10px 28px rgba(18, 18, 18, 0.14);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 220ms ease, transform 220ms ease, background 180ms ease, color 180ms ease;
+    }
+    .story-share-float.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
     .story-related {
       max-width: 72rem;
       width: calc(100% - 2.5rem);
@@ -646,6 +785,11 @@
       font-size: 1.32rem;
       line-height: 1.55;
       color: var(--ink);
+    }
+    .story-card.is-continuation .blog-body > p:first-child {
+      font-size: inherit;
+      line-height: inherit;
+      color: inherit;
     }
     .blog-body blockquote {
       margin: 2rem 0;
@@ -706,17 +850,18 @@
     @media (max-width: 1000px) {
       .story-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
       .story-meta {
-        display: flex;
-        align-items: baseline;
-        gap: 0.6rem;
-        flex-wrap: wrap;
+        position: static;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.85rem 1.25rem;
         margin-bottom: 1.75rem;
-        padding-bottom: 1rem;
+        padding-bottom: 1.15rem;
         border-bottom: 1px solid var(--line);
       }
-      .story-meta-label { margin: 0; }
-      .story-meta-date { margin: 0; }
-      .story-meta .story-back { margin-left: auto; }
+      .story-meta-row { margin: 0; }
+      .story-actions { margin: 0; }
+      .story-back { grid-column: 1 / -1; }
+      .story-share-float { display: none; }
     }
     @media (max-width: 700px) {
       .blog-hero { padding-top: 2.25rem; }
@@ -739,10 +884,13 @@
       .story-related { width: calc(100% - 1.5rem); }
       .story-card { padding: 1.75rem 1.15rem; }
       .story-hero-media { padding: 0 0.75rem; }
-      .story-hero-media img { aspect-ratio: 4 / 3; }
+      .story-hero-media img { aspect-ratio: 4 / 3; max-height: none; }
       .blog-body { font-size: 0.98rem; }
       .blog-body > p:first-child { font-size: 1.18rem; }
       .blog-body blockquote { font-size: 1.28rem; }
+      .story-quote-band { padding: 2.5rem 1.15rem; }
+      .story-quote-band blockquote { font-size: 1.4rem; }
+      .story-meta { grid-template-columns: 1fr; }
     }
     @media (max-width: 767px) {
       .blog-hero { padding-left: 1.1rem; padding-right: 1.1rem; }
@@ -812,11 +960,26 @@
       <p class="story-dek speakable-summary">A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</p>
     </header>
     <figure class="story-hero-media"><img src="/assets/blog/building-a-care-routine-that-has-room-for-you.jpg" alt="" fetchpriority="high"></figure>
+    
     <div class="story-card">
       <div class="story-grid">
+        
         <aside class="story-meta">
-          <p class="story-meta-label">Published</p>
-          <p class="story-meta-date"><time datetime="2026-07-09">July 9, 2026</time></p>
+          <div class="story-meta-row">
+            <p class="story-meta-label">Published</p>
+            <p class="story-meta-value"><time datetime="2026-07-09">July 9, 2026</time></p>
+          </div>
+          <div class="story-meta-row">
+            <p class="story-meta-label">Words</p>
+            <p class="story-meta-value">Liam's Call</p>
+          </div>
+          <ul class="story-actions">
+            <li>
+              <button type="button" class="story-share" data-share-url="https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you" data-share-title="Building a Care Routine That Has Room for You" aria-label="Share this story">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+              </button>
+            </li>
+          </ul>
           <a class="story-back" href="/blog">&larr; All stories</a>
         </aside>
         <div class="story-body-col">
@@ -828,10 +991,16 @@
 <p>Review the routine every few weeks. The needs of the person you care for will change, and so will yours. A routine that worked in January may not work in June. Treating it as a living document — something you adjust rather than abandon when it stops fitting — keeps it functional over the long term.</p>
           </article>
           
+          
           <div class="blog-cta">
             <p>If this resonates, you can keep going in a private chat. No account required.</p>
             <a class="pill-dark" href="/">Talk with Liam's Call AI</a>
             &nbsp;&nbsp;<a href="/resources" class="cta-alt-link">Crisis resources</a>
+          </div>
+          
+          <div class="story-tags">
+            <span>Read more about</span>
+            <a class="story-tag" href="/blog?category=Care%20Giver%20Tips">Care Giver Tips</a>
           </div>
           <p class="blog-disclaimer">
             Liam's Call is an informational tool, not a medical professional or crisis service.
@@ -840,6 +1009,9 @@
         </div>
       </div>
     </div>
+    <button type="button" class="story-share-float" data-share-url="https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you" data-share-title="Building a Care Routine That Has Room for You" aria-label="Share this story">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+    </button>
     
     <section class="story-related" aria-label="More stories">
       <h2 class="section-title">More stories</h2>
@@ -847,27 +1019,27 @@
         
         <div class="polaroid-row is-wide-narrow">
           
-    <a class="polaroid pl-sand is-wide" href="/blog/saying-no-without-exploding" data-category="Care Giver Tips">
-      <span class="polaroid-media is-placeholder" aria-hidden="true"></span>
-      <span class="polaroid-caption"><span class="t">Saying No Without Exploding - Boundaries for Exhausted Caregivers</span> — Learn how to set small boundaries as a caregiver without feeling overwhelmed.</span>
+    <a class="polaroid pl-sand is-wide" href="/blog/ask-family-for-respite" data-category="Care Giver Tips">
+      <span class="polaroid-media"><img src="/assets/blog/ask-family-for-respite.jpg" alt="" loading="eager" decoding="async"></span>
+      <span class="polaroid-caption"><span class="t">How to Ask Family for Respite Without a Fight</span> — Scripts for asking siblings or relatives for a specific, time-bound care shift without turning it into a permanent argument.</span>
     </a>
           
-    <a class="polaroid pl-mint is-narrow" href="/blog/how-to-ask-for-help-without-feeling-guilty" data-category="Care Giver Tips">
-      <span class="polaroid-media"><img src="/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg" alt="" loading="lazy" decoding="async"></span>
-      <span class="polaroid-caption"><span class="t">How to Ask for Help Without Feeling Guilty</span> — Why caregivers avoid asking for help, how to break the guilt loop, and how to make requests specific enough that people can say yes.</span>
+    <a class="polaroid pl-mint is-narrow" href="/blog/one-boundary-default-caregiver" data-category="Care Giver Tips">
+      <span class="polaroid-media"><img src="/assets/blog/one-boundary-default-caregiver.jpg" alt="" loading="lazy" decoding="async"></span>
+      <span class="polaroid-caption"><span class="t">How to Set One Boundary When You Are the Default Caregiver</span> — Pick one sustainable boundary when you are the default caregiver — instead of overhauling the whole care map overnight.</span>
     </a>
         </div>
 
         <div class="polaroid-row is-narrow-wide">
           
-    <a class="polaroid pl-cream is-narrow" href="/blog/the-5-minute-reset" data-category="Care Giver Tips">
-      <span class="polaroid-media"><img src="/assets/blog/the-5-minute-reset.jpg" alt="" loading="lazy" decoding="async"></span>
-      <span class="polaroid-caption"><span class="t">The 5-Minute Reset: Micro-breaks That Actually Work</span> — When a full break feels impossible, five-minute resets can still help. Breathing, grounding, and other micro-breaks caregivers actually use.</span>
+    <a class="polaroid pl-cream is-narrow" href="/blog/when-they-wont-accept-help" data-category="Care Giver Tips">
+      <span class="polaroid-media"><img src="/assets/blog/when-they-wont-accept-help.jpg" alt="" loading="lazy" decoding="async"></span>
+      <span class="polaroid-caption"><span class="t">How to Talk to Someone Who Will Not Accept Help</span> — How to have one clear conversation when a loved one refuses support — without turning it into a permanent fight.</span>
     </a>
           
-    <a class="polaroid pl-moss is-wide" href="/blog/you-cant-pour-from-an-empty-cup" data-category="Care Giver Tips">
-      <span class="polaroid-media"><img src="/assets/blog/you-cant-pour-from-an-empty-cup.jpg" alt="" loading="lazy" decoding="async"></span>
-      <span class="polaroid-caption"><span class="t">You Can't Pour From an Empty Cup</span> — Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support.</span>
+    <a class="polaroid pl-moss is-wide" href="/blog/saying-no-without-exploding" data-category="Care Giver Tips">
+      <span class="polaroid-media is-placeholder" aria-hidden="true"></span>
+      <span class="polaroid-caption"><span class="t">Saying No Without Exploding - Boundaries for Exhausted Caregivers</span> — Learn how to set small boundaries as a caregiver without feeling overwhelmed.</span>
     </a>
         </div>
       </div>
@@ -904,5 +1076,52 @@
     })();
   </script>
   <script src="/assets/sidebar.js" defer></script>
+  <script>
+    (function () {
+      function bindShare(btn) {
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          var url = btn.getAttribute('data-share-url') || window.location.href;
+          var title = btn.getAttribute('data-share-title') || document.title;
+          function done() {
+            btn.classList.add('is-copied');
+            var prev = btn.getAttribute('aria-label') || 'Share';
+            btn.setAttribute('aria-label', 'Link copied');
+            setTimeout(function () {
+              btn.classList.remove('is-copied');
+              btn.setAttribute('aria-label', prev);
+            }, 1600);
+          }
+          if (navigator.share) {
+            navigator.share({ title: title, url: url }).catch(function () {});
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(function () {});
+            return;
+          }
+          try {
+            var ta = document.createElement('textarea');
+            ta.value = url;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+          } catch (e) {}
+        });
+      }
+      document.querySelectorAll('[data-share-url]').forEach(bindShare);
+      var floatBtn = document.querySelector('.story-share-float');
+      if (floatBtn) {
+        var onScroll = function () {
+          if (window.scrollY > 420) floatBtn.classList.add('is-visible');
+          else floatBtn.classList.remove('is-visible');
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
+    })();
+  </script>
 </body>
 </html>

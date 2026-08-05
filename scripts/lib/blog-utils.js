@@ -157,6 +157,7 @@ function markdownToHtml(md) {
   const out = [];
   let para = [];
   let list = null;
+  let quote = null;
 
   const flushPara = () => {
     if (!para.length) return;
@@ -168,6 +169,15 @@ function markdownToHtml(md) {
     out.push(`<${list.type}>${list.items.map((i) => `<li>${inlineMarkdown(i)}</li>`).join('')}</${list.type}>`);
     list = null;
   };
+  const flushQuote = () => {
+    if (!quote || !quote.length) {
+      quote = null;
+      return;
+    }
+    const inner = quote.map((line) => `<p>${inlineMarkdown(line)}</p>`).join('');
+    out.push(`<blockquote>${inner}</blockquote>`);
+    quote = null;
+  };
 
   for (const rawLine of lines) {
     const line = rawLine.trimEnd();
@@ -175,8 +185,18 @@ function markdownToHtml(md) {
     if (!trimmed) {
       flushPara();
       flushList();
+      flushQuote();
       continue;
     }
+    const bq = trimmed.match(/^>\s?(.*)$/);
+    if (bq) {
+      flushPara();
+      flushList();
+      if (!quote) quote = [];
+      if (bq[1]) quote.push(bq[1]);
+      continue;
+    }
+    if (quote) flushQuote();
     if (/^!\[/.test(trimmed) && /\]\([^)\s]+\)$/.test(trimmed)) {
       flushPara();
       flushList();
@@ -220,7 +240,26 @@ function markdownToHtml(md) {
   }
   flushPara();
   flushList();
+  flushQuote();
   return out.join('\n');
+}
+
+/** Split rendered article HTML into prose / pull-quote segments for WePresent-style bands. */
+function splitArticleSegments(html) {
+  const raw = String(html || '').trim();
+  if (!raw) return [];
+  const parts = raw.split(/(<blockquote>[\s\S]*?<\/blockquote>)/i);
+  const segments = [];
+  for (const part of parts) {
+    const chunk = part.trim();
+    if (!chunk) continue;
+    if (/^<blockquote[\s>]/i.test(chunk)) {
+      segments.push({ type: 'quote', html: chunk });
+    } else {
+      segments.push({ type: 'prose', html: chunk });
+    }
+  }
+  return segments;
 }
 
 function extractExcerpt(body, max = 160) {
@@ -685,6 +724,57 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
     })();
   </script>`
     : '';
+  const shareScript =
+    variant === 'article'
+      ? `
+  <script>
+    (function () {
+      function bindShare(btn) {
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          var url = btn.getAttribute('data-share-url') || window.location.href;
+          var title = btn.getAttribute('data-share-title') || document.title;
+          function done() {
+            btn.classList.add('is-copied');
+            var prev = btn.getAttribute('aria-label') || 'Share';
+            btn.setAttribute('aria-label', 'Link copied');
+            setTimeout(function () {
+              btn.classList.remove('is-copied');
+              btn.setAttribute('aria-label', prev);
+            }, 1600);
+          }
+          if (navigator.share) {
+            navigator.share({ title: title, url: url }).catch(function () {});
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(function () {});
+            return;
+          }
+          try {
+            var ta = document.createElement('textarea');
+            ta.value = url;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+          } catch (e) {}
+        });
+      }
+      document.querySelectorAll('[data-share-url]').forEach(bindShare);
+      var floatBtn = document.querySelector('.story-share-float');
+      if (floatBtn) {
+        var onScroll = function () {
+          if (window.scrollY > 420) floatBtn.classList.add('is-visible');
+          else floatBtn.classList.remove('is-visible');
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
+    })();
+  </script>`
+      : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1115,11 +1205,11 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
     }
     .empty-feed { padding: 2rem 1.5rem; color: var(--muted); }
 
-    /* ---- Story page (WePresent article: tinted page, white card) ---- */
+    /* ---- Story page (WePresent editorial rhythm, Liam's Call tones) ---- */
     main.blog-main.is-article {
       max-width: none;
       margin: 0;
-      padding: 0 0 4rem;
+      padding: 0 0 4.5rem;
       background: var(--story-cream);
     }
     main.blog-main.story-tone-sage { background: var(--story-sage); }
@@ -1127,7 +1217,6 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
     main.blog-main.story-tone-sand { background: var(--story-sand); }
     main.blog-main.story-tone-cream { background: var(--story-cream); }
     main.blog-main.is-article .blog-crumb {
-      margin: 0;
       padding: 1.25rem 1.5rem 0;
       max-width: 72rem;
       margin: 0 auto;
@@ -1177,6 +1266,7 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
       max-height: 40rem;
       object-fit: cover;
       border-radius: 1rem;
+      background: rgba(18, 18, 18, 0.06);
     }
     .story-card {
       background: #fff;
@@ -1187,21 +1277,87 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
       padding: clamp(2.25rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3.5rem);
       box-sizing: border-box;
     }
+    .story-card.is-continuation { margin-top: 1rem; }
     .story-grid {
       display: grid;
       grid-template-columns: 11rem minmax(0, 40rem);
       gap: clamp(1.5rem, 4vw, 4rem);
       justify-content: center;
+      align-items: start;
     }
-    .story-meta { font-size: 0.82rem; color: var(--muted); }
+    .story-grid.is-body-only {
+      grid-template-columns: minmax(0, 40rem);
+    }
+    .story-meta {
+      position: sticky;
+      top: 1.25rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .story-meta-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      margin: 0 0 1.35rem;
+    }
     .story-meta-label {
-      margin: 0 0 0.3rem;
+      margin: 0;
       font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
+      color: var(--muted);
     }
-    .story-meta-date { margin: 0 0 1.25rem; font-weight: 600; color: var(--ink); }
+    .story-meta-value {
+      margin: 0;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+    .story-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0 0 1.5rem;
+      list-style: none;
+      padding: 0;
+    }
+    .story-share,
+    .story-share-float {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      padding: 0;
+      border: 1px solid rgba(18, 18, 18, 0.25);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+    }
+    .story-share:focus-visible,
+    .story-share-float:focus-visible {
+      outline: 2px solid var(--green-dark);
+      outline-offset: 2px;
+    }
+    .story-share:hover,
+    .story-share-float:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+    .story-share.is-copied,
+    .story-share-float.is-copied {
+      background: var(--green-dark);
+      border-color: var(--green-dark);
+      color: #fff;
+    }
+    .story-share svg,
+    .story-share-float svg { width: 1.05rem; height: 1.05rem; fill: none; stroke: currentColor; stroke-width: 1.75; }
     .story-back {
       display: inline-flex;
       align-items: center;
@@ -1212,6 +1368,79 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
       text-decoration: none;
     }
     .story-back:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .story-quote-band {
+      max-width: none;
+      width: 100%;
+      margin: 0;
+      padding: clamp(2.75rem, 7vw, 5rem) 1.5rem;
+      background: transparent;
+      text-align: center;
+    }
+    .story-quote-band blockquote {
+      margin: 0 auto;
+      max-width: 40rem;
+      padding: 0;
+      border: none;
+      font-family: var(--font-story-title);
+      font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+      font-weight: 400;
+      line-height: 1.25;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+    }
+    .story-quote-band blockquote p { margin: 0; }
+    .story-quote-band blockquote p + p { margin-top: 0.75rem; }
+    .story-tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem 1rem;
+      margin: 2.5rem 0 0;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--line);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .story-tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(18, 18, 18, 0.35);
+      border-radius: 999px;
+      padding: 0.45rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+      text-decoration: none;
+      color: var(--ink);
+      transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+    }
+    .story-tag:hover {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
+    }
+    .story-share-float {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 40;
+      width: 3rem;
+      height: 3rem;
+      box-shadow: 0 10px 28px rgba(18, 18, 18, 0.14);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 220ms ease, transform 220ms ease, background 180ms ease, color 180ms ease;
+    }
+    .story-share-float.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
     .story-related {
       max-width: 72rem;
       width: calc(100% - 2.5rem);
@@ -1233,6 +1462,11 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
       font-size: 1.32rem;
       line-height: 1.55;
       color: var(--ink);
+    }
+    .story-card.is-continuation .blog-body > p:first-child {
+      font-size: inherit;
+      line-height: inherit;
+      color: inherit;
     }
     .blog-body blockquote {
       margin: 2rem 0;
@@ -1293,17 +1527,18 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
     @media (max-width: 1000px) {
       .story-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
       .story-meta {
-        display: flex;
-        align-items: baseline;
-        gap: 0.6rem;
-        flex-wrap: wrap;
+        position: static;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.85rem 1.25rem;
         margin-bottom: 1.75rem;
-        padding-bottom: 1rem;
+        padding-bottom: 1.15rem;
         border-bottom: 1px solid var(--line);
       }
-      .story-meta-label { margin: 0; }
-      .story-meta-date { margin: 0; }
-      .story-meta .story-back { margin-left: auto; }
+      .story-meta-row { margin: 0; }
+      .story-actions { margin: 0; }
+      .story-back { grid-column: 1 / -1; }
+      .story-share-float { display: none; }
     }
     @media (max-width: 700px) {
       .blog-hero { padding-top: 2.25rem; }
@@ -1326,10 +1561,13 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
       .story-related { width: calc(100% - 1.5rem); }
       .story-card { padding: 1.75rem 1.15rem; }
       .story-hero-media { padding: 0 0.75rem; }
-      .story-hero-media img { aspect-ratio: 4 / 3; }
+      .story-hero-media img { aspect-ratio: 4 / 3; max-height: none; }
       .blog-body { font-size: 0.98rem; }
       .blog-body > p:first-child { font-size: 1.18rem; }
       .blog-body blockquote { font-size: 1.28rem; }
+      .story-quote-band { padding: 2.5rem 1.15rem; }
+      .story-quote-band blockquote { font-size: 1.4rem; }
+      .story-meta { grid-template-columns: 1fr; }
     }
     @media (max-width: 767px) {
       .blog-hero { padding-left: 1.1rem; padding-right: 1.1rem; }
@@ -1416,7 +1654,7 @@ function blogShell({ title, description, canonical, schema, active, bodyHtml, br
       });
     })();
   </script>
-  <script src="/assets/sidebar.js" defer></script>${swiperScript}
+  <script src="/assets/sidebar.js" defer></script>${swiperScript}${shareScript}
 </body>
 </html>
 `;
@@ -1833,6 +2071,7 @@ module.exports = {
   toSlug,
   escapeHtml,
   markdownToHtml,
+  splitArticleSegments,
   extractExcerpt,
   loadPost,
   loadPublishedPosts,

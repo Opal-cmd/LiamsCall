@@ -13,6 +13,7 @@ const {
   blogShell,
   escapeHtml,
   renderAdSlot,
+  splitArticleSegments,
 } = require('./lib/blog-utils');
 const { execFileSync } = require('child_process');
 const {
@@ -126,9 +127,34 @@ function buildFilterScript() {
             .forEach(function (b) {
               b.classList.toggle('is-active', b.getAttribute('data-filter-value') === value);
             });
+          try {
+            var url = new URL(window.location.href);
+            if (state.category && state.category !== 'all') url.searchParams.set('category', state.category);
+            else url.searchParams.delete('category');
+            window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+          } catch (err) {}
           apply();
         });
       });
+
+      try {
+        var initial = new URLSearchParams(window.location.search).get('category');
+        if (initial) {
+          var match = buttons.find(function (b) {
+            return b.getAttribute('data-filter-type') === 'category' &&
+              b.getAttribute('data-filter-value') === initial;
+          });
+          if (match) {
+            state.category = initial;
+            buttons
+              .filter(function (b) { return b.getAttribute('data-filter-type') === 'category'; })
+              .forEach(function (b) {
+                b.classList.toggle('is-active', b.getAttribute('data-filter-value') === initial);
+              });
+          }
+        }
+      } catch (err) {}
+      apply();
 
       function enableDragScroll(el) {
         if (!el) return;
@@ -171,8 +197,6 @@ function buildFilterScript() {
       }
 
       enableDragScroll(document.querySelector('.selects-rail'));
-
-      apply();
     })();
   </script>`;
 }
@@ -311,6 +335,13 @@ function buildIndex(posts) {
       <p class="blog-hero-lead">
         Grounded pieces on wellbeing, communication, and supporting someone through mental health, addiction, or housing challenges.
       </p>
+      <p class="blog-hero-lead" style="margin-top:0.75rem;font-size:0.92rem;">
+        Start with a topic guide:
+        <a href="/mental-health-support-for-families">Mental health for families</a> ·
+        <a href="/addiction-help-for-families">Addiction help</a> ·
+        <a href="/housing-help-for-families">Housing help</a> ·
+        <a href="/caregiver-support">Caregiver support</a>
+      </p>
     </header>
     ${strip}
     <div class="blog-toolbar">
@@ -390,6 +421,126 @@ const STORY_TONES = {
   'Care Giver Tips': 'story-tone-cream',
 };
 
+function shareIconSvg() {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>`;
+}
+
+function renderStoryMeta({ date, shareUrl, shareTitle }) {
+  return `
+        <aside class="story-meta">
+          <div class="story-meta-row">
+            <p class="story-meta-label">Published</p>
+            <p class="story-meta-value"><time datetime="${escapeHtml(date)}">${escapeHtml(formatDateDisplay(date))}</time></p>
+          </div>
+          <div class="story-meta-row">
+            <p class="story-meta-label">Words</p>
+            <p class="story-meta-value">Liam's Call</p>
+          </div>
+          <ul class="story-actions">
+            <li>
+              <button type="button" class="story-share" data-share-url="${escapeHtml(shareUrl)}" data-share-title="${escapeHtml(shareTitle)}" aria-label="Share this story">
+                ${shareIconSvg()}
+              </button>
+            </li>
+          </ul>
+          <a class="story-back" href="/blog">&larr; All stories</a>
+        </aside>`;
+}
+
+function renderArticleSections(post, { howtoHtml, category }) {
+  const segments = splitArticleSegments(post.html);
+  const shareUrl = `${SITE}/blog/${post.slug}`;
+  const shareTitle = post.title;
+  const meta = renderStoryMeta({ date: post.date, shareUrl, shareTitle });
+  const tags = `
+          <div class="story-tags">
+            <span>Read more about</span>
+            <a class="story-tag" href="/blog?category=${encodeURIComponent(category)}">${escapeHtml(category)}</a>
+          </div>`;
+  const footerBits = `
+          ${howtoHtml}
+          <div class="blog-cta">
+            <p>If this resonates, you can keep going in a private chat. No account required.</p>
+            <a class="pill-dark" href="/">Talk with Liam's Call AI</a>
+            &nbsp;&nbsp;<a href="/resources" class="cta-alt-link">Crisis resources</a>
+          </div>
+          ${tags}
+          <p class="blog-disclaimer">
+            Liam's Call is an informational tool, not a medical professional or crisis service.
+            In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.
+          </p>`;
+
+  if (!segments.length) {
+    return `
+    <div class="story-card">
+      <div class="story-grid">
+        ${meta}
+        <div class="story-body-col">
+          <article class="blog-body"></article>
+          ${footerBits}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const parts = [];
+  let proseIndex = 0;
+  for (let i = 0; i < segments.length; i += 1) {
+    const seg = segments[i];
+    if (seg.type === 'quote') {
+      parts.push(`
+    <section class="story-quote-band" aria-label="Pull quote">
+      ${seg.html}
+    </section>`);
+      continue;
+    }
+    const isFirst = proseIndex === 0;
+    const isLast = !segments.slice(i + 1).some((s) => s.type === 'prose');
+    proseIndex += 1;
+    if (isFirst) {
+      parts.push(`
+    <div class="story-card">
+      <div class="story-grid">
+        ${meta}
+        <div class="story-body-col">
+          <article class="blog-body">
+            ${seg.html}
+          </article>
+          ${isLast ? footerBits : ''}
+        </div>
+      </div>
+    </div>`);
+    } else {
+      parts.push(`
+    <div class="story-card is-continuation">
+      <div class="story-grid is-body-only">
+        <div class="story-body-col">
+          <article class="blog-body">
+            ${seg.html}
+          </article>
+          ${isLast ? footerBits : ''}
+        </div>
+      </div>
+    </div>`);
+    }
+  }
+
+  // If the article ended on a quote, append footer in a closing card.
+  const last = segments[segments.length - 1];
+  if (last && last.type === 'quote') {
+    parts.push(`
+    <div class="story-card is-continuation">
+      <div class="story-grid is-body-only">
+        <div class="story-body-col">
+          ${footerBits}
+        </div>
+      </div>
+    </div>`);
+  }
+
+  return parts.join('\n');
+}
+
 function buildPost(post, allPosts = []) {
   assertPostGuards(post, { strictSafe: post.risk === 'safe' });
   const category = normalizeCategory(post.category);
@@ -426,30 +577,10 @@ function buildPost(post, allPosts = []) {
       <p class="story-dek speakable-summary">${escapeHtml(post.description)}</p>
     </header>
     ${hero}
-    <div class="story-card">
-      <div class="story-grid">
-        <aside class="story-meta">
-          <p class="story-meta-label">Published</p>
-          <p class="story-meta-date"><time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDateDisplay(post.date))}</time></p>
-          <a class="story-back" href="/blog">&larr; All stories</a>
-        </aside>
-        <div class="story-body-col">
-          <article class="blog-body">
-            ${post.html}
-          </article>
-          ${howtoHtml}
-          <div class="blog-cta">
-            <p>If this resonates, you can keep going in a private chat. No account required.</p>
-            <a class="pill-dark" href="/">Talk with Liam's Call AI</a>
-            &nbsp;&nbsp;<a href="/resources" class="cta-alt-link">Crisis resources</a>
-          </div>
-          <p class="blog-disclaimer">
-            Liam's Call is an informational tool, not a medical professional or crisis service.
-            In a crisis, call or text <a href="tel:988">9-8-8</a> (Canada &amp; U.S.) or call <a href="tel:911">9-1-1</a> for emergencies.
-          </p>
-        </div>
-      </div>
-    </div>
+    ${renderArticleSections(post, { howtoHtml, category })}
+    <button type="button" class="story-share-float" data-share-url="${escapeHtml(postUrl)}" data-share-title="${escapeHtml(post.title)}" aria-label="Share this story">
+      ${shareIconSvg()}
+    </button>
     ${relatedHtml}
   `;
 
