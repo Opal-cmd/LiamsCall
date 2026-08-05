@@ -207,7 +207,7 @@ topics:
     title: "Housing First in Plain Words for Families"
     category: "Homelessness"
     risk: review
-    used: false
+    used: true
     angle: "Explain Housing First simply for families helping someone homeless; point them to ask local services via 211 — never invent program names or phones."
     source_url: "https://www.samhsa.gov/homelessness-programs-resources"
     source_name: "SAMHSA homelessness resources"
