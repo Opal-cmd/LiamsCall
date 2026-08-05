@@ -1,7 +1,7 @@
 ---
 title: "When Someone You Love Refuses Addiction Treatment"
 slug: when-someone-refuses-addiction-treatment
-date: 2026-08-05
+date: 2026-08-03
 category: "Addiction"
 region: "Canada"
 description: "Practical, non-confrontational strategies for families when a loved one refuses addiction treatment or detox, and how to find support for yourself."
