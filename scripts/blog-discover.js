@@ -10,7 +10,7 @@
  *   node scripts/blog-discover.js --limit=5
  *   node scripts/blog-discover.js --dry-run
  *
- * Env: OPENAI_API_KEY (recommended), BLOG_OPENAI_MODEL or OPENAI_MODEL (optional, default gpt-4o)
+ * Env: OPENAI_API_KEY (recommended), BLOG_OPENAI_MODEL or OPENAI_MODEL (optional, default gpt-5.5)
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
@@ -25,7 +25,7 @@ const {
   loadSources,
 } = require('./lib/blog-utils');
 
-const MODEL = process.env.BLOG_OPENAI_MODEL || process.env.OPENAI_MODEL || 'gpt-4o';
+const MODEL = process.env.BLOG_OPENAI_MODEL || process.env.OPENAI_MODEL || 'gpt-5.5';
 const API_KEY = process.env.OPENAI_API_KEY;
 
 function parseArgs(argv) {
@@ -132,6 +132,7 @@ Rules:
 - Propose at most ${limit} topics.
 - risk=review if crisis, shelters, treatment, diagnosis, or hotlines are central.`;
 
+  const usesCompletionTokens = /^(gpt-5|o[0-9])/i.test(MODEL);
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -141,7 +142,6 @@ Rules:
     body: JSON.stringify({
       model: MODEL,
       temperature: 0.6,
-      max_tokens: 2500,
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: system },
@@ -150,6 +150,9 @@ Rules:
           content: `Create up to ${limit} original topic ideas from these inspirations:\n${JSON.stringify(payload, null, 2)}`,
         },
       ],
+      ...(usesCompletionTokens
+        ? { max_completion_tokens: 2500 }
+        : { max_tokens: 2500 }),
     }),
   });
   if (!res.ok) throw new Error(`OpenAI discover failed: ${res.status} ${await res.text()}`);

@@ -11,8 +11,8 @@
  *
  * Env:
  *   OPENAI_API_KEY (required)
- *   BLOG_OPENAI_MODEL (optional, default gpt-4o) — preferred for blog writing
- *   OPENAI_MODEL (optional fallback)
+ *   BLOG_OPENAI_MODEL (optional, default gpt-5.5) — preferred for blog writing
+ *   OPENAI_MODEL (optional fallback; chat can stay on gpt-4o-mini)
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });

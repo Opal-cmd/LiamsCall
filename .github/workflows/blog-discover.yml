@@ -24,7 +24,7 @@ jobs:
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
           BLOG_OPENAI_MODEL: ${{ vars.BLOG_OPENAI_MODEL }}
         run: |
-          export BLOG_OPENAI_MODEL="${BLOG_OPENAI_MODEL:-${OPENAI_MODEL:-gpt-4o}}"
+          export BLOG_OPENAI_MODEL="${BLOG_OPENAI_MODEL:-${OPENAI_MODEL:-gpt-5.5}}"
           node scripts/blog-discover.js --limit=5
       - name: Commit updated topics queue
         run: |

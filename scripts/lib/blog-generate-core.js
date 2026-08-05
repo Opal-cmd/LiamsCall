@@ -35,7 +35,7 @@ HARD RULES:
 - End with one gentle practical next step, not a hard sell.`;
 
 function getModel() {
-  return process.env.BLOG_OPENAI_MODEL || process.env.OPENAI_MODEL || 'gpt-4o';
+  return process.env.BLOG_OPENAI_MODEL || process.env.OPENAI_MODEL || 'gpt-5.5';
 }
 
 function getApiKey() {
@@ -93,22 +93,27 @@ async function callOpenAI(userPrompt) {
   const apiKey = getApiKey();
   if (!apiKey) throw new Error('Missing OPENAI_API_KEY. Add it to the server .env (or Render env), then try again.');
   const model = getModel();
+  // Newer GPT-5 family prefers max_completion_tokens; older models use max_tokens.
+  const usesCompletionTokens = /^(gpt-5|o[0-9])/i.test(model);
+  const body = {
+    model,
+    messages: [
+      { role: 'system', content: SYSTEM },
+      { role: 'user', content: userPrompt },
+    ],
+    temperature: 0.7,
+    response_format: { type: 'json_object' },
+    ...(usesCompletionTokens
+      ? { max_completion_tokens: 4096 }
+      : { max_tokens: 4096 }),
+  };
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: SYSTEM },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.7,
-      max_tokens: 4096,
-      response_format: { type: 'json_object' },
-    }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     const text = await res.text();
