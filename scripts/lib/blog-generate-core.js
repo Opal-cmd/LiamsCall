@@ -38,7 +38,7 @@ HARD RULES:
 - End with one gentle practical next step, then the Further reading / Resources links.`;
 
 function getModel() {
-  return process.env.BLOG_GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  return process.env.BLOG_GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 }
 
 function getApiKey() {

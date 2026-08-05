@@ -10,7 +10,7 @@
  *   node scripts/blog-discover.js --limit=5
  *   node scripts/blog-discover.js --dry-run
  *
- * Env: GEMINI_API_KEY (recommended), BLOG_GEMINI_MODEL or GEMINI_MODEL (optional, default gemini-2.5-flash)
+ * Env: GEMINI_API_KEY (recommended), BLOG_GEMINI_MODEL or GEMINI_MODEL (optional, default gemini-3.6-flash)
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
@@ -25,7 +25,7 @@ const {
   loadSources,
 } = require('./lib/blog-utils');
 
-const MODEL = process.env.BLOG_GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const MODEL = process.env.BLOG_GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 const API_KEY = process.env.GEMINI_API_KEY;
 
 function parseArgs(argv) {

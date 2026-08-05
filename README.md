@@ -50,7 +50,7 @@ Crawlable Markdown → HTML blog for SEO.
 ```bash
 npm run blog:build                 # rebuild public/blog + sitemap
 npm run blog:discover              # pull idea angles from allowlisted RSS/seeds into topics.yaml
-npm run blog:generate              # next topic from topics.yaml (needs GEMINI_API_KEY; uses gemini-2.5-flash by default)
+npm run blog:generate              # next topic from topics.yaml (needs GEMINI_API_KEY; uses gemini-3.6-flash by default)
 npm run blog:approve -- my-slug    # publish a draft from content/blog/drafts/
 ```
 

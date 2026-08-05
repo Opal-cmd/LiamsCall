@@ -24,7 +24,7 @@ jobs:
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
           BLOG_GEMINI_MODEL: ${{ vars.BLOG_GEMINI_MODEL }}
         run: |
-          export BLOG_GEMINI_MODEL="${BLOG_GEMINI_MODEL:-${GEMINI_MODEL:-gemini-2.5-flash}}"
+          export BLOG_GEMINI_MODEL="${BLOG_GEMINI_MODEL:-${GEMINI_MODEL:-gemini-3.6-flash}}"
           node scripts/blog-discover.js --limit=5
       - name: Commit updated topics queue
         run: |

@@ -11,7 +11,7 @@
  *
  * Env:
  *   GEMINI_API_KEY (required)
- *   BLOG_GEMINI_MODEL (optional, default gemini-2.5-flash)
+ *   BLOG_GEMINI_MODEL (optional, default gemini-3.6-flash)
  *   GEMINI_MODEL (optional fallback)
  */
 

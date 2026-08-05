@@ -535,7 +535,7 @@ app.use(express.static(PUBLIC_DIR));
 
 function modelForProvider(provider) {
   if (provider === 'groq')     return process.env.GROQ_MODEL    || 'llama-3.3-70b-versatile';
-  if (provider === 'gemini')   return process.env.GEMINI_MODEL  || 'gemini-2.0-flash';
+  if (provider === 'gemini')   return process.env.GEMINI_MODEL  || 'gemini-3.6-flash';
   if (provider === 'anthropic') return process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
   return process.env.OPENAI_MODEL || 'gpt-4o-mini';
 }
@@ -575,8 +575,7 @@ function getApiConfig(provider, modelOverride, systemPrompt) {
   }
 
   // Gemini via Google's OpenAI-compatible endpoint — same streaming format as Groq/OpenAI.
-  // gemini-2.5-flash thinking can silently consume max_tokens and cut replies short.
-  // Prefer gemini-2.0-flash by default; if 2.5 is configured, force reasoning_effort none.
+  // Thinking models can consume max_tokens on reasoning; force reasoning_effort none for 2.5/3.x.
   if (provider === 'gemini') {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('Missing GEMINI_API_KEY in environment variables.');
