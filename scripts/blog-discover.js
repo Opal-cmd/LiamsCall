@@ -10,7 +10,7 @@
  *   node scripts/blog-discover.js --limit=5
  *   node scripts/blog-discover.js --dry-run
  *
- * Env: OPENAI_API_KEY (recommended), OPENAI_MODEL (optional)
+ * Env: OPENAI_API_KEY (recommended), BLOG_OPENAI_MODEL or OPENAI_MODEL (optional, default gpt-4o)
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
@@ -25,7 +25,7 @@ const {
   loadSources,
 } = require('./lib/blog-utils');
 
-const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+const MODEL = process.env.BLOG_OPENAI_MODEL || process.env.OPENAI_MODEL || 'gpt-4o';
 const API_KEY = process.env.OPENAI_API_KEY;
 
 function parseArgs(argv) {

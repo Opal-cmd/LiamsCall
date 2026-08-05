@@ -50,7 +50,7 @@ Crawlable Markdown → HTML blog for SEO.
 ```bash
 npm run blog:build                 # rebuild public/blog + sitemap
 npm run blog:discover              # pull idea angles from allowlisted RSS/seeds into topics.yaml
-npm run blog:generate              # next topic from topics.yaml (needs OPENAI_API_KEY)
+npm run blog:generate              # next topic from topics.yaml (needs OPENAI_API_KEY; uses gpt-4o by default)
 npm run blog:approve -- my-slug    # publish a draft from content/blog/drafts/
 ```
 

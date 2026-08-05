@@ -35,7 +35,7 @@ HARD RULES:
 - End with one gentle practical next step, not a hard sell.`;
 
 function getModel() {
-  return process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  return process.env.BLOG_OPENAI_MODEL || process.env.OPENAI_MODEL || 'gpt-4o';
 }
 
 function getApiKey() {

@@ -11,7 +11,8 @@
  *
  * Env:
  *   OPENAI_API_KEY (required)
- *   OPENAI_MODEL (optional, default gpt-4o-mini)
+ *   BLOG_OPENAI_MODEL (optional, default gpt-4o) — preferred for blog writing
+ *   OPENAI_MODEL (optional fallback)
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
