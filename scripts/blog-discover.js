@@ -5,6 +5,10 @@
  * Discover ORIGINAL blog topic angles inspired by allowlisted feeds/seeds.
  * Never copies articles - only proposes new Liam's Call topics into topics.yaml.
  *
+ * Niche (hard): families/caregivers supporting someone with drug/alcohol
+ * addiction, homelessness/housing crisis, or mental health challenges tied
+ * to those — not general wellness tips, and not eldercare.
+ *
  * Usage:
  *   node scripts/blog-discover.js
  *   node scripts/blog-discover.js --limit=5
@@ -96,17 +100,63 @@ function guessRisk(text, fallback = 'safe') {
   return fallback === 'review' ? 'review' : 'safe';
 }
 
+/** Eldercare / aging — out of niche for Liam's Call. */
+function isEldercareOffNiche(text) {
+  const t = String(text || '').toLowerCase();
+  return /\b(elder(?:ly)?|senior(?:s)?|aging parent|ageing parent|dementia|alzheimer|nursing home|long[- ]term care|ltc|retirement home|geriatric|palliative(?!.*(substance|addiction|overdose|shelter|homeless)))\b/.test(t);
+}
+
+/**
+ * On-niche: addiction, homelessness/housing crisis, or mental health only when
+ * tied to those — or caregiving for that group. Rejects general wellness tips.
+ */
+function isOnNiche(text) {
+  const t = String(text || '').toLowerCase();
+  if (!t.trim()) return false;
+  if (isEldercareOffNiche(t)) return false;
+
+  const addiction =
+    /\b(addiction|substance|drug|drugs|alcohol|opioid|fentanyl|overdose|detox|withdrawal|recovery|sobriety|relapse|treatment|raam|connexontario|active use|still using|is using|substance use)\b/.test(t);
+  const housing =
+    /\b(homeless|homelessness|housing|shelter|encampment|evict|couch[- ]surf|unsheltered|211)\b/.test(t);
+  const mhTied =
+    /\b(mental health|psychosis|crisis|988|suicide|self[- ]harm|psych(?:iatric)?|trauma)\b/.test(t) &&
+    (addiction || housing || /\b(substance|drug|alcohol|overdose|shelter|homeless|housing|loved one who|someone who uses|family member who)\b/.test(t));
+  const caregiverOfGroup =
+    /\b(caregiver|family|families|parent|partner|spouse|loved one|sibling)\b/.test(t) &&
+    (addiction || housing || mhTied || /\b(substance|addiction|homeless|housing|detox|recovery|crisis|988)\b/.test(t));
+
+  // Reject standalone general MH / wellness without addiction or housing.
+  const generalWellnessOnly =
+    /\b(wellness tip|self[- ]care tip|mindfulness|meditation|gratitude|work[- ]life|burnout tip|anxiety tip|depression tip|holiday loneliness|menopause|eating disorder)\b/.test(t) &&
+    !addiction &&
+    !housing;
+
+  if (generalWellnessOnly) return false;
+  return addiction || housing || mhTied || caregiverOfGroup;
+}
+
+function isCaregiverRelevant(text) {
+  const t = String(text || '').toLowerCase();
+  // Skip obvious admin / unrelated campaigns
+  if (/\b(grant|funding opportunity|rfa|nofo|contract award|billing|ehr|data exchange|hiv testing day)\b/.test(t)) {
+    return false;
+  }
+  return isOnNiche(t);
+}
+
 function heuristicTopics(inspirations, limit) {
   const out = [];
-  for (const src of inspirations.slice(0, limit * 2)) {
+  for (const src of inspirations.slice(0, limit * 4)) {
     if (out.length >= limit) break;
+    if (!isOnNiche(`${src.title} ${src.summary} ${src.category}`)) continue;
     const id = `insp-${toSlug(src.title).slice(0, 48)}`;
     out.push({
       id,
-      title: `For caregivers: ${src.title}`.slice(0, 110),
-      category: src.category || 'Caregiving',
-      risk: guessRisk(`${src.title} ${src.summary}`, src.default_risk || 'safe'),
-      angle: `Write an original Liam's Call post for caregivers/families inspired by themes around "${src.title}". Do not rewrite or quote the source at length. One calm practical takeaway. Further reading may link ${src.url}.`,
+      title: `For families facing addiction or housing crisis: ${src.title}`.slice(0, 110),
+      category: src.category || 'Care Giver Tips',
+      risk: guessRisk(`${src.title} ${src.summary}`, src.default_risk || 'review'),
+      angle: `Write an original Liam's Call post for families/caregivers supporting someone with addiction, homelessness, or a related mental-health crisis — inspired by themes around "${src.title}". Not eldercare. Not general wellness. Do not rewrite or quote the source at length. One calm practical takeaway. Further reading may link ${src.url}.`,
       source_url: src.url,
       source_name: src.source_name || '',
     });
@@ -123,11 +173,25 @@ async function geminiPropose(inspirations, limit) {
     summary: s.summary || '',
     source: s.source_name || '',
   }));
-  const system = `You help Liam's Call invent ORIGINAL caregiver/family blog topic ideas.
+  const system = `You help Liam's Call invent ORIGINAL blog topic ideas for a narrow audience.
+
+WHO WE SERVE (required in every topic):
+- Families and caregivers supporting someone dealing with drug/alcohol addiction, homelessness or housing crisis, and/or mental health challenges tied to addiction or housing — in Canada and the U.S.
+- Caregiving here means that group only (partner, parent, sibling, friend of someone in addiction/housing/crisis) — NEVER eldercare, dementia, nursing homes, or aging-parent care.
+
+IN SCOPE:
+- Practical next steps for families around detox/referral, overdose aftermath, refusal of treatment, shelter/housing search, 988/crisis with someone nearby, relapse, dual diagnosis when tied to substance use, supporting a teen with substance use, etc.
+- Mental health angles ONLY when clearly linked to addiction, substance use, homelessness, or housing instability — not standalone anxiety/depression/wellness tips.
+
+OUT OF SCOPE (never propose):
+- General mental health tips, mindfulness, burnout-as-self-care, holiday loneliness, menopause, eating disorders (unless explicitly tied to substance use), workplace wellness.
+- Elder caregiving, dementia, long-term care, aging parents.
+- Clinical treatment protocols, medication advice, invented phone numbers.
+
 Rules:
-- Never rewrite or paraphrase a source article into a post outline that copies its structure.
-- Use sources only as inspiration for a new angle relevant to mental health, addiction, housing, or caregiving.
-- Prefer practical, calm topics. No medication advice. No invented phone numbers.
+- Never rewrite or paraphrase a source article into a post that copies its structure.
+- Use sources only as inspiration for a new niche angle.
+- Prefer concrete situations + one practical takeaway. Titles should name the situation (who + what), not vague themes.
 - Return ONLY JSON: {"topics":[{"id":"kebab-id","title":"...","category":"...","risk":"safe|review","angle":"...","source_url":"...","source_name":"..."}]}
 - Propose at most ${limit} topics.
 - risk=review if crisis, shelters, treatment, diagnosis, or hotlines are central.`;
@@ -146,7 +210,7 @@ Rules:
         { role: 'system', content: system },
         {
           role: 'user',
-          content: `Create up to ${limit} original topic ideas from these inspirations:\n${JSON.stringify(payload, null, 2)}`,
+          content: `Create up to ${limit} original ON-NICHE topic ideas from these inspirations. Drop any that are general wellness or eldercare:\n${JSON.stringify(payload, null, 2)}`,
         },
       ],
       ...(/gemini-2\.5|gemini-3/i.test(MODEL)
@@ -159,24 +223,17 @@ Rules:
   const text = data.choices?.[0]?.message?.content || '';
   const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
   const parsed = JSON.parse(fence ? fence[1] : text);
-  return (parsed.topics || []).map((t) => ({
-    id: toSlug(t.id || t.title).slice(0, 60),
-    title: t.title,
-    category: t.category || 'Caregiving',
-    risk: guessRisk(`${t.title} ${t.angle} ${t.risk}`, t.risk || 'safe'),
-    angle: t.angle,
-    source_url: t.source_url || '',
-    source_name: t.source_name || '',
-  }));
-}
-
-function isCaregiverRelevant(text) {
-  const t = String(text || '').toLowerCase();
-  // Skip obvious admin / unrelated campaigns
-  if (/\b(grant|funding opportunity|rfa|nofo|contract award|billing|ehr|data exchange|hiv testing day)\b/.test(t)) {
-    return false;
-  }
-  return /\b(caregiver|family|families|parent|loved one|mental health|addiction|substance|recovery|housing|homeless|crisis|988|support|youth|child|children|partner|spouse|burnout|grief|trauma|depression|anxiety)\b/.test(t);
+  return (parsed.topics || [])
+    .map((t) => ({
+      id: toSlug(t.id || t.title).slice(0, 60),
+      title: t.title,
+      category: t.category || 'Care Giver Tips',
+      risk: guessRisk(`${t.title} ${t.angle} ${t.risk}`, t.risk || 'review'),
+      angle: t.angle,
+      source_url: t.source_url || '',
+      source_name: t.source_name || '',
+    }))
+    .filter((t) => isOnNiche(`${t.title} ${t.angle} ${t.category}`));
 }
 
 async function collectInspirations() {
@@ -196,7 +253,7 @@ async function collectInspirations() {
           ...item,
           source_name: feed.name,
           default_risk: feed.default_risk || 'review',
-          category: 'Caregiving',
+          category: 'Care Giver Tips',
         });
       }
     } catch (err) {
@@ -236,6 +293,13 @@ async function main() {
     console.warn(`Gemini propose failed, using heuristic: ${err.message}`);
   }
   if (!proposed.length) proposed = heuristicTopics(inspirations, args.limit);
+
+  // Hard filter: never enqueue general wellness or eldercare topics.
+  const before = proposed.length;
+  proposed = proposed.filter((t) => isOnNiche(`${t.title} ${t.angle} ${t.category}`));
+  if (before && proposed.length < before) {
+    console.warn(`Dropped ${before - proposed.length} off-niche topic(s).`);
+  }
 
   // Every discovered topic enters the queue as review-tier. Only an admin
   // editing the topic in the Blog desk can mark one safe.

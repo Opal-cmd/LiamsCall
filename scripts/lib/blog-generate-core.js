@@ -22,9 +22,10 @@ const {
 } = require('./blog-utils');
 const { ensurePostImage } = require('./blog-images');
 
-const SYSTEM = `You write calm, practical blog posts for Liam's Call (liamscall.com) — a free AI chat for caregivers and families facing mental health, addiction, and housing challenges in Canada and the U.S.
+const SYSTEM = `You write calm, practical blog posts for Liam's Call (liamscall.com) — a free AI chat for families and caregivers supporting someone with drug/alcohol addiction, homelessness or housing crisis, and mental health challenges tied to those situations (Canada and the U.S.). Caregiving here means that group — not eldercare or general wellness tips.
 
 HARD RULES:
+- Stay on niche: addiction, homelessness/housing, or mental health only when linked to those. Do not write generic self-care, mindfulness, or aging-parent / dementia content.
 - Never invent phone numbers or local shelter/clinic contact details.
 - Only link to these hosts if you include a URL: ontariocaregiver.ca, connexontario.ca, 988.ca, 988lifeline.org, 211.ca, 211ontario.ca, 211.org, toronto.ca, samhsa.gov, kidshelpphone.ca, mentalhealthcommission.ca, nami.org, camh.ca, hopeforwellness.ca, canada.ca, wellnesstogether.ca, liamscall.com — PLUS any exact resource URLs listed in the user message.
 - Hyperlinks are required. Whenever you use a resource (inspiration article, org page, helpline overview), include a Markdown hyperlink to that exact URL in the body — do not mention a site without linking it.
@@ -108,7 +109,7 @@ Do NOT copy the article. Use it only as inspiration / citation.`;
 Title: ${topic.title}
 Category: ${topic.category || 'Caregiving'}
 Risk tier: ${topic.risk || 'safe'}
-Angle: ${topic.angle || 'Practical caregiver support'}
+Angle: ${topic.angle || 'Practical support for families facing addiction, housing crisis, or related mental-health challenges'}
 
 ${sourceBlock}
 ${relatedBlock}

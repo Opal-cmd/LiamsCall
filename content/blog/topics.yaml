@@ -1,7 +1,6 @@
-# Topic queue for automated blog generation.
-# Every generated post lands in drafts/ for human review, whatever the risk tier.
-# risk: review → default; treat the subject as sensitive (crisis, medical, housing)
-# risk: safe   → everyday caregiver tip; still requires review before publishing
+# Hybrid topic queue for automated blog generation.
+# risk: safe  → may auto-publish
+# risk: review → always write to drafts/ and open a PR
 # used: true  → already generated (do not pick again)
 # source_url (optional) → reputable article that inspired the angle (never copy it)
 
@@ -15,48 +14,48 @@ topics:
     source_url: "https://ontariocaregiver.ca/get-support/"
     source_name: "Ontario Caregiver Organization - get support"
 
-  - id: sleep-when-nights-are-broken
-    title: "When Sleep Is Broken: Softening the Edges of Night-Shift Caregiving"
-    category: "Caregiver Wellbeing"
+  - id: overnight-worry-active-use
+    title: "When You Cannot Sleep Because They Are Still Using"
+    category: "Addiction"
     risk: review
     used: false
-    angle: "Practical ways to protect scraps of rest when overnight care interrupts sleep, without pretending an 8-hour night is available."
-    source_url: "https://ontariocaregiver.ca"
-    source_name: "Ontario Caregiver Organization - home"
+    angle: "Practical ways families can settle their body for a few hours of rest while a loved one is in active use or overnight withdrawal risk — without pretending the danger is gone."
+    source_url: "https://www.samhsa.gov/find-help/national-helpline"
+    source_name: "SAMHSA National Helpline"
 
-  - id: friends-who-dont-get-it
-    title: "When Friends Don't Get It: Staying Connected While Caregiving"
-    category: "Communication"
+  - id: friends-dont-get-addiction-care
+    title: "When Friends Do Not Get That Your Loved One Has an Addiction"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "How to explain your bandwidth honestly and keep one or two friendships alive without guilt performances."
+    angle: "How to explain addiction-care bandwidth to friends without oversharing, and keep one connection alive when people only understand eldercare or “bad choices.”"
     source_url: "https://www.nami.org/Your-Journey/Family-Members-and-Caregivers"
     source_name: "NAMI family caregivers"
 
-  - id: caregiver-identity-loss
-    title: "Who Am I Besides a Caregiver?"
-    category: "Caregiver Wellbeing"
+  - id: identity-beyond-addiction-family
+    title: "Who Am I Besides the Family Member Managing Their Addiction?"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "Naming identity loss when roles collapse into caregiving, and reclaiming tiny pieces of self without abandoning anyone."
+    angle: "Naming identity loss when your life collapses into crisis calls, detox waits, and housing searches — and reclaiming one small piece of self without abandoning them."
     source_url: "https://www.nami.org/support-education/"
     source_name: "NAMI find support"
 
-  - id: hard-conversations-with-siblings
-    title: "Hard Conversations With Siblings About Sharing Care"
-    category: "Communication"
+  - id: siblings-share-addiction-care
+    title: "Hard Conversations With Siblings About Sharing Addiction Care"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "Scripts and mindset for inviting siblings into care without starting a permanent war."
+    angle: "Scripts for inviting siblings into detox rides, overnight watches, or money limits without starting a permanent war — focused on substance use and housing crises, not eldercare."
     source_url: "https://mentalhealthcommission.ca"
     source_name: "Mental Health Commission of Canada"
 
   - id: navigating-988-first-call
-    title: "What Happens When You Call or Text 988"
-    category: "Crisis Resources"
+    title: "What Happens When You Call or Text 9-8-8 About Someone Using"
+    category: "Mental health"
     risk: review
     used: false
-    angle: "Calm overview of 988 for Canada/US, what to expect on the call, and when 911 is the right choice instead. Only cite verified numbers."
+    angle: "Calm overview of 988 for families worried about a loved one in addiction-related distress or suicidal crisis — what to expect, and when 911 is the right choice instead."
     source_url: "https://988.ca"
     source_name: "Canada 9-8-8"
 
@@ -79,110 +78,110 @@ topics:
     source_name: "ConnexOntario"
 
   - id: supporting-someone-refusing-treatment
-    title: "When Someone You Love Refuses Treatment"
-    category: "Mental Health"
+    title: "When Someone You Love Refuses Addiction Treatment"
+    category: "Addiction"
     risk: review
     used: false
-    angle: "Motivational, non-confrontational framing for caregivers; no diagnosis or medication advice; invite professional help."
-    source_url: "https://www.camh.ca/en/health-info"
-    source_name: "CAMH health info"
+    angle: "Non-confrontational framing for families when a loved one refuses detox or counseling — no diagnosis or medication advice; invite ConnexOntario / local referral as a next question."
+    source_url: "https://connexontario.ca"
+    source_name: "ConnexOntario"
 
-  - id: guilt-after-getting-angry
-    title: "The Guilt After You Snap"
-    category: "Caregiver Wellbeing"
+  - id: guilt-after-snap-during-use
+    title: "The Guilt After You Snap During an Addiction Crisis"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "What to do in the hour after losing your temper with someone you care for - repair without self-destruction."
+    angle: "What to do in the hour after losing your temper with someone in active use or withdrawal — repair without self-destruction, and without pretending the substance use is fine."
     source_url: "https://www.nami.org"
     source_name: "NAMI home"
 
-  - id: packing-a-hospital-bag-for-them
-    title: "Packing a Go-Bag for Someone Else's Hard Day"
-    category: "Practical Tips"
+  - id: pack-for-detox-or-psych-er
+    title: "What to Pack for a Detox or Mental-Health ER Trip"
+    category: "Addiction"
     risk: review
     used: false
-    angle: "A calm checklist for caregivers heading to ER or appointments with a loved one who may not advocate for themselves."
+    angle: "A calm go-bag checklist for families heading to ER or withdrawal management with someone who may not advocate for themselves — ID, meds list, charges, comfort items."
     source_url: "https://www.camh.ca"
     source_name: "CAMH home"
 
-  - id: talking-to-kids-about-a-parents-illness
-    title: "Talking to Kids When a Parent Is Unwell"
-    category: "Communication"
+  - id: talking-to-kids-about-parents-substance-use
+    title: "Talking to Kids When a Parent Is Using or in Crisis"
+    category: "Mental health"
     risk: review
     used: false
-    angle: "Age-honest language that protects kids without dumping adult fear on them."
+    angle: "Age-honest language when a parent has a substance-use or housing crisis — protect kids without dumping adult fear, and when Kids Help Phone is a fit."
     source_url: "https://kidshelpphone.ca"
     source_name: "Kids Help Phone"
 
-  - id: when-caregiving-hurts-your-job
-    title: "When Caregiving Starts Showing Up at Work"
-    category: "Caregiver Wellbeing"
+  - id: addiction-care-showing-up-at-work
+    title: "When Their Addiction Starts Showing Up at Your Job"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "How to ask for flexibility without oversharing, and when EAP or HR support is worth a quiet try."
+    angle: "How to ask for flexibility after overnight crises, detox drop-offs, or housing searches without oversharing — and when EAP is worth a quiet try."
     source_url: "https://www.canada.ca/en/public-health/services/mental-health-services.html"
     source_name: "Canada.ca mental health"
 
-  - id: lonely-evenings-after-care-tasks
-    title: "Lonely Evenings After the Tasks Are Done"
-    category: "Caregiver Wellbeing"
+  - id: lonely-after-shelter-or-detox-tasks
+    title: "Lonely Evenings After the Shelter Calls and Detox Tasks"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "Naming the quiet loneliness that arrives once the practical work pauses - and one small connection habit."
+    angle: "Naming the quiet loneliness after 211 calls, hospital waits, and “are they okay tonight?” loops — one small connection habit that is not eldercare self-care fluff."
     source_url: "https://www.wellnesstogether.ca"
     source_name: "Wellness Together Canada"
 
-  - id: tracking-symptoms-without-obsessing
-    title: "Noticing Changes Without Becoming a Full-Time Monitor"
-    category: "Practical Tips"
+  - id: track-use-and-mood-without-obsessing
+    title: "Noticing Use and Mood Changes Without Becoming a Full-Time Monitor"
+    category: "Addiction"
     risk: review
     used: false
-    angle: "A light symptom/mood log that helps appointments without turning home into a clinic."
+    angle: "A light log of substance use, sleep, and crisis signs that helps appointments — without turning home into a clinic or a surveillance operation."
     source_url: "https://www.camh.ca/en/camh-news-and-stories"
     source_name: "CAMH getting help"
 
-  - id: caring-from-another-city
-    title: "Caring From Another City"
-    category: "Communication"
+  - id: caring-from-another-city-housing-addiction
+    title: "Supporting Their Addiction or Housing Crisis From Another City"
+    category: "Homelessness"
     risk: review
     used: false
-    angle: "Long-distance caregiving: what you can do remotely, what to ask local helpers for, and how to handle guilt."
+    angle: "Long-distance family support: what you can do remotely with 211 and local helpers, what to ask on-site people for, and how to handle guilt when you cannot be there for detox or shelter intake."
     source_url: "https://www.211.org"
     source_name: "211 United States"
 
   - id: when-they-minimize-the-problem
-    title: "When They Say 'I'm Fine' and You Know They're Not"
-    category: "Communication"
+    title: "When They Say 'I'm Fine' About Using or Sleeping Outside"
+    category: "Addiction"
     risk: review
     used: false
-    angle: "Gentle ways to stay present with denial without turning every talk into an intervention."
+    angle: "Gentle ways to stay present with denial about substance use or homelessness without turning every talk into an intervention."
     source_url: "https://www.samhsa.gov/find-help"
     source_name: "SAMHSA behavioral health treatment services"
 
-  - id: caregiver-body-aches
-    title: "The Body Keeps the Care Schedule"
-    category: "Caregiver Wellbeing"
+  - id: body-cost-of-addiction-crisis-care
+    title: "The Body Cost of Crisis Nights and Shelter Runs"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "Physical strain from lifting, interrupted sleep, and tension - when to see a doctor about your own body."
+    angle: "Physical strain from interrupted sleep, hospital chairs, and tense vigils while supporting someone in addiction or housing crisis — when to see a doctor about your own body."
     source_url: "https://ontariocaregiver.ca/about/"
     source_name: "Ontario Caregiver Organization - about"
 
-  - id: holidays-while-caregiving
-    title: "Holidays When Care Comes First"
-    category: "Routines"
+  - id: holidays-when-they-are-using-or-unhoused
+    title: "Holidays When They Are Using or Without Stable Housing"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "Shrinking holiday expectations so the day can be kind instead of a performance."
+    angle: "Shrinking holiday expectations when a loved one is in active use, early recovery, or housing instability — so the day can be kind instead of a performance."
     source_url: "https://988lifeline.org"
     source_name: "988 Lifeline - home"
 
-  - id: money-stress-and-care
-    title: "Money Stress While You're Also the Caregiver"
-    category: "Caregiver Wellbeing"
+  - id: money-stress-addiction-housing
+    title: "Money Stress While You Are Funding Their Crisis"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "Naming financial strain without shame, and pointing to general places people ask about benefits/help (no invented numbers)."
+    angle: "Naming financial strain from bailouts, lost wages, and housing gaps without shame — and pointing families to 211-style navigation, not invented benefit numbers."
     source_url: "https://211ontario.ca"
     source_name: "211 Ontario"
 
@@ -191,128 +190,127 @@ topics:
     category: "Addiction"
     risk: review
     used: false
-    angle: "What helps vs what tends to backfire for partners; no treatment protocols; invite local professional/RAAM-style access as a question to ask."
+    angle: "What helps vs what tends to backfire for partners in early recovery; no treatment protocols; invite local professional or RAAM-style access as a question to ask."
     source_url: "https://www.samhsa.gov/find-help/national-helpline"
     source_name: "SAMHSA National Helpline"
 
   - id: after-a-psych-er-visit
-    title: "The Day After a Mental Health ER Visit"
-    category: "Mental Health"
+    title: "The Day After a Mental-Health ER Visit Tied to Substance Use"
+    category: "Mental health"
     risk: review
     used: false
-    angle: "Practical next-day orientation for caregivers - follow-up questions to ask clinicians, rest, and crisis numbers only from the verified table."
+    angle: "Practical next-day orientation for families after an ER visit involving overdose risk, intoxication, or dual crisis — follow-up questions, rest, and verified crisis numbers only."
     source_url: "https://988lifeline.org/help-someone-else/"
     source_name: "988 Lifeline - help someone else"
 
   - id: housing-first-in-plain-words
-    title: "Housing First in Plain Words"
-    category: "Housing"
+    title: "Housing First in Plain Words for Families"
+    category: "Homelessness"
     risk: review
     used: false
-    angle: "Explain Housing First simply for caregivers helping someone homeless; point to asking local services, not inventing programs."
+    angle: "Explain Housing First simply for families helping someone homeless; point them to ask local services via 211 — never invent program names or phones."
     source_url: "https://www.samhsa.gov/homelessness-programs-resources"
     source_name: "SAMHSA homelessness resources"
 
-  - id: respite-without-apology
-    title: "Taking Respite Without Apologizing for Existing"
-    category: "Caregiver Wellbeing"
+  - id: respite-during-addiction-care
+    title: "Taking a Few Hours Off Addiction Care Without Apologizing"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "Why short breaks are maintenance, how to ask family or programs for a few hours, and what to do with the guilt."
-    source_url: "https://www.hopeforwellness.ca"
-    source_name: "Hope for Wellness (Indigenous)"
+    angle: "Why short breaks are maintenance when you are the default person for detox rides and crisis nights — how to ask family for coverage, and what to do with the guilt."
+    source_url: "https://ontariocaregiver.ca/get-support/"
+    source_name: "Ontario Caregiver Organization - get support"
 
-  - id: when-friends-offer-vague-help
-    title: "When People Say 'Let Me Know If You Need Anything'"
-    category: "Communication"
+  - id: turn-vague-offers-into-detox-help
+    title: "When People Say 'Let Me Know' During Their Addiction Crisis"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "Turn vague offers into specific asks that actually land."
+    angle: "Turn vague offers into specific asks that help: a detox ride, a few hours of phone coverage, groceries while you are at the shelter desk."
     source_url: "https://988lifeline.org/talk-to-someone-now/"
     source_name: "988 Lifeline - talk to someone"
 
-  - id: documenting-for-appointments
-    title: "What to Bring to the Next Appointment"
-    category: "Practical Tips"
+  - id: documenting-for-addiction-appointments
+    title: "What to Bring to Their Addiction or Dual-Diagnosis Appointment"
+    category: "Addiction"
     risk: review
     used: false
-    angle: "A one-page prep sheet: meds list, recent changes, questions - so the visit is less chaotic."
+    angle: "A one-page prep sheet: substances used, recent overdoses or ER visits, meds list, housing status, questions — so the visit is less chaotic."
     source_url: "https://www.samhsa.gov/find-help/helplines"
     source_name: "SAMHSA helplines"
 
-  - id: compassion-fatigue-vs-burnout
-    title: "Tired of Caring vs Tired From Caring"
-    category: "Caregiver Wellbeing"
+  - id: burnout-from-addiction-family-care
+    title: "Tired of Caring vs Tired From Addiction Crisis Care"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "Distinguish burnout and compassion fatigue in plain language without diagnosing the reader."
+    angle: "Distinguish burnout and compassion fatigue for families living through relapse, overdose scares, and housing instability — plain language, no diagnosis of the reader."
     source_url: "https://www.samhsa.gov/find-help/find-treatment"
     source_name: "SAMHSA find treatment"
 
-  - id: when-youre-both-unwell
-    title: "When You're Unwell Too"
-    category: "Caregiver Wellbeing"
+  - id: when-youre-sick-and-they-need-housing-help
+    title: "When You Are Sick Too and They Still Need Housing Help"
+    category: "Homelessness"
     risk: review
     used: false
-    angle: "How to keep a minimum care plan going when the caregiver also has a hard health week."
+    angle: "How to keep a minimum plan going — 211, a trusted contact, one safety check — when the family supporter also has a hard health week."
     source_url: "https://www.toronto.ca/community-people/housing-shelter/"
     source_name: "Toronto community and housing supports"
 
-  - id: ending-a-care-day-ritual
-    title: "A Two-Minute End-of-Day Ritual"
-    category: "Routines"
+  - id: end-of-crisis-day-ritual
+    title: "A Two-Minute End to a Crisis-Care Day"
+    category: "Care Giver Tips"
     risk: review
     used: false
-    angle: "A tiny shutdown ritual that helps the nervous system mark 'care shift over' even if you're still in the same house."
-    source_url: "https://www.toronto.ca"
-    source_name: "City of Toronto"
+    angle: "A tiny shutdown ritual after shelter calls, hospital waits, or overnight use worry — so your nervous system can mark “shift over” even if they are still in the same house."
+    source_url: "https://ontariocaregiver.ca"
+    source_name: "Ontario Caregiver Organization - home"
 
-  - id: mental-health-support-children
-    title: "Creating a Supportive Home Environment for Children's Mental Health"
-    category: "mental health"
+  - id: kids-home-when-parent-uses
+    title: "Keeping Home Safer for Kids When a Parent Is Using"
+    category: "Mental health"
     risk: review
     used: false
-    angle: "Discuss practical strategies for parents to foster open communication, emotional safety, and resilience in children, particularly during challenging times."
-    source_url: "https://www.samhsa.gov/blog/expanding-mental-health-support-children-families-through-teleconsultation"
-    source_name: "SAMHSA Blog"
+    angle: "Practical steps when a parent’s substance use puts kids at home at risk: routines, who to call, what kids can know, and when Kids Help Phone or emergency services fit — not generic children’s wellness tips."
+    source_url: "https://kidshelpphone.ca"
+    source_name: "Kids Help Phone"
 
-  - id: menopause-substance-use
-    title: "Navigating Midlife: Understanding the Impact of Menopause on Mental Health and Substance Use"
-    category: "mental health"
+  - id: midlife-partner-substance-use
+    title: "When Midlife Stress and a Partner’s Substance Use Collide"
+    category: "Addiction"
     risk: review
     used: false
-    angle: "Explore how hormonal changes during menopause can affect mood and coping mechanisms, and provide tips for women and caregivers on managing these transitions."
+    angle: "For families: how midlife stress can intensify a partner’s substance use, what support looks like without medical advice, and where to ask about treatment navigation."
     source_url: "https://www.samhsa.gov/blog/why-menopause-matters-substance-use-disorder-prevention-treatment-recovery"
     source_name: "SAMHSA Blog"
 
-  - id: youth-mental-health-awareness
-    title: "Empowering Youth: How to Recognize Signs of Mental Health Struggles in Friends"
-    category: "mental health"
+  - id: youth-friend-substance-or-crisis
+    title: "When Your Teen’s Friend Is Using or in Crisis"
+    category: "Mental health"
     risk: review
     used: false
-    angle: "Provide guidance for parents and educators on how to teach children to identify and support peers who may be experiencing mental health challenges."
-    source_url: "https://www.samhsa.gov/blog/one-students-quick-thinking-shows-coordinated-action-through-samhsa-program-youth-mental-health-works"
-    source_name: "SAMHSA Blog"
+    angle: "Guidance for parents on helping a teen support a friend with substance use or acute distress — what to say, when to involve adults, and Kids Help Phone vs emergency services."
+    source_url: "https://kidshelpphone.ca"
+    source_name: "Kids Help Phone"
 
-  - id: holiday-support
-    title: "Building Connections: Combatting Loneliness During the Holidays"
-    category: "mental health"
+  - id: holidays-early-recovery-or-unhoused
+    title: "Holidays With Someone in Early Recovery or Without Housing"
+    category: "Addiction"
     risk: review
     used: false
-    angle: "Offer practical tips for families and caregivers on how to create inclusive holiday traditions that foster connection and support for those feeling isolated."
-    source_url: "https://www.samhsa.gov/blog/feeling-lonely-you-are-not-alone-tips-and-resources-for-the-holiday-season"
-    source_name: "SAMHSA Blog"
+    angle: "Practical ways families can plan a calmer holiday when a loved one is in early recovery or housing unstable — fewer triggers, clearer boundaries, verified crisis options if things spike."
+    source_url: "https://988.ca"
+    source_name: "Canada 9-8-8"
 
-  - id: eating-disorders-support
-    title: "Supporting Loved Ones: Understanding the Intersection of Eating Disorders and Mental Health"
-    category: "mental health"
+  - id: eating-and-substance-use-together
+    title: "When Eating Problems and Substance Use Show Up Together"
+    category: "Addiction"
     risk: review
     used: false
-    angle: "Discuss how caregivers can provide support to individuals dealing with both eating disorders and mental health issues, emphasizing empathy and understanding without focusing on treatment."
+    angle: "How families can stay supportive when both eating difficulties and substance use are present — empathy and practical next-step questions, not treatment protocols."
     source_url: "https://www.samhsa.gov/blog/how-to-support-people-with-both-eating-and-substance-use-disorders"
     source_name: "SAMHSA Blog"
 
-  # --- Caregiver-action guides (SEO Order 3) ---
   - id: first-hour-in-crisis
     title: "The First Hour: What Families Can Do When Someone Is in Crisis"
     category: "Mental health"
