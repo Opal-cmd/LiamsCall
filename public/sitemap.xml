@@ -32,7 +32,7 @@
   <url>
     <!-- title: Stories forcaregivers -->
     <loc>https://liamscall.com/blog</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
@@ -53,28 +53,28 @@
   <url>
     <!-- title: Sitemap -->
     <loc>https://liamscall.com/sitemap</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <!-- title: Privacy Policy -->
     <loc>https://liamscall.com/privacy</loc>
-    <lastmod>2026-07-29</lastmod>
+    <lastmod>2026-08-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <!-- title: Terms of Use -->
     <loc>https://liamscall.com/terms</loc>
-    <lastmod>2026-07-29</lastmod>
+    <lastmod>2026-08-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <!-- title: Housing First in Plain Words for Families -->
     <loc>https://liamscall.com/blog/housing-first-plain-words-families</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
@@ -86,7 +86,7 @@
   <url>
     <!-- title: When Someone You Love Refuses Addiction Treatment -->
     <loc>https://liamscall.com/blog/when-someone-refuses-addiction-treatment</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
@@ -98,7 +98,7 @@
   <url>
     <!-- title: Finding Toronto Shelter Help Without Guessing Phone Numbers -->
     <loc>https://liamscall.com/blog/finding-toronto-shelter-help</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
@@ -110,7 +110,7 @@
   <url>
     <!-- title: Ontario Detox Near Me: How to Find Help That Is Actually Open -->
     <loc>https://liamscall.com/blog/ontario-detox-near-me</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
@@ -120,21 +120,9 @@
     </image:image>
   </url>
   <url>
-    <!-- title: Building a Care Routine That Has Room for You -->
-    <loc>https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you</loc>
-    <lastmod>2026-08-05</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-    <image:image>
-      <image:loc>https://liamscall.com/assets/blog/building-a-care-routine-that-has-room-for-you.jpg</image:loc>
-      <image:title>Building a Care Routine That Has Room for You</image:title>
-      <image:caption>A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</image:caption>
-    </image:image>
-  </url>
-  <url>
     <!-- title: Grief While They're Still Here: Understanding Anticipatory Loss -->
     <loc>https://liamscall.com/blog/grief-while-theyre-still-here</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
@@ -146,7 +134,7 @@
   <url>
     <!-- title: How to Ask for Help Without Feeling Guilty -->
     <loc>https://liamscall.com/blog/how-to-ask-for-help-without-feeling-guilty</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
@@ -158,7 +146,7 @@
   <url>
     <!-- title: The 5-Minute Reset: Micro-breaks That Actually Work -->
     <loc>https://liamscall.com/blog/the-5-minute-reset</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
@@ -170,7 +158,7 @@
   <url>
     <!-- title: You Can't Pour From an Empty Cup -->
     <loc>https://liamscall.com/blog/you-cant-pour-from-an-empty-cup</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
