@@ -72,6 +72,18 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <!-- title: Talking to Kids When a Parent Is Using or in Crisis -->
+    <loc>https://liamscall.com/blog/talking-to-kids-parent-crisis</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/talking-to-kids-parent-crisis.jpg</image:loc>
+      <image:title>Talking to Kids When a Parent Is Using or in Crisis</image:title>
+      <image:caption>How to talk to children honestly and safely when a parent faces addiction or housing crisis. Practical language tips and resources like Kids Help Phone.</image:caption>
+    </image:image>
+  </url>
+  <url>
     <!-- title: Housing First in Plain Words for Families -->
     <loc>https://liamscall.com/blog/housing-first-plain-words-families</loc>
     <lastmod>2026-08-06</lastmod>
