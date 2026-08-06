@@ -5,7 +5,7 @@
   <url>
     <!-- title: Liam's Call -->
     <loc>https://liamscall.com/</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -39,14 +39,14 @@
   <url>
     <!-- title: Crisis & Support Resources -->
     <loc>https://liamscall.com/resources</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <!-- title: About Us -->
     <loc>https://liamscall.com/about</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -60,14 +60,14 @@
   <url>
     <!-- title: Privacy Policy -->
     <loc>https://liamscall.com/privacy</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <!-- title: Terms of Use -->
     <loc>https://liamscall.com/terms</loc>
-    <lastmod>2026-08-05</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -117,6 +117,18 @@
       <image:loc>https://liamscall.com/assets/blog/ontario-detox-near-me.jpg</image:loc>
       <image:title>Ontario Detox Near Me: How to Find Help That Is Actually Open</image:title>
       <image:caption>Searching Ontario detox near me? ConnexOntario matches people to current withdrawal management and addiction treatment — safer than outdated Google clinic lists.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <!-- title: Building a Care Routine That Has Room for You -->
+    <loc>https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/building-a-care-routine-that-has-room-for-you.jpg</image:loc>
+      <image:title>Building a Care Routine That Has Room for You</image:title>
+      <image:caption>A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</image:caption>
     </image:image>
   </url>
   <url>
