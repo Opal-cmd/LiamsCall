@@ -2,13 +2,14 @@
 title: "Grief While They're Still Here: Understanding Anticipatory Loss"
 slug: grief-while-theyre-still-here
 date: 2026-07-07
-category: Mental health
-region: Canada
+category: "Mental health"
+region: "Canada"
 description: "Anticipatory grief has no public ritual. What it feels like for caregivers, why it's normal, and gentle ways to let it have somewhere to go."
 risk: review
 image: "/assets/blog/grief-while-theyre-still-here.jpg"
 ---
-There is a form of grief that has no public ritual, no bereavement leave, no casseroles at the door. It is the grief of watching someone you love slowly become someone different — through dementia, a progressive illness, or the long decline of aging. They are still here, still present in some form. But the person you knew is changing, and you are losing them in pieces, over years.
+
+There is a form of grief that has no public ritual, no bereavement leave, no casseroles at the door. It is the grief of watching someone you love slowly become someone different — through severe addiction, a progressive mental illness that typically shows from substance abuse, or the long decline of homelessness. They are still here, still present in some form. But the person you knew is changing, and you are losing them in pieces, over years.
 
 Psychologists call this anticipatory grief, and it is one of the most common — and least acknowledged — experiences in caregiving. Studies suggest that caregivers of people with dementia often describe their grief as more painful than the grief they feel after the person's actual death, in part because there is no social permission to mourn someone who is still alive.
 
