@@ -1,7 +1,7 @@
 ---
 title: "Talking to Kids When a Parent Is Using or in Crisis"
 slug: talking-to-kids-parent-crisis
-date: 2026-08-05
+date: 2026-08-06
 category: "Mental health"
 region: "Canada"
 description: "How to talk to children honestly and safely when a parent faces addiction or housing crisis. Practical language tips and resources like Kids Help Phone."
@@ -14,19 +14,19 @@ When a parent is struggling with addiction, severe mental health challenges, or 
 
 ## Be Honest but Age-Appropriate
 
-Children are highly perceptive and often notice changes in a parent's behavior, mood, or living situation. Attempting to hide a crisis completely can sometimes increase their anxiety, as they may fill in the blanks with their own worst fears. It is usually best to offer a simple, honest explanation that matches their developmental level. 
+Children are highly perceptive and often notice changes in a parent's behavior, mood, or living situation. Attempting to hide a crisis completely can sometimes increase their anxiety, as they may fill in the blanks with their own worst fears. It is usually best to offer a simple, honest explanation that matches their developmental level.
 
 For a younger child, you might explain addiction as a sickness that makes a person behave in ways that are confusing or hurtful. For an older child or teenager, you can use more direct terms while avoiding unnecessary details that might overwhelm them. The goal is to explain the situation without placing blame on the parent or the child.
 
 ## Reassure Them It Is Not Their Fault
 
-Children often internalize family stress and may secretly believe they caused the parent's substance use or the family's housing instability. It is vital to state clearly and repeatedly that the adult's struggles are not the child's fault, nor is it the child's responsibility to fix them. 
+Children often internalize family stress and may secretly believe they caused the parent's substance use or the family's housing instability. It is vital to state clearly and repeatedly that the adult's struggles are not the child's fault, nor is it the child's responsibility to fix them.
 
 You can remind them that they are allowed to love their parent while also feeling angry, sad, or scared about their behavior. Validating these conflicting emotions helps children feel seen and reduces the isolation that often accompanies family crises.
 
 ## Focus on Safety and Routine
 
-During a housing crisis or a period of active substance use, a child's sense of predictability is shattered. Focus conversations on what is being done to keep them safe. Let them know who will be taking them to school, where they will be sleeping, and who they can turn to if they feel unsafe. 
+During a housing crisis or a period of active substance use, a child's sense of predictability is shattered. Focus conversations on what is being done to keep them safe. Let them know who will be taking them to school, where they will be sleeping, and who they can turn to if they feel unsafe.
 
 If you are navigating housing instability, resources through the [SAMHSA homelessness programs](https://www.samhsa.gov/homelessness-programs-resources) can help you find structural support, which in turn helps you provide a more stable environment for the children in your care.
 
@@ -42,7 +42,10 @@ Sources referenced: [Kids Help Phone](https://kidshelpphone.ca), [Centre for Add
 
 ## Further reading
 
-* [Kids Help Phone](https://kidshelpphone.ca)
-* [Centre for Addiction and Mental Health](https://www.camh.ca/en/health-info)
-* [ConnexOntario](https://connexontario.ca)
-* [SAMHSA Homelessness Programs and Resources](https://www.samhsa.gov/homelessness-programs-resources)
+- [Kids Help Phone](https://kidshelpphone.ca)
+
+- [Centre for Addiction and Mental Health](https://www.camh.ca/en/health-info)
+
+- [ConnexOntario](https://connexontario.ca)
+
+- [SAMHSA Homelessness Programs and Resources](https://www.samhsa.gov/homelessness-programs-resources)
