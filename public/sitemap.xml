@@ -120,6 +120,18 @@
     </image:image>
   </url>
   <url>
+    <!-- title: Building a Care Routine That Has Room for You -->
+    <loc>https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/building-a-care-routine-that-has-room-for-you.jpg</image:loc>
+      <image:title>Building a Care Routine That Has Room for You</image:title>
+      <image:caption>A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</image:caption>
+    </image:image>
+  </url>
+  <url>
     <!-- title: Grief While They're Still Here: Understanding Anticipatory Loss -->
     <loc>https://liamscall.com/blog/grief-while-theyre-still-here</loc>
     <lastmod>2026-08-06</lastmod>
@@ -129,6 +141,18 @@
       <image:loc>https://liamscall.com/assets/blog/grief-while-theyre-still-here.jpg</image:loc>
       <image:title>Grief While They're Still Here: Understanding Anticipatory Loss</image:title>
       <image:caption>Anticipatory grief has no public ritual. What it feels like for caregivers, why it's normal, and gentle ways to let it have somewhere to go.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <!-- title: How to Ask for Help Without Feeling Guilty -->
+    <loc>https://liamscall.com/blog/how-to-ask-for-help-without-feeling-guilty</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://liamscall.com/assets/blog/how-to-ask-for-help-without-feeling-guilty.jpg</image:loc>
+      <image:title>How to Ask for Help Without Feeling Guilty</image:title>
+      <image:caption>Why caregivers avoid asking for help, how to break the guilt loop, and how to make requests specific enough that people can say yes.</image:caption>
     </image:image>
   </url>
 </urlset>
