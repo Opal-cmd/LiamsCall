@@ -120,18 +120,6 @@
     </image:image>
   </url>
   <url>
-    <!-- title: Building a Care Routine That Has Room for You -->
-    <loc>https://liamscall.com/blog/building-a-care-routine-that-has-room-for-you</loc>
-    <lastmod>2026-08-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-    <image:image>
-      <image:loc>https://liamscall.com/assets/blog/building-a-care-routine-that-has-room-for-you.jpg</image:loc>
-      <image:title>Building a Care Routine That Has Room for You</image:title>
-      <image:caption>A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours.</image:caption>
-    </image:image>
-  </url>
-  <url>
     <!-- title: Grief While They're Still Here: Understanding Anticipatory Loss -->
     <loc>https://liamscall.com/blog/grief-while-theyre-still-here</loc>
     <lastmod>2026-08-06</lastmod>
@@ -165,18 +153,6 @@
       <image:loc>https://liamscall.com/assets/blog/the-5-minute-reset.jpg</image:loc>
       <image:title>The 5-Minute Reset: Micro-breaks That Actually Work</image:title>
       <image:caption>When a full break feels impossible, five-minute resets can still help. Breathing, grounding, and other micro-breaks caregivers actually use.</image:caption>
-    </image:image>
-  </url>
-  <url>
-    <!-- title: You Can't Pour From an Empty Cup -->
-    <loc>https://liamscall.com/blog/you-cant-pour-from-an-empty-cup</loc>
-    <lastmod>2026-08-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-    <image:image>
-      <image:loc>https://liamscall.com/assets/blog/you-cant-pour-from-an-empty-cup.jpg</image:loc>
-      <image:title>You Can't Pour From an Empty Cup</image:title>
-      <image:caption>Caregiver burnout builds quietly. Warning signs, why rest is structural (not optional), and where to start asking for support.</image:caption>
     </image:image>
   </url>
 </urlset>
