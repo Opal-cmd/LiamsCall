@@ -2,15 +2,16 @@
 title: "Building a Care Routine That Has Room for You"
 slug: building-a-care-routine-that-has-room-for-you
 date: 2026-07-09
-category: Care Giver Tips
-region: Ontario
+category: "Care Giver Tips"
+region: "Ontario"
 description: "A daily care routine can lower stress for you and the person you support — if it includes buffers and time that is genuinely yours."
 risk: review
 image: "/assets/blog/building-a-care-routine-that-has-room-for-you.jpg"
 ---
+
 Routine often gets described as a burden — a rigid structure that boxes you in. But for caregivers, a well-built daily routine is less a cage and more a container. It absorbs the cognitive load of constant decision-making, creates predictability for the person you care for, and — when designed intentionally — carves out space that belongs to you.
 
-The research on routines in caregiving contexts is consistent: predictable schedules reduce agitation in people with dementia, improve sleep for both parties, and lower caregiver-reported stress levels over time. The structure itself is protective, not just for the person receiving care but for you. Knowing what comes next reduces the mental overhead of perpetual improvisation.
+The research on routines in caregiving contexts is consistent: predictable schedules reduce agitation in people with medically-diagnosed, severe or chronic mental health issues, improve sleep for both parties, and lower caregiver-reported stress levels over time. The structure itself is protective, not just for the person receiving care but for you. Knowing what comes next reduces the mental overhead of perpetual improvisation.
 
 Start with the non-negotiables: medication times, meals, hygiene, and sleep windows. Anchor these first, and let the rest of the day organize around them. Then look at your own needs — not as luxuries to slot in if time allows, but as fixed appointments that are as important as anything else. Even one 30-minute block per day that is genuinely yours (not on call, not available) can function as a reset.
 
