@@ -21,7 +21,7 @@ services:
       - key: PROVIDER_CHAIN
         value: gemini,openai
       - key: GEMINI_MODEL
-        value: gemini-2.0-flash
+        value: gemini-3.6-flash
       - key: MAX_TOKENS
         value: "4096"
       # Set these in the Render dashboard (do not commit secrets):
