@@ -223,6 +223,86 @@ async function deleteOneFile(rel, message) {
   }
 }
 
+function gitRefPath(branch) {
+  return encodeRepoPath(`heads/${branch}`);
+}
+
+async function getHeadRef() {
+  const repo = gitRepo();
+  return githubRequest('GET', `/repos/${repo}/git/ref/${gitRefPath(gitBranch())}`);
+}
+
+async function getGitCommit(sha) {
+  const repo = gitRepo();
+  return githubRequest('GET', `/repos/${repo}/git/commits/${encodeURIComponent(sha)}`);
+}
+
+async function createBlob(rel) {
+  const repo = gitRepo();
+  const abs = path.join(ROOT, rel);
+  const content = fs.readFileSync(abs).toString('base64');
+  return githubRequest('POST', `/repos/${repo}/git/blobs`, {
+    content,
+    encoding: 'base64',
+  });
+}
+
+function isRefRace(err) {
+  return err?.status === 409 || /reference update failed|not a fast forward|sha/i.test(err?.message || '');
+}
+
+async function createAtomicCommit({ upsert, remove, message }) {
+  const repo = gitRepo();
+  const branch = gitBranch();
+  const ref = await getHeadRef();
+  const baseSha = ref?.object?.sha;
+  if (!baseSha) throw new Error(`Could not resolve ${branch} branch head.`);
+
+  const baseCommit = await getGitCommit(baseSha);
+  const baseTree = baseCommit?.tree?.sha;
+  if (!baseTree) throw new Error(`Could not resolve ${branch} base tree.`);
+
+  const tree = [];
+  for (const rel of upsert) {
+    const blob = await createBlob(rel);
+    if (!blob?.sha) throw new Error(`Could not create blob for ${rel}.`);
+    tree.push({ path: rel, mode: '100644', type: 'blob', sha: blob.sha });
+  }
+  for (const rel of remove) {
+    tree.push({ path: rel, mode: '100644', type: 'blob', sha: null });
+  }
+
+  const nextTree = await githubRequest('POST', `/repos/${repo}/git/trees`, {
+    base_tree: baseTree,
+    tree,
+  });
+  if (!nextTree?.sha) throw new Error('Could not create backup tree.');
+  if (nextTree.sha === baseTree) {
+    return { skipped: true, reason: 'No file changes to commit.' };
+  }
+
+  const commit = await githubRequest('POST', `/repos/${repo}/git/commits`, {
+    message,
+    tree: nextTree.sha,
+    parents: [baseSha],
+    committer: {
+      name: 'liamscall-blog-bot',
+      email: 'blog-bot@liamscall.com',
+    },
+  });
+  if (!commit?.sha) throw new Error('Could not create backup commit.');
+
+  await githubRequest('PATCH', `/repos/${repo}/git/refs/${gitRefPath(branch)}`, {
+    sha: commit.sha,
+    force: false,
+  });
+
+  return {
+    commitSha: commit.sha,
+    commitUrl: commit.html_url || `https://github.com/${repo}/commit/${commit.sha}`,
+  };
+}
+
 /**
  * Upsert and/or delete repo-relative paths in GitHub.
  * @param {{ upsert?: string[], remove?: string[], message?: string }} opts
@@ -231,30 +311,68 @@ async function syncFilesToGit(opts = {}) {
   if (!backupConfigured()) return notConfiguredResult();
 
   const upsert = existingPaths(opts.upsert || []);
-  const remove = [...new Set((opts.remove || []).map((p) => String(p).replace(/\\/g, '/')).filter(Boolean))];
+  const requestedRemove = [
+    ...new Set((opts.remove || []).map((p) => String(p).replace(/\\/g, '/')).filter(Boolean)),
+  ].filter((rel) => !upsert.includes(rel));
   const message = opts.message || 'Blog desk backup';
 
-  if (!upsert.length && !remove.length) {
+  if (!upsert.length && !requestedRemove.length) {
     return { ok: false, skipped: true, reason: 'No files to sync.' };
   }
 
-  const results = [];
-  for (const rel of upsert) {
-    results.push(await putOneFile(rel, `${message}: update ${path.posix.basename(rel)}`));
-  }
-  for (const rel of remove) {
-    // Don't delete a path we just upserted in the same sync.
-    if (upsert.includes(rel)) continue;
-    results.push(await deleteOneFile(rel, `${message}: remove ${path.posix.basename(rel)}`));
+  const skipped = [];
+  const remove = [];
+  for (const rel of requestedRemove) {
+    const meta = await getFileMeta(rel);
+    if (!meta || meta.type !== 'file' || !meta.sha) {
+      skipped.push({ path: rel, ok: true, action: 'delete', skipped: true, reason: 'Not on GitHub' });
+    } else {
+      remove.push(rel);
+    }
   }
 
-  const failed = results.filter((r) => !r.ok);
-  const okOnes = results.filter((r) => r.ok && !r.skipped);
+  if (!upsert.length && !remove.length) {
+    return { ok: true, files: skipped, commitUrl: null };
+  }
+
+  const changed = [
+    ...upsert.map((rel) => ({ path: rel, ok: true, action: 'upsert' })),
+    ...remove.map((rel) => ({ path: rel, ok: true, action: 'delete' })),
+  ];
+
+  let committed;
+  try {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        committed = await createAtomicCommit({ upsert, remove, message });
+        break;
+      } catch (err) {
+        if (attempt === 0 && isRefRace(err)) continue;
+        throw err;
+      }
+    }
+  } catch (err) {
+    const error = err.message || String(err);
+    return {
+      ok: false,
+      files: [
+        ...changed.map((r) => ({ ...r, ok: false, error })),
+        ...skipped,
+      ],
+      commitUrl: null,
+      error,
+    };
+  }
+
   return {
-    ok: failed.length === 0 && (okOnes.length > 0 || results.some((r) => r.skipped)),
-    files: results,
-    commitUrl: okOnes.find((r) => r.commitUrl)?.commitUrl || null,
-    error: failed.length ? failed.map((f) => `${f.path}: ${f.error}`).join('; ') : undefined,
+    ok: true,
+    files: [
+      ...changed.map((r) => ({ ...r, commitUrl: committed?.commitUrl || null })),
+      ...skipped,
+    ],
+    commitUrl: committed?.commitUrl || null,
+    skipped: Boolean(committed?.skipped) || undefined,
+    reason: committed?.reason,
   };
 }
 
